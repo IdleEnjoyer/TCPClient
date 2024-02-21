@@ -16,6 +16,7 @@ using System.Net.Sockets;
 using System.Configuration;
 using System.Net;
 using System.Windows.Markup;
+using System.IO;
 
 namespace TCPDevice
 {
@@ -25,24 +26,28 @@ namespace TCPDevice
     public partial class MainWindow : Window
     {
         private TcpClient Client;
-        private byte[] Data;
+        private NetworkStream Stream;
+        private byte[] ByteData;
         private string DataString;
         public MainWindow()
         {
             InitializeComponent();
         }
 
-        private void StartConnection_Click(object sender, RoutedEventArgs e)
+        private async void StartConnection_Click(object sender, RoutedEventArgs e)
         {
             try
             {
                 IPAddress Address = IPAddress.Parse(IPInput.Text);
                 int Port = int.Parse(PortInput.Text);
-                
+
                 Client = new TcpClient(Address.ToString(), Port);
+                Stream = Client.GetStream();
 
                 ConnectionStatus.Content = "Connected!";
                 ConnectionStatus.Foreground = Brushes.Green;
+
+                await StartReadingDataAsync();
             }
             catch (Exception ex)
             {
@@ -56,7 +61,7 @@ namespace TCPDevice
             try
             {
                 Client.Close();
-                ConnectionStatus.Content = "Disconnected...";
+                ConnectionStatus.Content = "Disconnected";
                 ConnectionStatus.Foreground = Brushes.Red;
             }
             catch (Exception ex)
@@ -76,15 +81,22 @@ namespace TCPDevice
                 }
                 else
                 {
-                    DataString += DataField.Text.Split(EndSymbol.Text)[0];
-                    Data = System.Text.Encoding.ASCII.GetBytes(DataString);
-                    NetworkStream Stream = Client.GetStream();
-                    Stream.Write(Data, 0, Data.Length);
-                    DataString = string.Empty;
-                    MessageBox.Show("Data sent");
+                    if (Client.Connected)
+                    {
+                        DataString += DataField.Text.Split(EndSymbol.Text)[0];
+                        ByteData = System.Text.Encoding.ASCII.GetBytes(DataString);
+                        Stream.Write(ByteData, 0, ByteData.Length);
+                        DataString = string.Empty;
+                        MessageBox.Show("Data sent");
+                    }
+                    else
+                    {
+                        MessageBox.Show("Couldn't send data. Retry connection and try again.");
+                    }
+
                 }
                 DataField.Text = string.Empty;
-                
+
             }
             catch (Exception ex)
             {
@@ -95,6 +107,33 @@ namespace TCPDevice
         private void ShowData_Click(object sender, RoutedEventArgs e)
         {
             MessageBox.Show(DataString, "Current data");
+        }
+
+        private async Task StartReadingDataAsync()
+        {
+            byte[] Buffer = new byte[1024];
+            while (Client.Connected)
+            {
+                try
+                {
+                    int BytesRead = await Stream.ReadAsync(Buffer, 0, Buffer.Length);
+                    if (BytesRead == 0)
+                    {
+                        Client.Close();
+                        ConnectionStatus.Content = "Disconnected";
+                        ConnectionStatus.Foreground = Brushes.Red;
+                        MessageBox.Show("Server closed!", "Attention", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                        break;
+                    }
+                    string Data = Encoding.ASCII.GetString(Buffer, 0, BytesRead);
+                    ServerData.Text += "Server at " + System.DateTime.Now.ToString() + ": " + Data + "\n";
+                }
+                catch (IOException ex)
+                {
+                    MessageBox.Show(ex.Message, "huh");
+                    break;
+                }
+            }
         }
     }
 }

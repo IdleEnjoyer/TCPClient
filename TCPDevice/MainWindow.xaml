@@ -7,32 +7,62 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid Margin="0,0,0,-16">
-        <Label x:Name="DeviceHeader" Content="TCP Client" HorizontalAlignment="Center" Margin="0,10,0,0" VerticalAlignment="Top" Width="176" FontSize="36"/>
-        <Border HorizontalAlignment="Left" Height="318" Margin="20,80,0,0" VerticalAlignment="Top" Width="740">
-            <Grid>
-                <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="286" VerticalAlignment="Top" Width="343"/>
-
-                <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="318" Margin="359,0,0,0" VerticalAlignment="Center" Width="380">
-                    <Button x:Name="ShowData" Content="Show" HorizontalAlignment="Left" Height="43" Margin="69,264,0,0" VerticalAlignment="Top" Width="135" FontSize="24" Click="ShowData_Click"/>
-                </Border>
-
-                <Label Content="Connection:" HorizontalAlignment="Left" Height="42" Margin="0,13,0,0" VerticalAlignment="Top" Width="142" FontSize="24"/>
-                <Label x:Name="ConnectionStatus" Content="Not connected" HorizontalAlignment="Left" Margin="147,13,0,0" VerticalAlignment="Top" FontSize="24" Foreground="Red" Width="176"/>
-                <Label Content="IP:" HorizontalAlignment="Left" Margin="0,63,0,0" VerticalAlignment="Top" FontSize="24" Width="142"/>
-                <TextBox x:Name="IPInput" HorizontalAlignment="Left" Height="42" Margin="147,63,0,0" TextWrapping="Wrap" Text="192.168.0.1" VerticalAlignment="Top" Width="176" FontSize="24" TextAlignment="Justify"/>
-                <TextBox x:Name="PortInput" HorizontalAlignment="Left" Margin="147,111,0,0" TextWrapping="Wrap" Text="8000" VerticalAlignment="Top" Width="176" Height="42" FontSize="24" TextAlignment="Justify"/>
-                <Label Content="Port:" HorizontalAlignment="Left" Margin="0,111,0,0" VerticalAlignment="Top" FontSize="24" Width="142"/>
-                <Label Content="Data:" HorizontalAlignment="Left" Margin="359,13,0,0" VerticalAlignment="Top" FontSize="24"/>
-                <Button x:Name="StartConnection" Content="Start" HorizontalAlignment="Left" Height="50" Margin="42,209,0,0" VerticalAlignment="Top" Width="100" FontSize="24" Click="StartConnection_Click"/>
-                <TextBox x:Name="DataField" HorizontalAlignment="Left" Height="246" Margin="429,13,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="299" FontSize="24"/>
-                <TextBox x:Name="EndSymbol" HorizontalAlignment="Left" Margin="147,162,0,0" TextWrapping="Wrap" Text="!" VerticalAlignment="Top" Width="176" Height="42" FontSize="24" TextAlignment="Justify"/>
-                <Label Content="End symbol:" HorizontalAlignment="Left" Margin="0,162,0,0" VerticalAlignment="Top" FontSize="24" Width="142"/>
-                <Button x:Name="StartConnection_Копировать" Content="Start" HorizontalAlignment="Left" Height="50" Margin="42,209,0,0" VerticalAlignment="Top" Width="100" FontSize="24" Click="StartConnection_Click"/>
-                <Button x:Name="StopConnection" Content="Stop" HorizontalAlignment="Left" Height="50" Margin="147,209,0,0" VerticalAlignment="Top" Width="100" FontSize="24" Click="StopConnection_Click"/>
-                <Button x:Name="SendData" Content="Add" HorizontalAlignment="Left" Height="43" Margin="590,265,0,0" VerticalAlignment="Top" Width="138" FontSize="24" Click="SendData_Click"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="9*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="5*"/>
+            <ColumnDefinition Width="6*"/>
+        </Grid.ColumnDefinitions>
+        <Viewbox x:Name="ConnectionView" Grid.Row="1" Margin="0,0,0,25">
+            <Grid x:Name="ConnectionGrid" HorizontalAlignment="Center" Height="343">
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="4*"/>
+                </Grid.ColumnDefinitions>
+                <Button x:Name="StartConnection" Content="Start" HorizontalAlignment="Right" VerticalAlignment="Center" FontSize="24" Click="StartConnection_Click" Grid.Row="4" Margin="0,0,10,0"/>
+                <Label x:Name="ConnectionStatus" Content="Not connected" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24" Foreground="Red" Grid.Column="1"/>
+                <Label x:Name="IPLabel" Content="IP:" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="24" Grid.Row="1"/>
+                <TextBox x:Name="IPInput" TextWrapping="Wrap" Text="192.168.0.1" VerticalAlignment="Center" FontSize="24" TextAlignment="Justify" Grid.Row="1" Grid.Column="1"/>
+                <TextBox x:Name="PortInput" TextWrapping="Wrap" Text="8000" VerticalAlignment="Center" FontSize="24" TextAlignment="Justify" Grid.Column="1" Grid.Row="2"/>
+                <Label x:Name="PortLabel" Content="Port:" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="24" Grid.Row="2"/>
+                <TextBox x:Name="EndSymbol" TextWrapping="Wrap" Text="!" VerticalAlignment="Center" FontSize="24" TextAlignment="Justify" Grid.Row="3" Grid.Column="1" VerticalContentAlignment="Center"/>
+                <Label x:Name="EndSymbolLabel" Content="End symbol:" HorizontalAlignment="Left" Margin="-2,0,0,0" VerticalAlignment="Center" FontSize="24" Grid.Row="3"/>
+                <Button x:Name="StopConnection" Content="Stop" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="24" Click="StopConnection_Click" Grid.Column="1" Grid.Row="4" Margin="10,0,0,0"/>
+                <Label x:Name="ConnectionLabel" Content="Connection:" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="24"/>
+            </Grid>
+        </Viewbox>
+        <Viewbox x:Name="TitleView" Margin="0,-3,0,0">
+            <Label x:Name="DeviceHeader" Content="TCP Client" FontSize="36" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Height="82" Width="364"/>
+        </Viewbox>
+        <Viewbox Grid.Column="1" Grid.Row="1" Margin="0,0,10,25">
+            <Grid Height="343" Width="426">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="141*"/>
+                    <RowDefinition Height="45*"/>
+                    <RowDefinition Height="125*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="11*"/>
+                </Grid.ColumnDefinitions>
+                <Button x:Name="ShowData" Content="Show" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="24" Click="ShowData_Click" Grid.Column="1" Margin="71,0,0,0" Height="36" Width="62" Grid.Row="1"/>
+                <Label x:Name="DataLabel" Content="Data:" VerticalAlignment="Top" FontSize="24" Height="42"/>
+                <TextBox x:Name="DataField" TextWrapping="Wrap" FontSize="24" Grid.Column="1"/>
+                <Button x:Name="SendData" Content="Add" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Center" FontSize="24" Click="SendData_Click" Grid.Column="1" Height="36" Width="48" Grid.Row="1"/>
+                <Label x:Name="ServerLabel" Content="Server:" VerticalAlignment="Top" FontSize="24" Grid.Row="2" Height="42" Margin="-1,10,1,0"/>
+                <TextBox x:Name="ServerData" TextWrapping="Wrap" IsReadOnly="True" VerticalScrollBarVisibility="Auto" Grid.Column="1" Grid.Row="2"/>
 
             </Grid>
-        </Border>
+        </Viewbox>
 
     </Grid>
 </Window>
