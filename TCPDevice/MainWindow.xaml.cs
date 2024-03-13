@@ -70,45 +70,6 @@ namespace TCPDevice
             }
         }
 
-        private void SendData_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                if (!DataField.Text.Contains(EndSymbol.Text))
-                {
-                    DataString += DataField.Text;
-                    MessageBox.Show("Text added");
-                }
-                else
-                {
-                    if (Client.Connected)
-                    {
-                        DataString += DataField.Text.Split(EndSymbol.Text)[0];
-                        ByteData = System.Text.Encoding.ASCII.GetBytes(DataString);
-                        Stream.Write(ByteData, 0, ByteData.Length);
-                        DataString = string.Empty;
-                        MessageBox.Show("Data sent");
-                    }
-                    else
-                    {
-                        MessageBox.Show("Couldn't send data. Retry connection and try again.");
-                    }
-
-                }
-                DataField.Text = string.Empty;
-
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-        private void ShowData_Click(object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show(DataString, "Current data");
-        }
-
         private async Task StartReadingDataAsync()
         {
             byte[] Buffer = new byte[1024];
@@ -126,7 +87,6 @@ namespace TCPDevice
                         break;
                     }
                     string Data = Encoding.ASCII.GetString(Buffer, 0, BytesRead);
-                    ServerData.Text += "Server at " + System.DateTime.Now.ToString() + ": " + Data + "\n";
                 }
                 catch (IOException ex)
                 {
@@ -134,6 +94,16 @@ namespace TCPDevice
                     break;
                 }
             }
+        }
+
+        private void RadioButton_Checked(object sender, RoutedEventArgs e)
+        {
+            if()
+        }
+
+        private void StateBtn_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }
