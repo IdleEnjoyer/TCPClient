@@ -44,7 +44,7 @@ namespace TCPDevice
                 Client = new TcpClient(Address.ToString(), Port);
                 Stream = Client.GetStream();
 
-                ConnectionStatus.Content = "Connected!";
+                ConnectionStatus.Content = "Подключено!";
                 ConnectionStatus.Foreground = Brushes.Green;
 
                 await StartReadingDataAsync();
@@ -61,7 +61,7 @@ namespace TCPDevice
             try
             {
                 Client.Close();
-                ConnectionStatus.Content = "Disconnected";
+                ConnectionStatus.Content = "Отключен";
                 ConnectionStatus.Foreground = Brushes.Red;
             }
             catch (Exception ex)
@@ -81,29 +81,190 @@ namespace TCPDevice
                     if (BytesRead == 0)
                     {
                         Client.Close();
-                        ConnectionStatus.Content = "Disconnected";
+                        ConnectionStatus.Content = "Отключен";
                         ConnectionStatus.Foreground = Brushes.Red;
-                        MessageBox.Show("Server closed!", "Attention", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                        MessageBox.Show("Сервер закрыт!", "Внимание", MessageBoxButton.OK, MessageBoxImage.Exclamation);
                         break;
                     }
                     string Data = Encoding.ASCII.GetString(Buffer, 0, BytesRead);
+                    ServerData.Text += "Сервер " + System.DateTime.Now.ToString() + ": " + Data + "\n";
                 }
                 catch (IOException ex)
                 {
-                    MessageBox.Show(ex.Message, "huh");
+                    MessageBox.Show(ex.Message);
                     break;
                 }
             }
         }
 
-        private void RadioButton_Checked(object sender, RoutedEventArgs e)
-        {
-            if()
-        }
-
         private void StateBtn_Click(object sender, RoutedEventArgs e)
         {
+            try
+            {
+                string StateData = "EN0?\n\r";
+                ByteData = System.Text.Encoding.ASCII.GetBytes(StateData);
+                Stream.Write(ByteData, 0, ByteData.Length);
+                ServerData.Text += "Клиент " + System.DateTime.Now.ToString() + ": " + StateData.Substring(0, StateData.Length - 1);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
 
+        private void EnabledCheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                string StateData = "";
+                StateData = EnabledCheckBox.IsChecked == true ? StateData += "EN0 1\n\r" : StateData += "EN0 0\n\r";
+                ByteData = System.Text.Encoding.ASCII.GetBytes(StateData);
+                Stream.Write(ByteData, 0, ByteData.Length);
+                ServerData.Text += "Клиент " + System.DateTime.Now.ToString() + ": " + StateData.Substring(0, StateData.Length - 1);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void AbortBtn_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                string StateData = "ABORT0\n\r";
+                ByteData = System.Text.Encoding.ASCII.GetBytes(StateData);
+                Stream.Write(ByteData, 0, ByteData.Length);
+                ServerData.Text += "Клиент " + System.DateTime.Now.ToString() + ": " + StateData.Substring(0, StateData.Length - 1);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void ClearBtn_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                string StateData = "CLR0\n\r";
+                ByteData = System.Text.Encoding.ASCII.GetBytes(StateData);
+                Stream.Write(ByteData, 0, ByteData.Length);
+                ServerData.Text += "Клиент " + System.DateTime.Now.ToString() + ": " + StateData.Substring(0, StateData.Length - 1);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                string StateData = "MH0\n\r";
+                ByteData = System.Text.Encoding.ASCII.GetBytes(StateData);
+                Stream.Write(ByteData, 0, ByteData.Length);
+                ServerData.Text += "Клиент " + System.DateTime.Now.ToString() + ": " + StateData.Substring(0, StateData.Length - 1);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void PositionBtn_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                string StateData = "POS0?\n\r";
+                ByteData = System.Text.Encoding.ASCII.GetBytes(StateData);
+                Stream.Write(ByteData, 0, ByteData.Length);
+                ServerData.Text += "Клиент " + System.DateTime.Now.ToString() + ": " + StateData.Substring(0, StateData.Length - 1);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void ErrorsBtn_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                string StateData = "ERR0?\n\r";
+                ByteData = System.Text.Encoding.ASCII.GetBytes(StateData);
+                Stream.Write(ByteData, 0, ByteData.Length);
+                ServerData.Text += "Клиент " + System.DateTime.Now.ToString() + ": " + StateData.Substring(0, StateData.Length - 1);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void HomeBtn_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                string StateData = "MH0?\n\r";
+                ByteData = System.Text.Encoding.ASCII.GetBytes(StateData);
+                Stream.Write(ByteData, 0, ByteData.Length);
+                ServerData.Text += "Клиент " + System.DateTime.Now.ToString() + ": " + StateData.Substring(0, StateData.Length - 1);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void StoppedBtn_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                string StateData = "STOP0?\n\r";
+                ByteData = System.Text.Encoding.ASCII.GetBytes(StateData);
+                Stream.Write(ByteData, 0, ByteData.Length);
+                ServerData.Text += "Клиент " + System.DateTime.Now.ToString() + ": " + StateData.Substring(0, StateData.Length - 1);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void SpeedBtn_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                string StateData = "SPD0";
+                double Speed = double.Parse(SpeedInput.Text.Replace(".",","));
+                StateData += " " + Speed.ToString().Replace(",", ".") + "\n\r";
+                ByteData = System.Text.Encoding.ASCII.GetBytes(StateData);
+                Stream.Write(ByteData, 0, ByteData.Length);
+                ServerData.Text += "Клиент " + System.DateTime.Now.ToString() + ": " + StateData.Substring(0, StateData.Length - 1);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void MoveBtn_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                string StateData = "MOVE0";
+                double Movement = double.Parse(MoveInput.Text.Replace(".", ","));
+                StateData += " " + Movement.ToString().Replace(",", ".") + "\n\r";
+                ByteData = System.Text.Encoding.ASCII.GetBytes(StateData);
+                Stream.Write(ByteData, 0, ByteData.Length);
+                ServerData.Text += "Клиент " + System.DateTime.Now.ToString() + ": " + StateData.Substring(0, StateData.Length - 1);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
     }
 }
