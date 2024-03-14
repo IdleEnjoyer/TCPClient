@@ -18,23 +18,26 @@
         <Viewbox x:Name="ConnectionView" Grid.Row="1" Margin="0,0,0,25">
             <Grid x:Name="ConnectionGrid" HorizontalAlignment="Center" Height="343">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="127*"/>
-                    <RowDefinition Height="80*"/>
-                    <RowDefinition Height="69*"/>
+                    <RowDefinition Height="61*"/>
                     <RowDefinition Height="67*"/>
+                    <RowDefinition Height="65*"/>
+                    <RowDefinition Height="66*"/>
+                    <RowDefinition Height="84*"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="3*"/>
                     <ColumnDefinition Width="4*"/>
                 </Grid.ColumnDefinitions>
-                <Button x:Name="StartConnection" Content="Подключиться" HorizontalAlignment="Center" VerticalAlignment="Center" Click="StartConnection_Click" Grid.Row="3" Height="36" Width="89"/>
+                <Button x:Name="StartConnection" Content="Подключиться" HorizontalAlignment="Center" VerticalAlignment="Center" Click="StartConnection_Click" Grid.Row="4" Height="36" Width="89" Margin="0,8,0,0"/>
                 <Label x:Name="ConnectionStatus" Content="Отключен" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24" Foreground="Red" Grid.Column="1" Height="42" Width="167"/>
                 <Label x:Name="IPLabel" Content="IP:" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="24" Grid.Row="1" Height="40" Width="35"/>
                 <TextBox x:Name="IPInput" TextWrapping="Wrap" Text="192.168.0.1" VerticalAlignment="Center" FontSize="24" TextAlignment="Justify" Grid.Row="1" Grid.Column="1" Height="32"/>
                 <TextBox x:Name="PortInput" TextWrapping="Wrap" Text="8000" VerticalAlignment="Center" FontSize="24" TextAlignment="Justify" Grid.Column="1" Grid.Row="2" Height="34"/>
                 <Label x:Name="PortLabel" Content="Port:" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="24" Grid.Row="2" Height="42" Width="58"/>
-                <Button x:Name="StopConnection" Content="Отключиться" HorizontalAlignment="Center" VerticalAlignment="Center" Click="StopConnection_Click" Grid.Column="1" Grid.Row="3" Height="36" Width="81"/>
+                <Button x:Name="StopConnection" Content="Отключиться" HorizontalAlignment="Center" VerticalAlignment="Center" Click="StopConnection_Click" Grid.Column="1" Grid.Row="4" Height="36" Width="81" Margin="0,8,0,0"/>
                 <Label x:Name="ConnectionLabel" Content="Соединение:" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="22" Height="42" Width="137"/>
+                <Label Content="Символ конца" HorizontalAlignment="Left" Grid.Row="3" VerticalAlignment="Center" FontSize="24" Margin="3,0,0,0" Height="40" Width="168"/>
+                <TextBox x:Name="EndInput" Grid.Column="1" Grid.Row="3" TextWrapping="Wrap" Text="\r\n" VerticalAlignment="Center" FontSize="24" Height="32" Margin="2,0,2,0"/>
             </Grid>
         </Viewbox>
         <Viewbox x:Name="TitleView" Margin="0,-3,0,0">
@@ -79,6 +82,7 @@
                     <TextBox x:Name="SpeedInput" TextWrapping="Wrap" Text="6,0" FontSize="18" Grid.Column="1" Margin="0,2,0,2"/>
                     <Button x:Name="MoveBtn" Content="Сдвинуть" HorizontalAlignment="Center" Grid.Row="1" VerticalAlignment="Center" Height="28" Width="73" Click="MoveBtn_Click"/>
                     <Button x:Name="SpeedBtn" Content="Скорость" Height="28" Width="73" HorizontalAlignment="Center" VerticalAlignment="Center" Click="SpeedBtn_Click"/>
+                    <Button Grid.Column="2" Content="Отправить" HorizontalAlignment="Center" Height="29" Grid.RowSpan="2" VerticalAlignment="Center" Width="68" Click="Button_Click_1"/>
                 </Grid>
                 <Label Content="Команды параметров" Grid.Row="4" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
                 <TextBox x:Name="ServerData" Grid.Row="7" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" IsReadOnly="True"/>

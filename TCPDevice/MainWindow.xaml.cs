@@ -17,6 +17,7 @@ using System.Configuration;
 using System.Net;
 using System.Windows.Markup;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace TCPDevice
 {
@@ -101,10 +102,8 @@ namespace TCPDevice
         {
             try
             {
-                string StateData = "EN0?\n\r";
-                ByteData = System.Text.Encoding.ASCII.GetBytes(StateData);
-                Stream.Write(ByteData, 0, ByteData.Length);
-                ServerData.Text += "Клиент " + System.DateTime.Now.ToString() + ": " + StateData.Substring(0, StateData.Length - 1);
+                string StateData = "EN0?";
+                SendData(StateData, EndInput.Text);
             }
             catch (Exception ex)
             {
@@ -117,10 +116,8 @@ namespace TCPDevice
             try
             {
                 string StateData = "";
-                StateData = EnabledCheckBox.IsChecked == true ? StateData += "EN0 1\n\r" : StateData += "EN0 0\n\r";
-                ByteData = System.Text.Encoding.ASCII.GetBytes(StateData);
-                Stream.Write(ByteData, 0, ByteData.Length);
-                ServerData.Text += "Клиент " + System.DateTime.Now.ToString() + ": " + StateData.Substring(0, StateData.Length - 1);
+                StateData = EnabledCheckBox.IsChecked == true ? StateData += "EN0 1" : StateData += "EN0 0";
+                SendData(StateData, EndInput.Text);
             }
             catch (Exception ex)
             {
@@ -132,10 +129,8 @@ namespace TCPDevice
         {
             try
             {
-                string StateData = "ABORT0\n\r";
-                ByteData = System.Text.Encoding.ASCII.GetBytes(StateData);
-                Stream.Write(ByteData, 0, ByteData.Length);
-                ServerData.Text += "Клиент " + System.DateTime.Now.ToString() + ": " + StateData.Substring(0, StateData.Length - 1);
+                string StateData = "ABORT0";
+                SendData(StateData, EndInput.Text);
             }
             catch (Exception ex)
             {
@@ -147,10 +142,8 @@ namespace TCPDevice
         {
             try
             {
-                string StateData = "CLR0\n\r";
-                ByteData = System.Text.Encoding.ASCII.GetBytes(StateData);
-                Stream.Write(ByteData, 0, ByteData.Length);
-                ServerData.Text += "Клиент " + System.DateTime.Now.ToString() + ": " + StateData.Substring(0, StateData.Length - 1);
+                string StateData = "CLR0";
+                SendData(StateData, EndInput.Text);
             }
             catch (Exception ex)
             {
@@ -162,10 +155,8 @@ namespace TCPDevice
         {
             try
             {
-                string StateData = "MH0\n\r";
-                ByteData = System.Text.Encoding.ASCII.GetBytes(StateData);
-                Stream.Write(ByteData, 0, ByteData.Length);
-                ServerData.Text += "Клиент " + System.DateTime.Now.ToString() + ": " + StateData.Substring(0, StateData.Length - 1);
+                string StateData = "MH0";
+                SendData(StateData, EndInput.Text);
             }
             catch (Exception ex)
             {
@@ -177,10 +168,8 @@ namespace TCPDevice
         {
             try
             {
-                string StateData = "POS0?\n\r";
-                ByteData = System.Text.Encoding.ASCII.GetBytes(StateData);
-                Stream.Write(ByteData, 0, ByteData.Length);
-                ServerData.Text += "Клиент " + System.DateTime.Now.ToString() + ": " + StateData.Substring(0, StateData.Length - 1);
+                string StateData = "POS0?";
+                SendData(StateData, EndInput.Text);
             }
             catch (Exception ex)
             {
@@ -192,10 +181,8 @@ namespace TCPDevice
         {
             try
             {
-                string StateData = "ERR0?\n\r";
-                ByteData = System.Text.Encoding.ASCII.GetBytes(StateData);
-                Stream.Write(ByteData, 0, ByteData.Length);
-                ServerData.Text += "Клиент " + System.DateTime.Now.ToString() + ": " + StateData.Substring(0, StateData.Length - 1);
+                string StateData = "ERR0?";
+                SendData(StateData, EndInput.Text);
             }
             catch (Exception ex)
             {
@@ -207,10 +194,8 @@ namespace TCPDevice
         {
             try
             {
-                string StateData = "MH0?\n\r";
-                ByteData = System.Text.Encoding.ASCII.GetBytes(StateData);
-                Stream.Write(ByteData, 0, ByteData.Length);
-                ServerData.Text += "Клиент " + System.DateTime.Now.ToString() + ": " + StateData.Substring(0, StateData.Length - 1);
+                string StateData = "MH0?";
+                SendData(StateData, EndInput.Text);
             }
             catch (Exception ex)
             {
@@ -222,10 +207,8 @@ namespace TCPDevice
         {
             try
             {
-                string StateData = "STOP0?\n\r";
-                ByteData = System.Text.Encoding.ASCII.GetBytes(StateData);
-                Stream.Write(ByteData, 0, ByteData.Length);
-                ServerData.Text += "Клиент " + System.DateTime.Now.ToString() + ": " + StateData.Substring(0, StateData.Length - 1);
+                string StateData = "STOP0?";
+                SendData(StateData, EndInput.Text);
             }
             catch (Exception ex)
             {
@@ -239,10 +222,8 @@ namespace TCPDevice
             {
                 string StateData = "SPD0";
                 double Speed = double.Parse(SpeedInput.Text.Replace(".",","));
-                StateData += " " + Speed.ToString().Replace(",", ".") + "\n\r";
-                ByteData = System.Text.Encoding.ASCII.GetBytes(StateData);
-                Stream.Write(ByteData, 0, ByteData.Length);
-                ServerData.Text += "Клиент " + System.DateTime.Now.ToString() + ": " + StateData.Substring(0, StateData.Length - 1);
+                StateData += " " + Speed.ToString().Replace(",", ".");
+                SendData(StateData, EndInput.Text);
             }
             catch (Exception ex)
             {
@@ -256,10 +237,35 @@ namespace TCPDevice
             {
                 string StateData = "MOVE0";
                 double Movement = double.Parse(MoveInput.Text.Replace(".", ","));
-                StateData += " " + Movement.ToString().Replace(",", ".") + "\n\r";
-                ByteData = System.Text.Encoding.ASCII.GetBytes(StateData);
-                Stream.Write(ByteData, 0, ByteData.Length);
-                ServerData.Text += "Клиент " + System.DateTime.Now.ToString() + ": " + StateData.Substring(0, StateData.Length - 1);
+                StateData += " " + Movement.ToString().Replace(",", ".");
+                SendData(StateData, EndInput.Text);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        
+        void SendData(string Data, string EndSymbol)
+        {
+            EndSymbol = Regex.Unescape(EndSymbol);
+            ByteData = System.Text.Encoding.ASCII.GetBytes(Data+EndSymbol);
+            Stream.Write(ByteData, 0, ByteData.Length);
+            ServerData.Text += "Клиент " + System.DateTime.Now.ToString() + ": " + Data + "\n";
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                string StateData = "SPD0";
+                double Speed = double.Parse(SpeedInput.Text.Replace(".", ","));
+                StateData += " " + Speed.ToString().Replace(",", ".");
+                SendData(StateData, EndInput.Text);
+                StateData = "MOVE0";
+                double Movement = double.Parse(MoveInput.Text.Replace(".", ","));
+                StateData += " " + Movement.ToString().Replace(",", ".");
+                SendData(StateData, EndInput.Text);
             }
             catch (Exception ex)
             {
