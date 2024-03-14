@@ -43,8 +43,8 @@
         <Viewbox x:Name="TitleView" Margin="0,-3,0,0">
             <Label x:Name="DeviceHeader" Content="TCP Клиент" FontSize="36" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Height="82" Width="364"/>
         </Viewbox>
-        <Viewbox Grid.Column="1" Stretch="Fill" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <CheckBox x:Name="EnabledCheckBox" Content="Поляризация" FontSize="24" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" UseLayoutRounding="False" Height="42" HorizontalAlignment="Center" VerticalAlignment="Center" Width="219" Checked="EnabledCheckBox_Checked" Unchecked="EnabledCheckBox_Checked"/>
+        <Viewbox Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <CheckBox x:Name="EnabledCheckBox" Content="Поляризация" FontSize="24" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" UseLayoutRounding="False" Height="42" HorizontalAlignment="Center" VerticalAlignment="Center" Width="180" Checked="EnabledCheckBox_Checked" Unchecked="EnabledCheckBox_Checked"/>
         </Viewbox>
         <Viewbox Grid.Column="1" Grid.Row="1" Margin="0,0,0,25" Stretch="Fill" StretchDirection="DownOnly">
             <Grid HorizontalAlignment="Center" Height="343">

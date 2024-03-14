@@ -29,7 +29,6 @@ namespace TCPDevice
         private TcpClient Client;
         private NetworkStream Stream;
         private byte[] ByteData;
-        private string DataString;
         public MainWindow()
         {
             InitializeComponent();
