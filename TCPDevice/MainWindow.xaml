@@ -37,10 +37,10 @@
                 <Label x:Name="PortLabel" Content="Port:" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="24" Grid.Row="2" Height="42" Width="58"/>
                 <Button x:Name="StopConnection" Content="Отключиться" HorizontalAlignment="Center" VerticalAlignment="Center" Click="StopConnection_Click" Grid.Column="1" Grid.Row="5" Height="36" Width="81"/>
                 <Label x:Name="ConnectionLabel" Content="Соединение:" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="22" Height="42" Width="137"/>
-                <Label Content="Символ конца" HorizontalAlignment="Left" Grid.Row="3" VerticalAlignment="Center" FontSize="24" Margin="3,0,0,0" Height="40" Width="168"/>
-                <TextBox x:Name="EndInput" Grid.Column="1" Grid.Row="3" TextWrapping="Wrap" Text="\r\n" VerticalAlignment="Center" FontSize="24" Height="32"/>
-                <Label Content="Символ начала" HorizontalAlignment="Center" Grid.Row="4" VerticalAlignment="Center" FontSize="24"/>
-                <TextBox x:Name="StartInput" Grid.Column="1" Grid.Row="4" TextWrapping="Wrap" FontSize="24" VerticalAlignment="Center"/>
+                <Label Content="Символ конца" HorizontalAlignment="Left" Grid.Row="4" VerticalAlignment="Center" FontSize="24" Height="40" Width="168"/>
+                <TextBox x:Name="EndInput" Grid.Row="4" TextWrapping="Wrap" Text="\r\n" VerticalAlignment="Center" FontSize="24" Height="32" Grid.Column="1"/>
+                <Label Content="Символ начала" HorizontalAlignment="Left" Grid.Row="3" VerticalAlignment="Center" FontSize="24"/>
+                <TextBox x:Name="StartInput" Grid.Column="1" Grid.Row="3" TextWrapping="Wrap" FontSize="24" VerticalAlignment="Center"/>
             </Grid>
         </Viewbox>
         <Viewbox x:Name="TitleView" Margin="0,-3,0,0">
@@ -83,7 +83,7 @@
                     </Grid.ColumnDefinitions>
                     <TextBox x:Name="MoveInput" TextWrapping="Wrap" Text="0,0" FontSize="18" Grid.Column="1" Grid.Row="1" Margin="0,2,0,2"/>
                     <TextBox x:Name="SpeedInput" TextWrapping="Wrap" Text="6,0" FontSize="18" Grid.Column="1" Margin="0,2,0,2"/>
-                    <Button x:Name="MoveBtn" Content="Сдвинуть" HorizontalAlignment="Center" Grid.Row="1" VerticalAlignment="Center" Height="28" Width="73" Click="MoveBtn_Click"/>
+                    <Button x:Name="MoveBtn" Content="Движение" HorizontalAlignment="Center" Grid.Row="1" VerticalAlignment="Center" Height="28" Width="73" Click="MoveBtn_Click"/>
                     <Button x:Name="SpeedBtn" Content="Скорость" Height="28" Width="73" HorizontalAlignment="Center" VerticalAlignment="Center" Click="SpeedBtn_Click"/>
                     <Button Grid.Column="2" Content="Отправить" HorizontalAlignment="Center" Height="29" Grid.RowSpan="2" VerticalAlignment="Center" Width="68" Click="Button_Click_1"/>
                 </Grid>
