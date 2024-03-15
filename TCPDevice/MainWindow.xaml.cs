@@ -250,9 +250,10 @@ namespace TCPDevice
             string EndSymbol = EndInput.Text;
             string StartSymbol = StartInput.Text;
             EndSymbol = Regex.Unescape(EndSymbol);
-            ByteData = System.Text.Encoding.ASCII.GetBytes(StartSymbol + Data + EndSymbol);
+            string DataString = StartSymbol + Data + EndSymbol;
+            ByteData = System.Text.Encoding.ASCII.GetBytes(DataString);
             Stream.Write(ByteData, 0, ByteData.Length);
-            ServerData.Text += "Клиент " + System.DateTime.Now.ToString() + ": " + Data + "\n";
+            ServerData.Text += "Клиент " + System.DateTime.Now.ToString() + ": " + DataString;
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
