@@ -102,7 +102,7 @@ namespace TCPDevice
             try
             {
                 string StateData = "EN0?";
-                SendData(StateData, EndInput.Text);
+                SendData(StateData);
             }
             catch (Exception ex)
             {
@@ -116,7 +116,7 @@ namespace TCPDevice
             {
                 string StateData = "";
                 StateData = EnabledCheckBox.IsChecked == true ? StateData += "EN0 1" : StateData += "EN0 0";
-                SendData(StateData, EndInput.Text);
+                SendData(StateData);
             }
             catch (Exception ex)
             {
@@ -129,7 +129,7 @@ namespace TCPDevice
             try
             {
                 string StateData = "ABORT0";
-                SendData(StateData, EndInput.Text);
+                SendData(StateData);
             }
             catch (Exception ex)
             {
@@ -142,7 +142,7 @@ namespace TCPDevice
             try
             {
                 string StateData = "CLR0";
-                SendData(StateData, EndInput.Text);
+                SendData(StateData);
             }
             catch (Exception ex)
             {
@@ -155,7 +155,7 @@ namespace TCPDevice
             try
             {
                 string StateData = "MH0";
-                SendData(StateData, EndInput.Text);
+                SendData(StateData);
             }
             catch (Exception ex)
             {
@@ -168,7 +168,7 @@ namespace TCPDevice
             try
             {
                 string StateData = "POS0?";
-                SendData(StateData, EndInput.Text);
+                SendData(StateData);
             }
             catch (Exception ex)
             {
@@ -181,7 +181,7 @@ namespace TCPDevice
             try
             {
                 string StateData = "ERR0?";
-                SendData(StateData, EndInput.Text);
+                SendData(StateData);
             }
             catch (Exception ex)
             {
@@ -194,7 +194,7 @@ namespace TCPDevice
             try
             {
                 string StateData = "MH0?";
-                SendData(StateData, EndInput.Text);
+                SendData(StateData);
             }
             catch (Exception ex)
             {
@@ -207,7 +207,7 @@ namespace TCPDevice
             try
             {
                 string StateData = "STOP0?";
-                SendData(StateData, EndInput.Text);
+                SendData(StateData);
             }
             catch (Exception ex)
             {
@@ -222,7 +222,7 @@ namespace TCPDevice
                 string StateData = "SPD0";
                 double Speed = double.Parse(SpeedInput.Text.Replace(".",","));
                 StateData += " " + Speed.ToString().Replace(",", ".");
-                SendData(StateData, EndInput.Text);
+                SendData(StateData);
             }
             catch (Exception ex)
             {
@@ -237,7 +237,7 @@ namespace TCPDevice
                 string StateData = "MOVE0";
                 double Movement = double.Parse(MoveInput.Text.Replace(".", ","));
                 StateData += " " + Movement.ToString().Replace(",", ".");
-                SendData(StateData, EndInput.Text);
+                SendData(StateData);
             }
             catch (Exception ex)
             {
@@ -245,10 +245,12 @@ namespace TCPDevice
             }
         }
         
-        void SendData(string Data, string EndSymbol)
+        void SendData(string Data)
         {
+            string EndSymbol = EndInput.Text;
+            string StartSymbol = StartInput.Text;
             EndSymbol = Regex.Unescape(EndSymbol);
-            ByteData = System.Text.Encoding.ASCII.GetBytes(Data+EndSymbol);
+            ByteData = System.Text.Encoding.ASCII.GetBytes(StartSymbol + Data + EndSymbol);
             Stream.Write(ByteData, 0, ByteData.Length);
             ServerData.Text += "Клиент " + System.DateTime.Now.ToString() + ": " + Data + "\n";
         }
@@ -260,11 +262,11 @@ namespace TCPDevice
                 string StateData = "SPD0";
                 double Speed = double.Parse(SpeedInput.Text.Replace(".", ","));
                 StateData += " " + Speed.ToString().Replace(",", ".");
-                SendData(StateData, EndInput.Text);
+                SendData(StateData);
                 StateData = "MOVE0";
                 double Movement = double.Parse(MoveInput.Text.Replace(".", ","));
                 StateData += " " + Movement.ToString().Replace(",", ".");
-                SendData(StateData, EndInput.Text);
+                SendData(StateData);
             }
             catch (Exception ex)
             {
