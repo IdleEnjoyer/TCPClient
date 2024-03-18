@@ -18,6 +18,8 @@ using System.Net;
 using System.Windows.Markup;
 using System.IO;
 using System.Text.RegularExpressions;
+#pragma warning disable CS8618
+#pragma warning disable CS8602
 
 namespace TCPDevice
 {
@@ -102,7 +104,7 @@ namespace TCPDevice
         {
             try
             {
-                TextBox Command = EnabledCmd.SelectedItem as TextBox;
+                TextBox? Command = EnabledCmd.SelectedItem as TextBox;
                 string StateData = Command.Text;
                 SendData(StateData);
             }
@@ -116,10 +118,10 @@ namespace TCPDevice
         {
             try
             {
-                ComboBox EnabledCB = PolarisationCmd.Items.GetItemAt(1) as ComboBox;
-                TextBox EnabledTB = EnabledCB.Items.GetItemAt(1) as TextBox;
-                ComboBox DisabledCB = PolarisationCmd.Items.GetItemAt(0) as ComboBox;
-                TextBox DisabledTB = DisabledCB.Items.GetItemAt(1) as TextBox;
+                ComboBox? EnabledCB = PolarisationCmd.Items.GetItemAt(1) as ComboBox;
+                TextBox? EnabledTB = EnabledCB.Items.GetItemAt(1) as TextBox;
+                ComboBox? DisabledCB = PolarisationCmd.Items.GetItemAt(0) as ComboBox;
+                TextBox? DisabledTB = DisabledCB.Items.GetItemAt(1) as TextBox;
                 string StateData = "";
                 StateData = EnabledCheckBox.IsChecked == true ? StateData += EnabledTB.Text : StateData += DisabledTB.Text;
                 SendData(StateData);
@@ -134,7 +136,7 @@ namespace TCPDevice
         {
             try
             {
-                TextBox Command = AbortCmd.SelectedItem as TextBox;
+                TextBox? Command = AbortCmd.SelectedItem as TextBox;
                 string StateData = Command.Text;
                 SendData(StateData);
             }
@@ -148,7 +150,7 @@ namespace TCPDevice
         {
             try
             {
-                TextBox Command = ClearCmd.SelectedItem as TextBox;
+                TextBox? Command = ClearCmd.SelectedItem as TextBox;
                 string StateData = Command.Text;
                 SendData(StateData);
             }
@@ -162,7 +164,7 @@ namespace TCPDevice
         {
             try
             {
-                TextBox Command = ResetCmd.SelectedItem as TextBox;
+                TextBox? Command = ResetCmd.SelectedItem as TextBox;
                 string StateData = Command.Text;
                 SendData(StateData);
             }
@@ -176,7 +178,7 @@ namespace TCPDevice
         {
             try
             {
-                TextBox Command = PositionCmd.SelectedItem as TextBox;
+                TextBox? Command = PositionCmd.SelectedItem as TextBox;
                 string StateData = Command.Text;
                 SendData(StateData);
             }
@@ -190,7 +192,7 @@ namespace TCPDevice
         {
             try
             {
-                TextBox Command = ErrorCmd.SelectedItem as TextBox;
+                TextBox? Command = ErrorCmd.SelectedItem as TextBox;
                 string StateData = Command.Text;
                 SendData(StateData);
             }
@@ -204,7 +206,7 @@ namespace TCPDevice
         {
             try
             {
-                TextBox Command = HomeCmd.SelectedItem as TextBox;
+                TextBox? Command = HomeCmd.SelectedItem as TextBox;
                 string StateData = Command.Text;
                 SendData(StateData);
             }
@@ -218,7 +220,7 @@ namespace TCPDevice
         {
             try
             {
-                TextBox Command = StopCmd.SelectedItem as TextBox;
+                TextBox? Command = StopCmd.SelectedItem as TextBox;
                 string StateData = Command.Text;
                 SendData(StateData);
             }
@@ -232,7 +234,7 @@ namespace TCPDevice
         {
             try
             {
-                TextBox Command = SpeedCmd.SelectedItem as TextBox;
+                TextBox? Command = SpeedCmd.SelectedItem as TextBox;
                 string StateData = Command.Text;
                 double Speed = double.Parse(SpeedInput.Text.Replace(".",","));
                 StateData += " " + Speed.ToString().Replace(",", ".");
@@ -248,7 +250,7 @@ namespace TCPDevice
         {
             try
             {
-                TextBox Command = MoveCmd.SelectedItem as TextBox;
+                TextBox? Command = MoveCmd.SelectedItem as TextBox;
                 string StateData = Command.Text;
                 double Movement = double.Parse(MoveInput.Text.Replace(".", ","));
                 StateData += " " + Movement.ToString().Replace(",", ".");
@@ -276,7 +278,7 @@ namespace TCPDevice
         {
             try
             {
-                TextBox Command = SpeedCmd.SelectedItem as TextBox;
+                TextBox? Command = SpeedCmd.SelectedItem as TextBox;
                 string StateData = Command.Text;
                 double Speed = double.Parse(SpeedInput.Text.Replace(".", ","));
                 StateData += " " + Speed.ToString().Replace(",", ".");
@@ -301,7 +303,7 @@ namespace TCPDevice
 
         private void OnSelect(object sender, SelectionChangedEventArgs e)
         {
-            ComboBox Element = sender as ComboBox;
+            ComboBox? Element = sender as ComboBox;
             Element.SelectedItem = 0;
         }
 

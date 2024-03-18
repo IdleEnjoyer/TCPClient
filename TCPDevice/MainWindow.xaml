@@ -48,8 +48,10 @@
         </Viewbox>
         <Viewbox Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Fill" StretchDirection="DownOnly">
             <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Width="269">
-                <CheckBox x:Name="EnabledCheckBox" Content="Поляризация" FontSize="34" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" UseLayoutRounding="False" Height="55" HorizontalAlignment="Left" VerticalAlignment="Center" Width="235" Checked="EnabledCheckBox_Checked" Unchecked="EnabledCheckBox_Checked" Margin="24,0,0,0"/>
-                <ComboBox x:Name="PolarisationCmd" HorizontalAlignment="Left" Height="55" VerticalAlignment="Center" Width="19">
+                <Border Height="55" HorizontalAlignment="Left" VerticalAlignment="Center" Width="235" Margin="24,0,0,0" BorderBrush="Black" BorderThickness="1,1,1,1" >
+                    <CheckBox x:Name="EnabledCheckBox" Content="Поляризация" FontSize="34" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" UseLayoutRounding="False" Checked="EnabledCheckBox_Checked" Unchecked="EnabledCheckBox_Checked" BorderBrush="Black" BorderThickness="1,1,1,1"/>
+                </Border>
+                <ComboBox x:Name="PolarisationCmd" HorizontalAlignment="Left" Height="55" VerticalAlignment="Center" Width="19" Margin="5,0,0,0">
                     <ComboBox IsSynchronizedWithCurrentItem="False" SelectedIndex="0" Text="Выключение" SelectionChanged="OnSelect" >
                         <Label Content="Выключение"/>
                         <TextBox Text="EN0 0"/>
