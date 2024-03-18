@@ -75,8 +75,8 @@
                     <RowDefinition Height="21*"/>
                 </Grid.RowDefinitions>
                 <Button x:Name="AbortBtn" Content="Остановка" HorizontalAlignment="Left" VerticalAlignment="Center" Height="28" Width="64" Grid.Row="1" Margin="25,0,0,0" Click="AbortBtn_Click"/>
-                <Button x:Name="ClearBtn" Content="Очистить ошибки" HorizontalAlignment="Left" VerticalAlignment="Center" Height="28" Width="106" Grid.Row="1" Click="ClearBtn_Click" Margin="116,0,0,0"/>
-                <Button Content="Калибровка в ноль" HorizontalAlignment="Left" Margin="252,0,0,0" VerticalAlignment="Center" Height="28" Width="110" Grid.Row="1" Click="Button_Click"/>
+                <Button x:Name="ClearBtn" Content="Очистить ошибки" HorizontalAlignment="Left" VerticalAlignment="Center" Height="28" Width="106" Grid.Row="1" Click="ClearBtn_Click" Margin="113,0,0,0"/>
+                <Button Content="Калибровка в ноль" HorizontalAlignment="Left" Margin="243,0,0,0" VerticalAlignment="Center" Height="28" Width="110" Grid.Row="1" Click="Button_Click"/>
                 <Label x:Name="ControlLabel" Content="Команды управления" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="0,0,0,2"/>
                 <Button x:Name="StateBtn" Content="Включено" HorizontalAlignment="Left" Grid.Row="3" VerticalAlignment="Center" Click="StateBtn_Click" Height="28" Width="60" Margin="25,0,0,0"/>
                 <Button x:Name="PositionBtn" Content="Позиция" HorizontalAlignment="Left" Margin="104,0,0,0" Grid.Row="3" VerticalAlignment="Center" Height="28" Width="53" Click="PositionBtn_Click"/>
@@ -96,26 +96,26 @@
                     </Grid.ColumnDefinitions>
                     <TextBox x:Name="MoveInput" TextWrapping="Wrap" Text="0,0" FontSize="18" Grid.Column="1" Grid.Row="1" Margin="0,2,0,2"/>
                     <TextBox x:Name="SpeedInput" TextWrapping="Wrap" Text="6,0" FontSize="18" Grid.Column="1" Margin="0,2,0,2"/>
-                    <Button x:Name="MoveBtn" Content="Движение" HorizontalAlignment="Center" Grid.Row="1" VerticalAlignment="Center" Height="28" Width="73" Click="MoveBtn_Click"/>
-                    <Button x:Name="SpeedBtn" Content="Скорость" Height="28" Width="73" HorizontalAlignment="Center" VerticalAlignment="Center" Click="SpeedBtn_Click"/>
+                    <Button x:Name="MoveBtn" Content="Движение" HorizontalAlignment="Left" Grid.Row="1" VerticalAlignment="Center" Height="28" Width="73" Click="MoveBtn_Click" Margin="25,0,0,0"/>
+                    <Button x:Name="SpeedBtn" Content="Скорость" Height="28" Width="73" HorizontalAlignment="Left" VerticalAlignment="Center" Click="SpeedBtn_Click" Margin="25,0,0,0"/>
                     <Button Grid.Column="2" Content="Отправить" HorizontalAlignment="Center" Height="29" Grid.RowSpan="2" VerticalAlignment="Center" Width="68" Click="Button_Click_1"/>
-                    <ComboBox x:Name="SpeedCmd" HorizontalAlignment="Left" Height="28" Margin="7,0,0,0" VerticalAlignment="Center" Width="14" SelectedIndex="0">
+                    <ComboBox x:Name="SpeedCmd" HorizontalAlignment="Left" Height="28" Margin="11,0,0,0" VerticalAlignment="Center" Width="14" SelectedIndex="0">
                         <TextBox Text="SPD0"/>
                     </ComboBox>
-                    <ComboBox x:Name="MoveCmd" HorizontalAlignment="Left" Height="28" Margin="7,0,0,0" Grid.Row="1" VerticalAlignment="Center" Width="14" SelectedIndex="0">
+                    <ComboBox x:Name="MoveCmd" HorizontalAlignment="Left" Height="28" Margin="11,0,0,0" Grid.Row="1" VerticalAlignment="Center" Width="14" SelectedIndex="0">
                         <TextBox Text="MOVE0"/>
                     </ComboBox>
                 </Grid>
                 <Label Content="Команды параметров" Grid.Row="4" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="0,2,0,0"/>
-                <TextBox x:Name="ServerData" Grid.Row="7" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" IsReadOnly="True" Margin="0,0,0,21" Grid.RowSpan="2"/>
+                <TextBox x:Name="ServerData" Grid.Row="7" TextWrapping="Wrap" VerticalScrollBarVisibility="Visible" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" IsReadOnly="True" Margin="0,0,0,21" Grid.RowSpan="2"/>
                 <Label Content="Сервер" Grid.Row="6" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Margin="0,0,0,74" Grid.RowSpan="2"/>
                 <ComboBox x:Name="AbortCmd" HorizontalAlignment="Left" Height="28" Margin="11,0,0,0" Grid.Row="1" VerticalAlignment="Center" Width="14" SelectedIndex="0" BorderThickness="1,1,1,1">
-                    <TextBox Cursor="" Text="EN0"/>
+                    <TextBox Cursor="" Text="ABORT0"/>
                 </ComboBox>
-                <ComboBox x:Name="ClearCmd" HorizontalAlignment="Left" Height="28" Margin="102,0,0,0" Grid.Row="1" VerticalAlignment="Center" Width="14" SelectedIndex="0">
+                <ComboBox x:Name="ClearCmd" HorizontalAlignment="Left" Height="28" Margin="99,0,0,0" Grid.Row="1" VerticalAlignment="Center" Width="14" SelectedIndex="0">
                     <TextBox Text="CLR0"/>
                 </ComboBox>
-                <ComboBox x:Name="ResetCmd" HorizontalAlignment="Left" Height="28" Margin="238,0,0,0" Grid.Row="1" VerticalAlignment="Center" Width="14" SelectedIndex="0">
+                <ComboBox x:Name="ResetCmd" HorizontalAlignment="Left" Height="28" Margin="229,0,0,0" Grid.Row="1" VerticalAlignment="Center" Width="14" SelectedIndex="0">
                     <TextBox Text="MH0"/>
                 </ComboBox>
                 <ComboBox x:Name="EnabledCmd" HorizontalAlignment="Left" Height="28" Margin="11,0,0,0" Grid.Row="3" VerticalAlignment="Center" Width="14" SelectedIndex="0">
@@ -134,7 +134,7 @@
                     <TextBox Text="STOP0?"/>
                 </ComboBox>
                 <Button x:Name="SendCmd" Content="Отправить" HorizontalAlignment="Left" Margin="310,0,0,0" Grid.Row="8" Width="68" Click="SendCmd_Click"/>
-                <TextBox x:Name="CommandInput" Grid.Row="8" TextWrapping="Wrap" Margin="0,0,68,0"/>
+                <TextBox x:Name="CommandInput" Grid.Row="8" TextWrapping="Wrap" Margin="0,0,68,0" KeyDown="OnPress"/>
             </Grid>
         </Viewbox>
 

@@ -88,6 +88,7 @@ namespace TCPDevice
                     }
                     string Data = Encoding.ASCII.GetString(Buffer, 0, BytesRead);
                     ServerData.Text += "Сервер " + System.DateTime.Now.ToString() + ": " + Data + "\n";
+                    ServerData.ScrollToEnd();
                 }
                 catch (IOException ex)
                 {
@@ -268,6 +269,7 @@ namespace TCPDevice
             ByteData = System.Text.Encoding.ASCII.GetBytes(DataString);
             Stream.Write(ByteData, 0, ByteData.Length);
             ServerData.Text += "Клиент " + System.DateTime.Now.ToString() + ": " + DataString;
+            ServerData.ScrollToEnd();
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
@@ -301,6 +303,14 @@ namespace TCPDevice
         {
             ComboBox Element = sender as ComboBox;
             Element.SelectedItem = 0;
+        }
+
+        private void OnPress(object sender, KeyEventArgs e)
+        {
+            if(e.Key == Key.Enter)
+            {
+                SendCmd_Click((TextBox)sender, e);
+            }
         }
     }
 }
