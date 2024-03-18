@@ -101,7 +101,8 @@ namespace TCPDevice
         {
             try
             {
-                string StateData = "EN0?";
+                TextBox Command = EnabledCmd.SelectedItem as TextBox;
+                string StateData = Command.Text;
                 SendData(StateData);
             }
             catch (Exception ex)
@@ -114,8 +115,12 @@ namespace TCPDevice
         {
             try
             {
+                ComboBox EnabledCB = PolarisationCmd.Items.GetItemAt(1) as ComboBox;
+                TextBox EnabledTB = EnabledCB.Items.GetItemAt(1) as TextBox;
+                ComboBox DisabledCB = PolarisationCmd.Items.GetItemAt(0) as ComboBox;
+                TextBox DisabledTB = DisabledCB.Items.GetItemAt(1) as TextBox;
                 string StateData = "";
-                StateData = EnabledCheckBox.IsChecked == true ? StateData += "EN0 1" : StateData += "EN0 0";
+                StateData = EnabledCheckBox.IsChecked == true ? StateData += EnabledTB.Text : StateData += DisabledTB.Text;
                 SendData(StateData);
             }
             catch (Exception ex)
@@ -128,7 +133,8 @@ namespace TCPDevice
         {
             try
             {
-                string StateData = "ABORT0";
+                TextBox Command = AbortCmd.SelectedItem as TextBox;
+                string StateData = Command.Text;
                 SendData(StateData);
             }
             catch (Exception ex)
@@ -141,7 +147,8 @@ namespace TCPDevice
         {
             try
             {
-                string StateData = "CLR0";
+                TextBox Command = ClearCmd.SelectedItem as TextBox;
+                string StateData = Command.Text;
                 SendData(StateData);
             }
             catch (Exception ex)
@@ -154,7 +161,8 @@ namespace TCPDevice
         {
             try
             {
-                string StateData = "MH0";
+                TextBox Command = ResetCmd.SelectedItem as TextBox;
+                string StateData = Command.Text;
                 SendData(StateData);
             }
             catch (Exception ex)
@@ -167,7 +175,8 @@ namespace TCPDevice
         {
             try
             {
-                string StateData = "POS0?";
+                TextBox Command = PositionCmd.SelectedItem as TextBox;
+                string StateData = Command.Text;
                 SendData(StateData);
             }
             catch (Exception ex)
@@ -180,7 +189,8 @@ namespace TCPDevice
         {
             try
             {
-                string StateData = "ERR0?";
+                TextBox Command = ErrorCmd.SelectedItem as TextBox;
+                string StateData = Command.Text;
                 SendData(StateData);
             }
             catch (Exception ex)
@@ -193,7 +203,8 @@ namespace TCPDevice
         {
             try
             {
-                string StateData = "MH0?";
+                TextBox Command = HomeCmd.SelectedItem as TextBox;
+                string StateData = Command.Text;
                 SendData(StateData);
             }
             catch (Exception ex)
@@ -206,7 +217,8 @@ namespace TCPDevice
         {
             try
             {
-                string StateData = "STOP0?";
+                TextBox Command = StopCmd.SelectedItem as TextBox;
+                string StateData = Command.Text;
                 SendData(StateData);
             }
             catch (Exception ex)
@@ -219,7 +231,8 @@ namespace TCPDevice
         {
             try
             {
-                string StateData = "SPD0";
+                TextBox Command = SpeedCmd.SelectedItem as TextBox;
+                string StateData = Command.Text;
                 double Speed = double.Parse(SpeedInput.Text.Replace(".",","));
                 StateData += " " + Speed.ToString().Replace(",", ".");
                 SendData(StateData);
@@ -234,7 +247,8 @@ namespace TCPDevice
         {
             try
             {
-                string StateData = "MOVE0";
+                TextBox Command = MoveCmd.SelectedItem as TextBox;
+                string StateData = Command.Text;
                 double Movement = double.Parse(MoveInput.Text.Replace(".", ","));
                 StateData += " " + Movement.ToString().Replace(",", ".");
                 SendData(StateData);
@@ -260,11 +274,13 @@ namespace TCPDevice
         {
             try
             {
-                string StateData = "SPD0";
+                TextBox Command = SpeedCmd.SelectedItem as TextBox;
+                string StateData = Command.Text;
                 double Speed = double.Parse(SpeedInput.Text.Replace(".", ","));
                 StateData += " " + Speed.ToString().Replace(",", ".");
                 SendData(StateData);
-                StateData = "MOVE0";
+                Command = MoveCmd.SelectedItem as TextBox;
+                StateData = Command.Text;
                 double Movement = double.Parse(MoveInput.Text.Replace(".", ","));
                 StateData += " " + Movement.ToString().Replace(",", ".");
                 SendData(StateData);
@@ -273,6 +289,18 @@ namespace TCPDevice
             {
                 MessageBox.Show(ex.Message);
             }
+        }
+
+        private void SendCmd_Click(object sender, RoutedEventArgs e)
+        {
+            SendData(CommandInput.Text);
+            CommandInput.Text = string.Empty;
+        }
+
+        private void OnSelect(object sender, SelectionChangedEventArgs e)
+        {
+            ComboBox Element = sender as ComboBox;
+            Element.SelectedItem = 0;
         }
     }
 }

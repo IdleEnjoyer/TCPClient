@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TCPDevice"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="490" Width="800">
     <Grid Margin="0,0,0,-16">
         <Grid.RowDefinitions>
             <RowDefinition Height="2*"/>
@@ -46,32 +46,45 @@
         <Viewbox x:Name="TitleView" Margin="0,-3,0,0">
             <Label x:Name="DeviceHeader" Content="TCP Клиент" FontSize="36" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Height="82" Width="364"/>
         </Viewbox>
-        <Viewbox Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <CheckBox x:Name="EnabledCheckBox" Content="Поляризация" FontSize="24" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" UseLayoutRounding="False" Height="42" HorizontalAlignment="Center" VerticalAlignment="Center" Width="180" Checked="EnabledCheckBox_Checked" Unchecked="EnabledCheckBox_Checked"/>
+        <Viewbox Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Fill" StretchDirection="DownOnly">
+            <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Width="269">
+                <CheckBox x:Name="EnabledCheckBox" Content="Поляризация" FontSize="34" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" UseLayoutRounding="False" Height="55" HorizontalAlignment="Left" VerticalAlignment="Center" Width="235" Checked="EnabledCheckBox_Checked" Unchecked="EnabledCheckBox_Checked" Margin="24,0,0,0"/>
+                <ComboBox x:Name="PolarisationCmd" HorizontalAlignment="Left" Height="55" VerticalAlignment="Center" Width="19">
+                    <ComboBox IsSynchronizedWithCurrentItem="False" SelectedIndex="0" Text="Выключение" SelectionChanged="OnSelect" >
+                        <Label Content="Выключение"/>
+                        <TextBox Text="EN0 0"/>
+                    </ComboBox>
+                    <ComboBox SelectedIndex="0" SelectionChanged="OnSelect" >
+                        <Label Content="Включение"/>
+                        <TextBox Text="EN0 1"/>
+                    </ComboBox>
+                </ComboBox>
+            </Grid>
         </Viewbox>
         <Viewbox Grid.Column="1" Grid.Row="1" Margin="0,0,0,25" Stretch="Fill" StretchDirection="DownOnly">
-            <Grid HorizontalAlignment="Center" Height="343">
+            <Grid HorizontalAlignment="Center" Height="379" Width="378">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="24*"/>
-                    <RowDefinition Height="42*"/>
-                    <RowDefinition Height="24*"/>
-                    <RowDefinition Height="42*"/>
-                    <RowDefinition Height="27*"/>
-                    <RowDefinition Height="65*"/>
                     <RowDefinition Height="28*"/>
-                    <RowDefinition Height="81*"/>
+                    <RowDefinition Height="40*"/>
+                    <RowDefinition Height="30*"/>
+                    <RowDefinition Height="45*"/>
+                    <RowDefinition Height="28*"/>
+                    <RowDefinition Height="84*"/>
+                    <RowDefinition Height="28*"/>
+                    <RowDefinition Height="74*"/>
+                    <RowDefinition Height="21*"/>
                 </Grid.RowDefinitions>
-                <Button x:Name="AbortBtn" Content="Отмена" HorizontalAlignment="Left" VerticalAlignment="Center" Height="28" Width="49" Grid.Row="1" Margin="10,0,0,0" Click="AbortBtn_Click"/>
-                <Button x:Name="ClearBtn" Content="Очистить ошибки" HorizontalAlignment="Left" Margin="69,0,0,0" VerticalAlignment="Center" Height="28" Width="105" Grid.Row="1" Click="ClearBtn_Click"/>
-                <Button Content="Сброс дома" HorizontalAlignment="Left" Margin="184,0,0,0" VerticalAlignment="Center" Height="28" Width="100" Grid.Row="1" Click="Button_Click"/>
-                <Label x:Name="ControlLabel" Content="Команды управления" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
-                <Button x:Name="StateBtn" Content="Включено" HorizontalAlignment="Left" Grid.Row="3" VerticalAlignment="Center" Click="StateBtn_Click" Height="28" Width="68" Margin="10,0,0,0"/>
-                <Button x:Name="PositionBtn" Content="Позиция" HorizontalAlignment="Left" Margin="83,0,0,0" Grid.Row="3" VerticalAlignment="Center" Height="28" Width="67" Click="PositionBtn_Click"/>
-                <Button x:Name="ErrorsBtn" Content="Ошибки" HorizontalAlignment="Left" Margin="155,0,0,0" Grid.Row="3" VerticalAlignment="Center" Height="28" Width="50" Click="ErrorsBtn_Click"/>
-                <Button x:Name="HomeBtn" Content="Дом" HorizontalAlignment="Left" Margin="210,0,0,0" Grid.Row="3" VerticalAlignment="Center" Height="28" Width="52" Click="HomeBtn_Click"/>
-                <Button x:Name="StoppedBtn" Content="Остановлено" HorizontalAlignment="Left" Margin="267,0,0,0" Grid.Row="3" VerticalAlignment="Center" Height="28" Width="79" Click="StoppedBtn_Click"/>
-                <Label x:Name="StateLabel" Content="Команды состояний" Grid.Row="2" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
-                <Grid Grid.Row="5" Height="59">
+                <Button x:Name="AbortBtn" Content="Остановка" HorizontalAlignment="Left" VerticalAlignment="Center" Height="28" Width="64" Grid.Row="1" Margin="25,0,0,0" Click="AbortBtn_Click"/>
+                <Button x:Name="ClearBtn" Content="Очистить ошибки" HorizontalAlignment="Left" VerticalAlignment="Center" Height="28" Width="106" Grid.Row="1" Click="ClearBtn_Click" Margin="116,0,0,0"/>
+                <Button Content="Калибровка в ноль" HorizontalAlignment="Left" Margin="252,0,0,0" VerticalAlignment="Center" Height="28" Width="110" Grid.Row="1" Click="Button_Click"/>
+                <Label x:Name="ControlLabel" Content="Команды управления" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="0,0,0,2"/>
+                <Button x:Name="StateBtn" Content="Включено" HorizontalAlignment="Left" Grid.Row="3" VerticalAlignment="Center" Click="StateBtn_Click" Height="28" Width="60" Margin="25,0,0,0"/>
+                <Button x:Name="PositionBtn" Content="Позиция" HorizontalAlignment="Left" Margin="104,0,0,0" Grid.Row="3" VerticalAlignment="Center" Height="28" Width="53" Click="PositionBtn_Click"/>
+                <Button x:Name="ErrorsBtn" Content="Ошибки" HorizontalAlignment="Left" Margin="176,0,0,0" Grid.Row="3" VerticalAlignment="Center" Height="28" Width="50" Click="ErrorsBtn_Click"/>
+                <Button x:Name="HomeBtn" Content="Дом" HorizontalAlignment="Left" Margin="245,0,0,0" Grid.Row="3" VerticalAlignment="Center" Height="28" Width="31" Click="HomeBtn_Click"/>
+                <Button x:Name="StoppedBtn" Content="Остановлено" HorizontalAlignment="Left" Margin="295,0,0,0" Grid.Row="3" VerticalAlignment="Center" Height="28" Width="79" Click="StoppedBtn_Click"/>
+                <Label x:Name="StateLabel" Content="Команды состояний" Grid.Row="2" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="0,2,0,0"/>
+                <Grid Grid.Row="5" Margin="0,5,0,5">
                     <Grid.RowDefinitions>
                         <RowDefinition/>
                         <RowDefinition/>
@@ -86,13 +99,44 @@
                     <Button x:Name="MoveBtn" Content="Движение" HorizontalAlignment="Center" Grid.Row="1" VerticalAlignment="Center" Height="28" Width="73" Click="MoveBtn_Click"/>
                     <Button x:Name="SpeedBtn" Content="Скорость" Height="28" Width="73" HorizontalAlignment="Center" VerticalAlignment="Center" Click="SpeedBtn_Click"/>
                     <Button Grid.Column="2" Content="Отправить" HorizontalAlignment="Center" Height="29" Grid.RowSpan="2" VerticalAlignment="Center" Width="68" Click="Button_Click_1"/>
+                    <ComboBox x:Name="SpeedCmd" HorizontalAlignment="Left" Height="28" Margin="7,0,0,0" VerticalAlignment="Center" Width="14" SelectedIndex="0">
+                        <TextBox Text="SPD0"/>
+                    </ComboBox>
+                    <ComboBox x:Name="MoveCmd" HorizontalAlignment="Left" Height="28" Margin="7,0,0,0" Grid.Row="1" VerticalAlignment="Center" Width="14" SelectedIndex="0">
+                        <TextBox Text="MOVE0"/>
+                    </ComboBox>
                 </Grid>
-                <Label Content="Команды параметров" Grid.Row="4" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
-                <TextBox x:Name="ServerData" Grid.Row="7" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" IsReadOnly="True"/>
-                <Label Content="Сервер" Grid.Row="6" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                <Label Content="Команды параметров" Grid.Row="4" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="0,2,0,0"/>
+                <TextBox x:Name="ServerData" Grid.Row="7" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" IsReadOnly="True" Margin="0,0,0,21" Grid.RowSpan="2"/>
+                <Label Content="Сервер" Grid.Row="6" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Margin="0,0,0,74" Grid.RowSpan="2"/>
+                <ComboBox x:Name="AbortCmd" HorizontalAlignment="Left" Height="28" Margin="11,0,0,0" Grid.Row="1" VerticalAlignment="Center" Width="14" SelectedIndex="0" BorderThickness="1,1,1,1">
+                    <TextBox Cursor="" Text="EN0"/>
+                </ComboBox>
+                <ComboBox x:Name="ClearCmd" HorizontalAlignment="Left" Height="28" Margin="102,0,0,0" Grid.Row="1" VerticalAlignment="Center" Width="14" SelectedIndex="0">
+                    <TextBox Text="CLR0"/>
+                </ComboBox>
+                <ComboBox x:Name="ResetCmd" HorizontalAlignment="Left" Height="28" Margin="238,0,0,0" Grid.Row="1" VerticalAlignment="Center" Width="14" SelectedIndex="0">
+                    <TextBox Text="MH0"/>
+                </ComboBox>
+                <ComboBox x:Name="EnabledCmd" HorizontalAlignment="Left" Height="28" Margin="11,0,0,0" Grid.Row="3" VerticalAlignment="Center" Width="14" SelectedIndex="0">
+                    <TextBox Text="EN0?"/>
+                </ComboBox>
+                <ComboBox x:Name="PositionCmd" HorizontalAlignment="Left" Height="28" Margin="90,0,0,0" Grid.Row="3" VerticalAlignment="Center" Width="14" SelectedIndex="0">
+                    <TextBox Text="POS0?"/>
+                </ComboBox>
+                <ComboBox x:Name="ErrorCmd" HorizontalAlignment="Left" Height="28" Margin="162,0,0,0" Grid.Row="3" VerticalAlignment="Center" Width="14" SelectedIndex="0">
+                    <TextBox Text="ERR0?"/>
+                </ComboBox>
+                <ComboBox x:Name="HomeCmd" HorizontalAlignment="Left" Height="28" Margin="231,0,0,0" Grid.Row="3" VerticalAlignment="Center" Width="14" SelectedIndex="0">
+                    <TextBox Text="MH0?"/>
+                </ComboBox>
+                <ComboBox x:Name="StopCmd" HorizontalAlignment="Left" Height="28" Margin="281,0,0,0" Grid.Row="3" VerticalAlignment="Center" Width="14" SelectedIndex="0">
+                    <TextBox Text="STOP0?"/>
+                </ComboBox>
+                <Button x:Name="SendCmd" Content="Отправить" HorizontalAlignment="Left" Margin="310,0,0,0" Grid.Row="8" Width="68" Click="SendCmd_Click"/>
+                <TextBox x:Name="CommandInput" Grid.Row="8" TextWrapping="Wrap" Margin="0,0,68,0"/>
             </Grid>
         </Viewbox>
-        <Viewbox Grid.Column="1" HorizontalAlignment="Left" Height="83" Margin="459,76,0,0" Grid.Row="1" VerticalAlignment="Top" Width="55"/>
 
     </Grid>
 </Window>
