@@ -1,182 +1,182 @@
 ﻿<Window x:Class="TCPDevice.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:TCPDevice"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="490" Width="800" Background="#FFC9C9C9">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="1*"/>
-            <RowDefinition Height="7*"/>
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="45*"/>
-            <ColumnDefinition Width="45*"/>
-            <ColumnDefinition Width="70*"/>
-        </Grid.ColumnDefinitions>
-        <Viewbox x:Name="ConnectionView" Grid.Row="1">
-            <Grid x:Name="ConnectionGrid" HorizontalAlignment="Center" Height="325">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="1*"/>
-                    <RowDefinition Height="1*"/>
-                    <RowDefinition Height="1*"/>
-                    <RowDefinition Height="1*"/>
-                    <RowDefinition Height="1*"/>
-                    <RowDefinition Height="1*"/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="3*"/>
-                    <ColumnDefinition Width="4*"/>
-                </Grid.ColumnDefinitions>
-                <Button x:Name="StartConnection" Content="Подключиться" Click="StartConnection_Click" Grid.Row="5" Margin="10,10,10,10" FontSize="16"/>
-                <Label x:Name="ConnectionStatus" Content="Отключен" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24" Foreground="Red" Grid.Column="1" Height="42" Width="167"/>
-                <Label x:Name="IPLabel" Content="IP:" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="24" Grid.Row="1" Height="40" Width="35"/>
-                <TextBox x:Name="IPInput" TextWrapping="Wrap" Text="192.168.0.1" VerticalAlignment="Center" FontSize="24" TextAlignment="Justify" Grid.Row="1" Grid.Column="1" Height="32"/>
-                <TextBox x:Name="PortInput" TextWrapping="Wrap" Text="8000" VerticalAlignment="Center" FontSize="24" TextAlignment="Justify" Grid.Column="1" Grid.Row="2" Height="34"/>
-                <Label x:Name="PortLabel" Content="Port:" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="24" Grid.Row="2" Height="42" Width="58"/>
-                <Button x:Name="StopConnection" Content="Отключиться" Click="StopConnection_Click" Grid.Column="1" Grid.Row="5" Width="164" Margin="10,10,10,10" FontSize="16"/>
-                <Label x:Name="ConnectionLabel" Content="Соединение:" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="22" Height="42" Width="137"/>
-                <Label Content="Символ конца:" HorizontalAlignment="Left" Grid.Row="4" VerticalAlignment="Center" FontSize="24" Height="40" Width="174"/>
-                <TextBox x:Name="EndInput" Grid.Row="4" TextWrapping="Wrap" Text="\r\n" VerticalAlignment="Center" FontSize="24" Height="32" Grid.Column="1"/>
-                <Label Content="Символ начала:" HorizontalAlignment="Left" Grid.Row="3" VerticalAlignment="Center" FontSize="24"/>
-                <TextBox x:Name="StartInput" Grid.Column="1" Grid.Row="3" TextWrapping="Wrap" FontSize="24" VerticalAlignment="Center"/>
-            </Grid>
-        </Viewbox>
-        <Viewbox x:Name="TitleView" Margin="0,0,0,0" Grid.Row="0">
-            <Label x:Name="DeviceHeader" Content="TCP Клиент" FontSize="36" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Height="82" Width="364"/>
-        </Viewbox>
-        <Viewbox x:Name="PolarisationView" Grid.Column="1" Margin="0,0,0,0" Grid.Row="0" >
-            <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Width="269">
-                <Border Height="55" HorizontalAlignment="Left" VerticalAlignment="Center" Width="235" Margin="24,0,0,0" BorderBrush="Black" BorderThickness="1,1,1,1" Background="#FFDDDDDD" >
-                    <CheckBox x:Name="EnabledCheckBox" Content="Поляризация" FontSize="34" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" UseLayoutRounding="False" Checked="EnabledCheckBox_Checked" Unchecked="EnabledCheckBox_Checked" BorderThickness="1,1,1,1"/>
-                </Border>
-                <ComboBox x:Name="PolarisationCmd" HorizontalAlignment="Left" Height="55" VerticalAlignment="Center" Width="19" Margin="5,0,0,0">
-                    <ComboBox IsSynchronizedWithCurrentItem="False" SelectedIndex="0" Text="Выключение" SelectionChanged="OnSelect" >
-                        <Label Content="Выключение"/>
-                        <TextBox Text="EN0 0"/>
-                    </ComboBox>
-                    <ComboBox SelectedIndex="0" SelectionChanged="OnSelect" >
-                        <Label Content="Включение"/>
-                        <TextBox Text="EN0 1"/>
-                    </ComboBox>
-                </ComboBox>
-            </Grid>
-        </Viewbox>
-        <Viewbox Grid.Column="1" Grid.Row="1">
-            <Grid x:Name="CmdGrid" VerticalAlignment="Top">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="1*"/>
-                    <RowDefinition Height="3*"/>
-                    <RowDefinition Height="1*"/>
-                    <RowDefinition Height="5*"/>
-                    <RowDefinition Height="1*"/>
-                    <RowDefinition Height="2*"/>
-                </Grid.RowDefinitions>
-                <Grid x:Name="CommandGrid" HorizontalAlignment="Left" Margin="10,0,0,0" Grid.Row="1" Width="128">
-                    <Grid.RowDefinitions>
-                        <RowDefinition/>
-                        <RowDefinition/>
-                        <RowDefinition/>
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="1*"/>
-                        <ColumnDefinition Width="6*"/>
-                    </Grid.ColumnDefinitions>
-                    <Button x:Name="AbortBtn" Content="Остановка" Click="AbortBtn_Click" Grid.Column="1"/>
-                    <Button x:Name="ClearBtn" Content="Очистить ошибки" Click="ClearBtn_Click" Grid.Column="1" Grid.Row="1"/>
-                    <Button Content="Калибровка в ноль" Click="Button_Click" Grid.Column="1" Grid.Row="2"/>
-                    <ComboBox x:Name="AbortCmd" SelectedIndex="0" BorderThickness="1,1,1,1">
-                        <TextBox Cursor="" Text="ABORT0"/>
-                    </ComboBox>
-                    <ComboBox x:Name="ClearCmd" SelectedIndex="0" Grid.Row="1">
-                        <TextBox Text="CLR0"/>
-                    </ComboBox>
-                    <ComboBox x:Name="ResetCmd" SelectedIndex="0" Grid.Row="2">
-                        <TextBox Text="MH0"/>
-                    </ComboBox>
-                </Grid>
-                <Label x:Name="ControlLabel" Content="Команды управления" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="5,0,5,5" Margin="0,0,0,2"/>
-                <Grid x:Name="StateGrid" Margin="10,0,0,0" Grid.Row="3" Width="128" HorizontalAlignment="Left">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="1*"/>
-                        <ColumnDefinition Width="6*"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition/>
-                        <RowDefinition/>
-                        <RowDefinition/>
-                        <RowDefinition/>
-                        <RowDefinition/>
-                    </Grid.RowDefinitions>
-                    <Button x:Name="StateBtn" Content="Включено" Click="StateBtn_Click" Grid.Column="1" Margin="0,0,0,0" Grid.Row="0"/>
-                    <Button x:Name="PositionBtn" Content="Позиция" Click="PositionBtn_Click" Grid.Row="1" Grid.Column="1" Margin="0,0,0,0"/>
-                    <Button x:Name="ErrorsBtn" Content="Ошибки" Click="ErrorsBtn_Click" Grid.Row="2" Grid.Column="1" Margin="0,0,0,0"/>
-                    <Button x:Name="HomeBtn" Content="Дом" Click="HomeBtn_Click" Grid.Row="3" Grid.Column="1" Margin="0,0,0,0"/>
-                    <Button x:Name="StoppedBtn" Content="Остановлено" Click="StoppedBtn_Click" Grid.Row="4" Grid.Column="1" Margin="0,0,0,0"/>
-                    <ComboBox x:Name="EnabledCmd" SelectedIndex="0" Grid.Column="0" Grid.Row="0" Margin="0,0,0,0">
-                        <TextBox Text="EN0?"/>
-                    </ComboBox>
-                    <ComboBox x:Name="PositionCmd" SelectedIndex="0" Grid.Row="1" Grid.Column="0" Margin="0,0,0,0">
-                        <TextBox Text="POS0?"/>
-                    </ComboBox>
-                    <ComboBox x:Name="ErrorCmd" SelectedIndex="0" Grid.Row="2" Grid.Column="0" Margin="0,0,0,0">
-                        <TextBox Text="ERR0?"/>
-                    </ComboBox>
-                    <ComboBox x:Name="HomeCmd" SelectedIndex="0" Grid.Row="3" Grid.Column="0" Margin="0,0,0,0">
-                        <TextBox Text="MH0?"/>
-                    </ComboBox>
-                    <ComboBox x:Name="StopCmd" SelectedIndex="0" Grid.Row="4" Grid.Column="0" Margin="0,0,0,0">
-                        <TextBox Text="STOP0?"/>
-                    </ComboBox>
-                </Grid>
-                <Label x:Name="StateLabel" Content="Команды состояний" Grid.Row="2" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="5,0,5,5"/>
-                <Grid x:Name="SpdMovGrid" Grid.Row="5" HorizontalAlignment="Left" Width="128" Margin="10,0,0,0">
-                    <Grid.RowDefinitions>
-                        <RowDefinition/>
-                        <RowDefinition/>
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="1*"/>
-                        <ColumnDefinition Width="4*"/>
-                        <ColumnDefinition Width="2*"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBox x:Name="MoveInput" TextWrapping="Wrap" Text="0,0" FontSize="12" Grid.Column="2" Margin="0,0,0,0" Grid.Row="1" VerticalContentAlignment="Center"/>
-                    <TextBox x:Name="SpeedInput" TextWrapping="Wrap" Text="6,0" FontSize="12" Grid.Column="2" Margin="0,0,0,0" Grid.Row="0" VerticalContentAlignment="Center"/>
-                    <Button x:Name="MoveBtn" Content="Движение" Click="MoveBtn_Click" Grid.Column="1" Margin="0,0,0,0" Grid.Row="1"/>
-                    <Button x:Name="SpeedBtn" Content="Скорость" Click="SpeedBtn_Click" Grid.Column="1" Margin="0,0,0,0" Grid.Row="0"/>
-                    <ComboBox x:Name="SpeedCmd" SelectedIndex="0" Margin="0,0,0,0" Grid.Row="0">
-                        <TextBox Text="SPD0"/>
-                    </ComboBox>
-                    <ComboBox x:Name="MoveCmd" SelectedIndex="0" Margin="0,0,0,0" Grid.Row="1">
-                        <TextBox Text="MOVE0"/>
-                    </ComboBox>
-                </Grid>
-                <Label Content="Команды параметров" Grid.Row="4" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="0,2,0,1" Padding="5,0,5,5"/>
-                <Button Content="Отправить" HorizontalAlignment="Left" Height="29" VerticalAlignment="Center" Width="68" Click="Button_Click_1" Margin="147,0,10,0" Grid.Row="5"/>
-            </Grid>
-        </Viewbox>
-        <Viewbox Grid.Column="2" Margin="10,10,10,10" Grid.Row="1">
-            <Grid Height="392" Width="380">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="95*"/>
-                    <RowDefinition Height="5*"/>
-                </Grid.RowDefinitions>
-                <TextBox x:Name="ServerData" TextWrapping="Wrap" VerticalScrollBarVisibility="Visible" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" IsReadOnly="True"/>
-                <Grid Grid.Row="1">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="60*"/>
-                        <ColumnDefinition Width="15*"/>
-                    </Grid.ColumnDefinitions>
-                    <Button x:Name="SendCmd" Content="Отправить" Margin="0,0,0,0" Click="SendCmd_Click" Grid.Column="1"/>
-                    <TextBox x:Name="CommandInput" TextWrapping="Wrap" Margin="0,0,0,0" KeyDown="OnPress"/>
-                </Grid>
-            </Grid>
-        </Viewbox>
-        <Viewbox Grid.Column="2" Margin="0,0,0,0" Grid.Row="0">
-            <Label Content="Сервер" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="28" Height="62" Width="350"/>
-        </Viewbox>
+		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:local="clr-namespace:TCPDevice"
+		mc:Ignorable="d"
+		Title="MainWindow" Height="490" Width="800" Background="#FFC9C9C9">
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="1*"/>
+			<RowDefinition Height="7*"/>
+		</Grid.RowDefinitions>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="45*"/>
+			<ColumnDefinition Width="45*"/>
+			<ColumnDefinition Width="70*"/>
+		</Grid.ColumnDefinitions>
+		<Viewbox x:Name="ConnectionView" Grid.Row="1">
+			<Grid x:Name="ConnectionGrid" HorizontalAlignment="Center" Height="325">
+				<Grid.RowDefinitions>
+					<RowDefinition Height="1*"/>
+					<RowDefinition Height="1*"/>
+					<RowDefinition Height="1*"/>
+					<RowDefinition Height="1*"/>
+					<RowDefinition Height="1*"/>
+					<RowDefinition Height="1*"/>
+				</Grid.RowDefinitions>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="3*"/>
+					<ColumnDefinition Width="4*"/>
+				</Grid.ColumnDefinitions>
+				<Button x:Name="StartConnection" Content="Подключиться" Click="StartConnection_Click" Grid.Row="5" Margin="10,10,10,10" FontSize="16"/>
+				<Label x:Name="ConnectionStatus" Content="Отключен" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24" Foreground="Red" Grid.Column="1" Height="42" Width="167"/>
+				<Label x:Name="IPLabel" Content="IP:" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="24" Grid.Row="1" Height="40" Width="35"/>
+				<TextBox x:Name="IPInput" TextWrapping="Wrap" Text="192.168.0.1" FontSize="24" TextAlignment="Justify" Grid.Row="1" Grid.Column="1" VerticalContentAlignment="Center"/>
+				<TextBox x:Name="PortInput" TextWrapping="Wrap" Text="8000" FontSize="24" TextAlignment="Justify" Grid.Column="1" Grid.Row="2" VerticalContentAlignment="Center"/>
+				<Label x:Name="PortLabel" Content="Port:" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="24" Grid.Row="2" Height="42" Width="58"/>
+				<Button x:Name="StopConnection" Content="Отключиться" Click="StopConnection_Click" Grid.Column="1" Grid.Row="5" Width="164" Margin="10,10,10,10" FontSize="16"/>
+				<Label x:Name="ConnectionLabel" Content="Соединение:" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="22" Height="42" Width="137"/>
+				<Label Content="Символ конца:" HorizontalAlignment="Left" Grid.Row="4" VerticalAlignment="Center" FontSize="24" Height="40" Width="174"/>
+				<TextBox x:Name="EndInput" Grid.Row="4" TextWrapping="Wrap" Text="\r\n" FontSize="24" Grid.Column="1" VerticalContentAlignment="Center"/>
+				<Label Content="Символ начала:" HorizontalAlignment="Left" Grid.Row="3" VerticalAlignment="Center" FontSize="24"/>
+				<TextBox x:Name="StartInput" Grid.Column="1" Grid.Row="3" TextWrapping="Wrap" FontSize="24" VerticalContentAlignment="Center"/>
+			</Grid>
+		</Viewbox>
+		<Viewbox x:Name="TitleView" Margin="0,0,0,0" Grid.Row="0">
+			<Label x:Name="DeviceHeader" Content="TCP Клиент" FontSize="36" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Height="82" Width="364"/>
+		</Viewbox>
+		<Viewbox x:Name="PolarisationView" Grid.Column="1" Margin="0,0,0,0" Grid.Row="0" >
+			<Grid HorizontalAlignment="Center" VerticalAlignment="Center" Width="269">
+				<Border Height="55" HorizontalAlignment="Left" VerticalAlignment="Center" Width="235" Margin="24,0,0,0" BorderBrush="Black" BorderThickness="1,1,1,1" Background="#FFDDDDDD" >
+					<CheckBox x:Name="EnabledCheckBox" Content="Поляризация" FontSize="34" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" UseLayoutRounding="False" Checked="EnabledCheckBox_Checked" Unchecked="EnabledCheckBox_Checked" BorderThickness="1,1,1,1"/>
+				</Border>
+				<ComboBox x:Name="PolarisationCmd" HorizontalAlignment="Left" Height="55" VerticalAlignment="Center" Width="19" Margin="5,0,0,0" SelectionChanged="OnSelect">
+					<ComboBox IsSynchronizedWithCurrentItem="False" SelectedIndex="0" Text="Выключение" SelectionChanged="OnSelect" >
+						<Label Content="Выключение"/>
+						<TextBox Text="EN0 0"/>
+					</ComboBox>
+					<ComboBox SelectedIndex="0" SelectionChanged="OnSelect" >
+						<Label Content="Включение"/>
+						<TextBox Text="EN0 1"/>
+					</ComboBox>
+				</ComboBox>
+			</Grid>
+		</Viewbox>
+		<Viewbox Grid.Column="1" Grid.Row="1">
+			<Grid x:Name="CmdGrid" VerticalAlignment="Top">
+				<Grid.RowDefinitions>
+					<RowDefinition Height="1*"/>
+					<RowDefinition Height="3*"/>
+					<RowDefinition Height="1*"/>
+					<RowDefinition Height="5*"/>
+					<RowDefinition Height="1*"/>
+					<RowDefinition Height="2*"/>
+				</Grid.RowDefinitions>
+				<Grid x:Name="CommandGrid" HorizontalAlignment="Left" Margin="10,0,0,0" Grid.Row="1" Width="138">
+					<Grid.RowDefinitions>
+						<RowDefinition/>
+						<RowDefinition/>
+						<RowDefinition/>
+					</Grid.RowDefinitions>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="1*"/>
+						<ColumnDefinition Width="6*"/>
+					</Grid.ColumnDefinitions>
+					<Button x:Name="AbortBtn" Content="Остановка" Click="AbortBtn_Click" Grid.Column="1"/>
+					<Button x:Name="ClearBtn" Content="Очистить ошибки" Click="ClearBtn_Click" Grid.Column="1" Grid.Row="1"/>
+					<Button Content="Калибровка (в ноль)" Click="Button_Click" Grid.Column="1" Grid.Row="2"/>
+					<ComboBox x:Name="AbortCmd" SelectedIndex="0" BorderThickness="1,1,1,1" SelectionChanged="OnSelect">
+						<TextBox Cursor="" Text="ABORT0"/>
+					</ComboBox>
+					<ComboBox x:Name="ClearCmd" SelectedIndex="0" Grid.Row="1" SelectionChanged="OnSelect">
+						<TextBox Text="CLR0"/>
+					</ComboBox>
+					<ComboBox x:Name="ResetCmd" SelectedIndex="0" Grid.Row="2" SelectionChanged="OnSelect">
+						<TextBox Text="MH0"/>
+					</ComboBox>
+				</Grid>
+				<Label x:Name="ControlLabel" Content="Команды управления" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="5,0,5,5" Margin="0,0,0,2"/>
+				<Grid x:Name="StateGrid" Margin="10,0,0,0" Grid.Row="3" Width="128" HorizontalAlignment="Left">
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="1*"/>
+						<ColumnDefinition Width="6*"/>
+					</Grid.ColumnDefinitions>
+					<Grid.RowDefinitions>
+						<RowDefinition/>
+						<RowDefinition/>
+						<RowDefinition/>
+						<RowDefinition/>
+						<RowDefinition/>
+					</Grid.RowDefinitions>
+					<Button x:Name="StateBtn" Content="Включено" Click="StateBtn_Click" Grid.Column="1" Margin="0,0,0,0" Grid.Row="0"/>
+					<Button x:Name="PositionBtn" Content="Позиция" Click="PositionBtn_Click" Grid.Row="1" Grid.Column="1" Margin="0,0,0,0"/>
+					<Button x:Name="ErrorsBtn" Content="Ошибки" Click="ErrorsBtn_Click" Grid.Row="2" Grid.Column="1" Margin="0,0,0,0"/>
+					<Button x:Name="HomeBtn" Content="Откалибровано" Click="HomeBtn_Click" Grid.Row="3" Grid.Column="1" Margin="0,0,0,0"/>
+					<Button x:Name="StoppedBtn" Content="Остановлено" Click="StoppedBtn_Click" Grid.Row="4" Grid.Column="1" Margin="0,0,0,0"/>
+					<ComboBox x:Name="EnabledCmd" SelectedIndex="0" Grid.Column="0" Grid.Row="0" Margin="0,0,0,0" SelectionChanged="OnSelect">
+						<TextBox Text="EN0?"/>
+					</ComboBox>
+					<ComboBox x:Name="PositionCmd" SelectedIndex="0" Grid.Row="1" Grid.Column="0" Margin="0,0,0,0" SelectionChanged="OnSelect">
+						<TextBox Text="POS0?"/>
+					</ComboBox>
+					<ComboBox x:Name="ErrorCmd" SelectedIndex="0" Grid.Row="2" Grid.Column="0" Margin="0,0,0,0" SelectionChanged="OnSelect">
+						<TextBox Text="ERR0?"/>
+					</ComboBox>
+					<ComboBox x:Name="HomeCmd" SelectedIndex="0" Grid.Row="3" Grid.Column="0" Margin="0,0,0,0" SelectionChanged="OnSelect">
+						<TextBox Text="MH0?"/>
+					</ComboBox>
+					<ComboBox x:Name="StopCmd" SelectedIndex="0" Grid.Row="4" Grid.Column="0" Margin="0,0,0,0">
+						<TextBox Text="STOP0?"/>
+					</ComboBox>
+				</Grid>
+				<Label x:Name="StateLabel" Content="Команды состояний" Grid.Row="2" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="5,0,5,5"/>
+				<Grid x:Name="SpdMovGrid" Grid.Row="5" HorizontalAlignment="Left" Width="128" Margin="10,0,0,0">
+					<Grid.RowDefinitions>
+						<RowDefinition/>
+						<RowDefinition/>
+					</Grid.RowDefinitions>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="1*"/>
+						<ColumnDefinition Width="4*"/>
+						<ColumnDefinition Width="2*"/>
+					</Grid.ColumnDefinitions>
+					<TextBox x:Name="MoveInput" TextWrapping="Wrap" Text="0,0" FontSize="12" Grid.Column="2" Margin="0,0,0,0" Grid.Row="1" VerticalContentAlignment="Center"/>
+					<TextBox x:Name="SpeedInput" TextWrapping="Wrap" Text="6,0" FontSize="12" Grid.Column="2" Margin="0,0,0,0" Grid.Row="0" VerticalContentAlignment="Center"/>
+					<Button x:Name="MoveBtn" Content="Движение" Click="MoveBtn_Click" Grid.Column="1" Margin="0,0,0,0" Grid.Row="1"/>
+					<Button x:Name="SpeedBtn" Content="Скорость" Click="SpeedBtn_Click" Grid.Column="1" Margin="0,0,0,0" Grid.Row="0"/>
+					<ComboBox x:Name="SpeedCmd" SelectedIndex="0" Margin="0,0,0,0" Grid.Row="0">
+						<TextBox Text="SPD0"/>
+					</ComboBox>
+					<ComboBox x:Name="MoveCmd" SelectedIndex="0" Margin="0,0,0,0" Grid.Row="1">
+						<TextBox Text="MOVE0"/>
+					</ComboBox>
+				</Grid>
+				<Label Content="Команды параметров" Grid.Row="4" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="0,2,0,1" Padding="5,0,5,5"/>
+				<Button x:Name="SpdMovSend" Content="Отправить" HorizontalAlignment="Left" Height="29" VerticalAlignment="Center" Width="68" Click="SpdMovSend_Click" Margin="147,0,10,0" Grid.Row="5"/>
+			</Grid>
+		</Viewbox>
+		<Viewbox x:Name="ChatView" Grid.Column="2" Margin="10,10,10,10" Grid.Row="1">
+			<Grid Height="392" Width="380">
+				<Grid.RowDefinitions>
+					<RowDefinition Height="95*"/>
+					<RowDefinition Height="5*"/>
+				</Grid.RowDefinitions>
+				<TextBox x:Name="ServerData" TextWrapping="Wrap" VerticalScrollBarVisibility="Visible" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" IsReadOnly="True"/>
+				<Grid Grid.Row="1">
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="60*"/>
+						<ColumnDefinition Width="15*"/>
+					</Grid.ColumnDefinitions>
+					<Button x:Name="SendCmd" Content="Отправить" Margin="0,0,0,0" Click="SendCmd_Click" Grid.Column="1"/>
+					<TextBox x:Name="CommandInput" TextWrapping="Wrap" Margin="0,0,0,0" KeyDown="OnPress"/>
+				</Grid>
+			</Grid>
+		</Viewbox>
+		<Viewbox Grid.Column="2" Margin="0,0,0,0" Grid.Row="0">
+			<Label Content="Сервер" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="28" Height="62" Width="360"/>
+		</Viewbox>
 
-    </Grid>
+	</Grid>
 </Window>

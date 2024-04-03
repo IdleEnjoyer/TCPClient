@@ -15,9 +15,6 @@ using System.Text.RegularExpressions;
 
 namespace TCPDevice
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         private TcpClient Client;
@@ -71,8 +68,8 @@ namespace TCPDevice
             {
                 try
                 {
-                    int BytesRead = await Stream.ReadAsync(Buffer, 0, Buffer.Length);
-                    if (BytesRead == 0)
+                    int BytesRead = await Stream.ReadAsync(Buffer);
+                    if (BytesRead == 0) 
                     {
                         Client.Close();
                         ConnectionStatus.Content = "Отключен";
@@ -266,7 +263,7 @@ namespace TCPDevice
             ServerData.ScrollToEnd();
         }
 
-        private void Button_Click_1(object sender, RoutedEventArgs e)
+        private void SpdMovSend_Click(object sender, RoutedEventArgs e)
         {
             try
             {
