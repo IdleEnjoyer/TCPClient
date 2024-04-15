@@ -100,7 +100,7 @@
                     <RowDefinition Height="95*"/>
                     <RowDefinition Height="5*"/>
                 </Grid.RowDefinitions>
-                <TextBox x:Name="ServerData" TextWrapping="Wrap" VerticalScrollBarVisibility="Visible" IsReadOnly="True"/>
+                <TextBox x:Name="ServerData" TextWrapping="Wrap" VerticalScrollBarVisibility="Visible" IsReadOnly="True" FontFamily="Cascadia Mono Light" FontSize="11"/>
                 <Grid Grid.Row="1">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="60*"/>
