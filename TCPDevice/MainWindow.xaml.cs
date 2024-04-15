@@ -97,7 +97,7 @@ namespace TCPDevice
                 }
                 catch (IOException ex)
                 {
-                    MessageBox.Show("Сервер закрыт!", "Внимание", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                    MessageBox.Show("Отключен от сервера", "Внимание", MessageBoxButton.OK, MessageBoxImage.Exclamation);
                     break;
                 }
             }
@@ -142,6 +142,16 @@ namespace TCPDevice
                         SendData("RES");
                     }
                 }
+                Demo1.Stop();
+                Demo1Cycle = false;
+                Demo2.Stop();
+                TimersElapsed.Reset();
+                TimersElapsed.Stop();
+                DispTimer.Stop();
+                DispTimer.Tick -= DispTimer2_Tick;
+                DispTimer.Tick -= DispTimer1_Tick;
+                Demo1Btn.IsEnabled = true;
+                Demo2Btn.IsEnabled = true;
             }
             catch (Exception ex)
             {
@@ -163,6 +173,7 @@ namespace TCPDevice
                 TimersElapsed.Stop();
                 DispTimer.Stop();
                 DispTimer.Tick -= DispTimer2_Tick;
+                DispTimer.Tick -= DispTimer1_Tick;
                 Demo1Btn.IsEnabled = true;
                 Demo2Btn.IsEnabled = true;
             }
@@ -333,7 +344,6 @@ namespace TCPDevice
         private void SendCmd_Click(object sender, RoutedEventArgs e)
         {
             SendData(CommandInput.Text);
-            CommandInput.Text = string.Empty;
         }
 
         private void OnSelect(object sender, SelectionChangedEventArgs e)
@@ -359,7 +369,7 @@ namespace TCPDevice
                     CurrentDemo.Content = "ВЕРТИКАЛЬНАЯ";
                     Demo2Btn.IsEnabled = false;
                     Demo1Btn.IsEnabled = false;
-                    SendData("MOVE 0 50");
+                    SendData("MOVE 100 50");
                     TimersElapsed.Start();
                     DispTimer.Tick += DispTimer1_Tick;
                     DispTimer.Start();
@@ -391,7 +401,7 @@ namespace TCPDevice
             else
             {
                 Demo1Cycle = false;
-                SendData("MOVE 0 50");
+                SendData("MOVE 100 50");
             }
             TimersElapsed.Restart();
         }
@@ -400,13 +410,13 @@ namespace TCPDevice
         {
             if (!Demo1Cycle)
             {
-                SendData("MOVE 90 45");
+                SendData("MOVE#1 90 45");
                 Demo1Cycle = true;
             }
             else
             {
                 Demo1Cycle = false;
-                SendData("MOVE 0 45");
+                SendData("MOVE#1 0 45");
             }
             TimersElapsed.Restart();
         }
@@ -420,7 +430,7 @@ namespace TCPDevice
                     CurrentDemo.Content = "ПОЛЯРИЗАЦИЯ";
                     Demo2Btn.IsEnabled = false;
                     Demo1Btn.IsEnabled = false;
-                    SendData("MOVE 0 45");
+                    SendData("MOVE#1 0 45");
                     TimersElapsed.Start();
                     DispTimer.Tick += DispTimer2_Tick;
                     DispTimer.Start();
