@@ -65,7 +65,7 @@
             </Grid>
         </Viewbox>
         <Viewbox Grid.Column="1" Grid.Row="1">
-            
+
             <Grid x:Name="CmdGrid" VerticalAlignment="Top">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="1*"/>
@@ -74,7 +74,8 @@
                 <Grid x:Name="CommandGrid" HorizontalAlignment="Left" Margin="10,0,0,0" Grid.Row="1" Width="138" Height="200">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
-                        <RowDefinition/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
@@ -88,11 +89,14 @@
                     </ComboBox>
                     <Button x:Name="Demo1Btn" Content="Вертикальная" Grid.Column="1" Grid.Row="1" Margin="0,0,0,10" Click="Demo1Btn_Click"/>
                     <Button x:Name="Demo2Btn" Content="Поляризация" Grid.Column="1" Grid.Row="2" Margin="0,0,0,10" Click="Demo2Btn_Click"/>
-                    <Label x:Name="CurrentDemo" Content="" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="14" Grid.Column="1" Grid.Row="3" />
+                    <Button x:Name="AllButton" Content="Всё" FontSize="12" Grid.Row="3" Grid.Column="1" Margin="0,0,0,10" Click="AllButton_Click"/>
+                    <Label x:Name="CurrentDemo" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="14" Grid.Column="1" Grid.Row="4" >
+                        
+                    </Label>
                 </Grid>
                 <Label x:Name="TimerLabel" Content="Таймер: " VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
             </Grid>
-            
+
         </Viewbox>
         <Viewbox x:Name="ChatView" Grid.Column="2" Margin="10,10,10,10" Grid.Row="1">
             <Grid Height="392" Width="380">

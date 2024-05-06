@@ -25,14 +25,15 @@ namespace TCPDevice
         private byte[] ByteData;
         private Stopwatch TimersElapsed = new Stopwatch();
         private DispatcherTimer DispTimer = new DispatcherTimer();
-        private Timer Demo1 = new Timer(65000);
+        private Timer Demo1 = new Timer(30000);
         private bool Demo1Cycle = false;
         private Timer Demo2 = new Timer(5000);
+        private int Demo3Cycle = 0;
         public MainWindow()
         {
             InitializeComponent();
-            Demo1.Elapsed += Demo1_Elapsed;
-            Demo2.Elapsed += Demo2_Elapsed;
+            //Demo1.Elapsed += Demo1_Elapsed;
+            //Demo2.Elapsed += Demo2_Elapsed;
             DispTimer.Interval = TimeSpan.FromMilliseconds(100);
         }
 
@@ -176,6 +177,7 @@ namespace TCPDevice
                 DispTimer.Tick -= DispTimer1_Tick;
                 Demo1Btn.IsEnabled = true;
                 Demo2Btn.IsEnabled = true;
+                AllButton.IsEnabled = true;
             }
             catch (Exception ex)
             {
@@ -369,10 +371,12 @@ namespace TCPDevice
                     CurrentDemo.Content = "ВЕРТИКАЛЬНАЯ";
                     Demo2Btn.IsEnabled = false;
                     Demo1Btn.IsEnabled = false;
+                    AllButton.IsEnabled = false;
                     SendData("MOVE 100 50");
                     TimersElapsed.Start();
                     DispTimer.Tick += DispTimer1_Tick;
                     DispTimer.Start();
+                    Demo1.Elapsed += Demo1_Elapsed;
                     Demo1.AutoReset = true;
                     Demo1.Enabled = true;
                     
@@ -387,7 +391,7 @@ namespace TCPDevice
 
         private void DispTimer1_Tick(object? sender, EventArgs e)
         {
-            int remainingTime = 65000 - (int)TimersElapsed.Elapsed.TotalMilliseconds;
+            int remainingTime = 30000 - (int)TimersElapsed.Elapsed.TotalMilliseconds;
             TimerLabel.Content = "Таймер: " + (remainingTime / 1000.0).ToString("0.000");
         }
 
@@ -430,10 +434,12 @@ namespace TCPDevice
                     CurrentDemo.Content = "ПОЛЯРИЗАЦИЯ";
                     Demo2Btn.IsEnabled = false;
                     Demo1Btn.IsEnabled = false;
+                    AllButton.IsEnabled = false;
                     SendData("MOVE#1 0 45");
                     TimersElapsed.Start();
                     DispTimer.Tick += DispTimer2_Tick;
                     DispTimer.Start();
+                    Demo2.Elapsed += Demo2_Elapsed;
                     Demo2.AutoReset = true;
                     Demo2.Enabled = true;
                 }
@@ -461,6 +467,121 @@ namespace TCPDevice
                 int index = textBox.Text.IndexOf(Environment.NewLine);
                 textBox.Text = textBox.Text.Substring(index + Environment.NewLine.Length);
             }
+        }
+
+        private void AllButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (Client.Connected)
+                {
+                    CurrentDemo.Content = "ВЕРТ И ПОЛЯР";
+                    Demo2Btn.IsEnabled = false;
+                    Demo1Btn.IsEnabled = false;
+                    AllButton.IsEnabled = false;
+                    SendData("MOVE 1100 100");
+                    TimersElapsed.Start();
+                    DispTimer.Tick += DispTimer1_Tick;
+                    DispTimer.Start();
+                    Demo1.Elapsed += Demo3_Elapsed;
+                    Demo1.AutoReset = true;
+                    Demo1.Enabled = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Не подключено!", "Внимание", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+            }
+        }
+
+        private void DispTimer3_Tick(object? sender, EventArgs e)
+        {
+            int remainingTime = 65000 - (int)TimersElapsed.Elapsed.TotalMilliseconds;
+            TimerLabel.Content = "Таймер: " + (remainingTime / 1000.0).ToString("0.000");
+        }
+
+        private void Demo3_Elapsed(object? sender, ElapsedEventArgs e)
+        {
+            switch (Demo3Cycle)
+            {
+                case 0:
+                    {
+                        SendData("MOVE#1 90 45");
+
+                        Demo1.Stop();
+                        Demo1.Elapsed -= Demo3_Elapsed;
+
+                        Demo2.Elapsed += Demo3_Elapsed;
+                        Demo2.AutoReset = true;
+                        Demo2.Enabled = true;
+
+                        DispTimer.Stop();
+                        DispTimer.Tick += DispTimer2_Tick;
+                        DispTimer.Tick -= DispTimer1_Tick;
+                        DispTimer.Start();
+
+                        Demo3Cycle++;
+                    }
+                    break;
+                case 1:
+                    {
+                        SendData("MOVE 3600 100");
+
+                        Demo2.Stop();
+                        Demo2.Elapsed -= Demo3_Elapsed;
+
+                        Demo1.Elapsed += Demo3_Elapsed;
+                        Demo1.AutoReset = true;
+                        Demo1.Enabled = true;
+
+                        DispTimer.Stop();
+                        DispTimer.Tick -= DispTimer2_Tick;
+                        DispTimer.Tick += DispTimer1_Tick;
+                        DispTimer.Start();
+
+                        Demo3Cycle++;
+                    }
+                    break;
+                case 2:
+                    {
+                        SendData("MOVE#1 0 45");
+
+                        Demo1.Stop();
+                        Demo1.Elapsed -= Demo3_Elapsed;
+
+                        Demo2.Elapsed += Demo3_Elapsed;
+                        Demo2.AutoReset = true;
+                        Demo2.Enabled = true;
+
+                        DispTimer.Stop();
+                        DispTimer.Tick += DispTimer2_Tick;
+                        DispTimer.Tick -= DispTimer1_Tick;
+                        DispTimer.Start();
+
+                        Demo3Cycle++;
+                    }
+                    break;
+                case 3:
+                    {
+                        SendData("MOVE 1100 100");
+
+                        Demo2.Stop();
+                        Demo2.Elapsed -= Demo3_Elapsed;
+
+                        Demo1.Elapsed += Demo3_Elapsed;
+                        Demo1.AutoReset = true;
+                        Demo1.Enabled = true;
+
+                        DispTimer.Stop();
+                        DispTimer.Tick -= DispTimer2_Tick;
+                        DispTimer.Tick += DispTimer1_Tick;
+                        DispTimer.Start();
+
+                        Demo3Cycle = 0;
+                    }
+                    break;
+            }
+            TimersElapsed.Restart();
         }
     }
 }
