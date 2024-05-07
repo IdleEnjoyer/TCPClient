@@ -372,7 +372,7 @@ namespace TCPDevice
                     Demo2Btn.IsEnabled = false;
                     Demo1Btn.IsEnabled = false;
                     AllButton.IsEnabled = false;
-                    SendData("MOVE 100 50");
+                    SendData("MOVE 1100 100");
                     TimersElapsed.Start();
                     DispTimer.Tick += DispTimer1_Tick;
                     DispTimer.Start();
@@ -399,13 +399,13 @@ namespace TCPDevice
         {
             if (!Demo1Cycle)
             {
-                SendData("MOVE 3000 50");
+                SendData("MOVE 3600 100");
                 Demo1Cycle = true;
             }
             else
             {
                 Demo1Cycle = false;
-                SendData("MOVE 100 50");
+                SendData("MOVE 1100 100");
             }
             TimersElapsed.Restart();
         }
