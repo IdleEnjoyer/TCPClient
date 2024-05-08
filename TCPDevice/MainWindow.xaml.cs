@@ -25,9 +25,11 @@ namespace TCPDevice
         private byte[] ByteData;
         private Stopwatch TimersElapsed = new Stopwatch();
         private DispatcherTimer DispTimer = new DispatcherTimer();
-        private Timer Demo1 = new Timer(30000);
+        private static int LongTimer = 30000;
+        private static int ShortTimer = 5000;
+        private Timer Demo1 = new Timer(LongTimer);
         private bool Demo1Cycle = false;
-        private Timer Demo2 = new Timer(5000);
+        private Timer Demo2 = new Timer(ShortTimer);
         private int Demo3Cycle = 0;
         public MainWindow()
         {
@@ -127,25 +129,29 @@ namespace TCPDevice
                 ComboBox? DisabledCB = PolarisationCmd.Items.GetItemAt(0) as ComboBox;
                 TextBox? DisabledTB = DisabledCB.Items.GetItemAt(1) as TextBox;
                 string StateData = "";
-                if(EnabledCheckBox.IsChecked == true)
-                {
-                    for (int i = 0; i < 6; i++)
-                    {
-                        SendData("RES");
-                    }
-                }
+                //if(EnabledCheckBox.IsChecked == true)
+                //{
+                //    for (int i = 0; i < 6; i++)
+                //    {
+                //        SendData("RES");
+                //    }
+                //}
                 StateData = EnabledCheckBox.IsChecked == true ? StateData += EnabledTB.Text : StateData += DisabledTB.Text;
                 SendData(StateData);
-                if (EnabledCheckBox.IsChecked != true)
-                {
-                    for (int i = 0; i < 6; i++)
-                    {
-                        SendData("RES");
-                    }
-                }
+                //if (EnabledCheckBox.IsChecked != true)
+                //{
+                //    for (int i = 0; i < 6; i++)
+                //    {
+                //        SendData("RES");
+                //    }
+                //}
                 Demo1.Stop();
                 Demo1Cycle = false;
                 Demo2.Stop();
+                Demo1.Elapsed -= Demo1_Elapsed;
+                Demo2.Elapsed -= Demo2_Elapsed;
+                Demo1.Elapsed -= Demo3_Elapsed;
+                Demo2.Elapsed -= Demo3_Elapsed;
                 TimersElapsed.Reset();
                 TimersElapsed.Stop();
                 DispTimer.Stop();
@@ -153,6 +159,7 @@ namespace TCPDevice
                 DispTimer.Tick -= DispTimer1_Tick;
                 Demo1Btn.IsEnabled = true;
                 Demo2Btn.IsEnabled = true;
+                AllButton.IsEnabled = true;
             }
             catch (Exception ex)
             {
@@ -170,6 +177,10 @@ namespace TCPDevice
                 Demo1.Stop();
                 Demo1Cycle = false;
                 Demo2.Stop();
+                Demo1.Elapsed -= Demo1_Elapsed;
+                Demo2.Elapsed -= Demo2_Elapsed;
+                Demo1.Elapsed -= Demo3_Elapsed;
+                Demo2.Elapsed -= Demo3_Elapsed;
                 TimersElapsed.Reset();
                 TimersElapsed.Stop();
                 DispTimer.Stop();
@@ -372,7 +383,7 @@ namespace TCPDevice
                     Demo2Btn.IsEnabled = false;
                     Demo1Btn.IsEnabled = false;
                     AllButton.IsEnabled = false;
-                    SendData("MOVE 1100 100");
+                    SendData("MOVEA11 1100 100");
                     TimersElapsed.Start();
                     DispTimer.Tick += DispTimer1_Tick;
                     DispTimer.Start();
@@ -391,7 +402,7 @@ namespace TCPDevice
 
         private void DispTimer1_Tick(object? sender, EventArgs e)
         {
-            int remainingTime = 30000 - (int)TimersElapsed.Elapsed.TotalMilliseconds;
+            int remainingTime = LongTimer - (int)TimersElapsed.Elapsed.TotalMilliseconds;
             TimerLabel.Content = "Таймер: " + (remainingTime / 1000.0).ToString("0.000");
         }
 
@@ -399,13 +410,13 @@ namespace TCPDevice
         {
             if (!Demo1Cycle)
             {
-                SendData("MOVE 3600 100");
+                SendData("MOVEA11 3600 100");
                 Demo1Cycle = true;
             }
             else
             {
                 Demo1Cycle = false;
-                SendData("MOVE 1100 100");
+                SendData("MOVEA11 1100 100");
             }
             TimersElapsed.Restart();
         }
@@ -414,13 +425,13 @@ namespace TCPDevice
         {
             if (!Demo1Cycle)
             {
-                SendData("MOVE#1 90 45");
+                SendData("MOVEA12 90 45");
                 Demo1Cycle = true;
             }
             else
             {
                 Demo1Cycle = false;
-                SendData("MOVE#1 0 45");
+                SendData("MOVEA12 0 45");
             }
             TimersElapsed.Restart();
         }
@@ -435,7 +446,7 @@ namespace TCPDevice
                     Demo2Btn.IsEnabled = false;
                     Demo1Btn.IsEnabled = false;
                     AllButton.IsEnabled = false;
-                    SendData("MOVE#1 0 45");
+                    SendData("MOVEA12 0 45");
                     TimersElapsed.Start();
                     DispTimer.Tick += DispTimer2_Tick;
                     DispTimer.Start();
@@ -452,7 +463,7 @@ namespace TCPDevice
 
         private void DispTimer2_Tick(object? sender, EventArgs e)
         {
-            int remainingTime = 5000 - (int)TimersElapsed.Elapsed.TotalMilliseconds;
+            int remainingTime = ShortTimer - (int)TimersElapsed.Elapsed.TotalMilliseconds;
             TimerLabel.Content = "Таймер: " + (remainingTime / 1000.0).ToString("0.000");
         }
 
@@ -479,7 +490,7 @@ namespace TCPDevice
                     Demo2Btn.IsEnabled = false;
                     Demo1Btn.IsEnabled = false;
                     AllButton.IsEnabled = false;
-                    SendData("MOVE 1100 100");
+                    SendData("MOVEA11 1100 100");
                     TimersElapsed.Start();
                     DispTimer.Tick += DispTimer1_Tick;
                     DispTimer.Start();
@@ -494,19 +505,13 @@ namespace TCPDevice
             }
         }
 
-        private void DispTimer3_Tick(object? sender, EventArgs e)
-        {
-            int remainingTime = 65000 - (int)TimersElapsed.Elapsed.TotalMilliseconds;
-            TimerLabel.Content = "Таймер: " + (remainingTime / 1000.0).ToString("0.000");
-        }
-
         private void Demo3_Elapsed(object? sender, ElapsedEventArgs e)
         {
             switch (Demo3Cycle)
             {
                 case 0:
                     {
-                        SendData("MOVE#1 90 45");
+                        SendData("MOVEA12 90 45");
 
                         Demo1.Stop();
                         Demo1.Elapsed -= Demo3_Elapsed;
@@ -525,7 +530,7 @@ namespace TCPDevice
                     break;
                 case 1:
                     {
-                        SendData("MOVE 3600 100");
+                        SendData("MOVEA11 3600 100");
 
                         Demo2.Stop();
                         Demo2.Elapsed -= Demo3_Elapsed;
@@ -544,7 +549,7 @@ namespace TCPDevice
                     break;
                 case 2:
                     {
-                        SendData("MOVE#1 0 45");
+                        SendData("MOVEA12 0 45");
 
                         Demo1.Stop();
                         Demo1.Elapsed -= Demo3_Elapsed;
@@ -563,7 +568,7 @@ namespace TCPDevice
                     break;
                 case 3:
                     {
-                        SendData("MOVE 1100 100");
+                        SendData("MOVEA11 1100 100");
 
                         Demo2.Stop();
                         Demo2.Elapsed -= Demo3_Elapsed;
