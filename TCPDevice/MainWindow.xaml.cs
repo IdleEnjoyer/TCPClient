@@ -11,6 +11,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Media.Animation;
+using System.Timers;
 
 #pragma warning disable CS8618
 #pragma warning disable CS8602
@@ -24,7 +25,9 @@ namespace TCPDevice
         private byte[] ByteData;
         private double CurrentPos1 = 0;
         private double CurrentPos2 = 0;
-        private bool LoopCycle = false;
+        private int LoopCycle1 = 1;
+        private int LoopCycle2 = 1;
+        System.Timers.Timer PauseTime;
         public MainWindow()
         {
             InitializeComponent();
@@ -83,10 +86,6 @@ namespace TCPDevice
                         break;
                     }
                     string Data = Encoding.ASCII.GetString(Buffer, 0, BytesRead);
-                    if (CurrentPos < 0)
-                    {
-                        CurrentPos = double.Parse(Data);
-                    }
                     ServerData.Text += "Сервер " + System.DateTime.Now.ToString() + ": " + Data + "\n";
                     ServerData.ScrollToEnd();
                 }
@@ -97,56 +96,6 @@ namespace TCPDevice
                 }
             }
         }
-
-        //private async Task ServerResponseAsync()
-        //{
-        //    byte[] Buffer = new byte[1024];
-        //    System.Timers.Timer Timeout = new System.Timers.Timer(5000);
-        //    Timeout.Elapsed += Timeout_Elapsed;
-        //    Timeout.Start();
-        //    while (Client.Connected && Waiting)
-        //    {
-        //        try
-        //        {
-        //            Task<int> bytesReadTask = Stream.ReadAsync(Buffer).AsTask();
-        //            Task completedTask = await Task.WhenAny(bytesReadTask, Task.Delay(TimeSpan.FromSeconds(5)));
-        //            if(completedTask == bytesReadTask)
-        //            {
-        //                int bytesRead = await bytesReadTask;
-        //                MessageBox.Show(bytesRead.ToString());
-        //            }
-        //            else
-        //            {
-        //                break;
-        //            }
-        //            //if (BytesRead == 0)
-        //            //{
-        //            //    Client.Close();
-        //            //    ConnectionStatus.Content = "Отключен";
-        //            //    ConnectionStatus.Foreground = Brushes.Red;
-        //            //    MessageBox.Show("Сервер закрыт!", "Внимание", MessageBoxButton.OK, MessageBoxImage.Exclamation);
-        //            //    break;
-        //            //}
-        //            //string Data = Encoding.ASCII.GetString(Buffer, 0, BytesRead);
-        //            //if (CurrentPos < 0)
-        //            //{
-        //            //    CurrentPos = double.Parse(Data);
-        //            //}
-        //            //ServerData.Text += "Сервер " + System.DateTime.Now.ToString() + ": " + Data + "\n";
-        //            //ServerData.ScrollToEnd();
-        //            return;
-        //        }
-        //        catch (IOException ex)
-        //        {
-        //            MessageBox.Show(ex.Message);
-        //            break;
-        //        }
-        //    }
-        //    Timeout.Stop();
-        //    Timeout.Elapsed -= Timeout_Elapsed;
-        //    ServerData.Text += "Истекло время ожидания сервера\n";
-        //    return;
-        //}
 
         private void EnabledCheckBox_Checked(object sender, RoutedEventArgs e)
         {
@@ -171,6 +120,9 @@ namespace TCPDevice
             try
             {
                 SendData("STOP");
+                PauseTime.Stop();
+                PauseTime.Elapsed -= PauseTime_Elapsed;
+
             }
             catch (Exception ex)
             {
@@ -196,9 +148,10 @@ namespace TCPDevice
             {
                 double Pos = double.Parse(TarPosInput1.Text.Replace(".", ","));
                 double Speed = double.Parse(SpeedInput1.Text.Replace(".", ","));
-                double Step = double.Parse(MoveInput1.Text.Replace(".", ","));
-                string StateData = "MOVEA1 " + Pos + " " + Step + " " + Speed;
+                string StateData = "MOVEA1 " + Pos + " " + Speed;
+                CurrentPos1 = Pos;
                 SendData(StateData);
+                CurPosLabel1.Content = CurrentPos1.ToString();
             }
             catch (Exception ex)
             {
@@ -212,9 +165,10 @@ namespace TCPDevice
             {
                 double Pos = double.Parse(TarPosInput2.Text.Replace(".", ","));
                 double Speed = double.Parse(SpeedInput2.Text.Replace(".", ","));
-                double Step = double.Parse(MoveInput2.Text.Replace(".", ","));
-                string StateData = "MOVEA2 " + Pos + " " + Step + " " + Speed;
+                string StateData = "MOVEA2 " + Pos + " " + Speed;
+                CurrentPos2 = Pos;
                 SendData(StateData);
+                CurPosLabel2.Content = CurrentPos2.ToString();
             }
             catch (Exception ex)
             {
@@ -246,11 +200,12 @@ namespace TCPDevice
         {
             try
             {
-                if (CurrentPos1 - double.Parse(MoveInput1.Text.Replace(".", ",")) < 0.0)
+                if (CurrentPos1 - double.Parse(MoveInput1.Text.Replace(".", ",")) > -100.0)
                 {
-                    CurrentPos1 = CurrentPos1 + double.Parse(MoveInput1.Text.Replace(".", ","));
+                    CurrentPos1 = CurrentPos1 - double.Parse(MoveInput1.Text.Replace(".", ","));
                     double Speed = double.Parse(SpeedInput1.Text.Replace(".", ","));
                     SendData("MOVEA1 " + CurrentPos1.ToString() + " " + Speed);
+                    CurPosLabel1.Content = CurrentPos1.ToString();
                 }
             }
             catch(Exception ex)
@@ -267,6 +222,7 @@ namespace TCPDevice
                     CurrentPos1 = CurrentPos1 + double.Parse(MoveInput1.Text.Replace(".", ","));
                     double Speed = double.Parse(SpeedInput1.Text.Replace(".", ","));
                     SendData("MOVEA1 " + CurrentPos1.ToString() + " " + Speed);
+                    CurPosLabel1.Content = CurrentPos1.ToString();
                 }
             }
             catch (Exception ex)
@@ -279,11 +235,12 @@ namespace TCPDevice
         {
             try
             {
-                if (CurrentPos2 - double.Parse(MoveInput2.Text.Replace(".", ",")) < 0.0)
+                if (CurrentPos2 - double.Parse(MoveInput2.Text.Replace(".", ",")) > -100.0)
                 {
-                    CurrentPos2 = CurrentPos2 + double.Parse(MoveInput2.Text.Replace(".", ","));
+                    CurrentPos2 = CurrentPos2 - double.Parse(MoveInput2.Text.Replace(".", ","));
                     double Speed = double.Parse(SpeedInput2.Text.Replace(".", ","));
                     SendData("MOVEA2 " + CurrentPos2.ToString() + " " + Speed);
+                    CurPosLabel2.Content = CurrentPos2.ToString();
                 }
             }
             catch (Exception ex)
@@ -301,12 +258,83 @@ namespace TCPDevice
                     CurrentPos2 = CurrentPos2 + double.Parse(MoveInput2.Text.Replace(".", ","));
                     double Speed = double.Parse(SpeedInput2.Text.Replace(".", ","));
                     SendData("MOVEA2 " + CurrentPos2.ToString() + " " + Speed);
+                    CurPosLabel2.Content = CurrentPos2.ToString();
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
+        }
+
+        private void WalkingStart1_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                int Time = (int)(double.Parse(PauInput1.Text) * 1000);
+                PauseTime = new System.Timers.Timer(Time);
+                PauseTime.AutoReset = true;
+                PauseTime.Elapsed += PauseTime1_Elapsed;
+                PauseTime.Start();
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void PauseTime1_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
+        {
+
+            this.Dispatcher.Invoke(() =>
+            {
+                if (CurrentPos1 + double.Parse(MoveInput1.Text.Replace(".", ",")) > 100.0)
+                {
+                    LoopCycle1 = -1;
+                }
+                else if (CurrentPos1 - double.Parse(MoveInput1.Text.Replace(".", ",")) < -100.0)
+                {
+                    LoopCycle1 = 1;
+                }
+                CurrentPos1 = CurrentPos1 + LoopCycle1 * double.Parse(MoveInput1.Text.Replace(".", ","));
+                double Speed = double.Parse(SpeedInput1.Text.Replace(".", ","));
+                SendData("MOVEA1 " + CurrentPos1.ToString() + " " + Speed.ToString());
+            });
+        }
+
+        private void WalkingStart2_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                int Time = (int)(double.Parse(PauInput1.Text) * 1000);
+                PauseTime = new System.Timers.Timer(Time);
+                PauseTime.AutoReset = true;
+                PauseTime.Elapsed += PauseTime2_Elapsed;
+                PauseTime.Start();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void PauseTime2_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
+        {
+
+            this.Dispatcher.Invoke(() =>
+            {
+                if (CurrentPos2 + double.Parse(MoveInput2.Text.Replace(".", ",")) > 100.0)
+                {
+                    LoopCycle2 = -1;
+                }
+                else if (CurrentPos2 - double.Parse(MoveInput2.Text.Replace(".", ",")) < -100.0)
+                {
+                    LoopCycle2 = 1;
+                }
+                CurrentPos1 = CurrentPos2 + LoopCycle1 * double.Parse(MoveInput2.Text.Replace(".", ","));
+                double Speed = double.Parse(SpeedInput2.Text.Replace(".", ","));
+                SendData("MOVEA1 " + CurrentPos2.ToString() + " " + Speed.ToString());
+            });
         }
     }
 }

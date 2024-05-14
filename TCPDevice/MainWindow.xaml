@@ -75,42 +75,48 @@
                     <RowDefinition Height="1*"/>
                     <RowDefinition Height="1*"/>
                     <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1*"/>
                     <ColumnDefinition Width="2*"/>
                     <ColumnDefinition Width="2*"/>
                 </Grid.ColumnDefinitions>
-                <Button x:Name="AbortBtn" Content="STOP" Click="AbortBtn_Click" Grid.Column="1" Grid.Row="7" Grid.ColumnSpan="2" Margin="43,0,42,0"/>
+                <Button x:Name="AbortBtn" Content="STOP" Click="AbortBtn_Click" Grid.Column="1" Grid.Row="8" Grid.ColumnSpan="2" Margin="43,0,42,0"/>
 
-                <TextBox x:Name="MoveInput1" TextWrapping="Wrap" Text="5,0" FontSize="12" Grid.Column="1" Margin="10,0,10,0" Grid.Row="0" VerticalContentAlignment="Center" Width="65"/>
-                <TextBox x:Name="MoveInput2" TextWrapping="Wrap" Text="5,0" FontSize="12" Grid.Column="2" Margin="10,0,10,0" Grid.Row="0" VerticalContentAlignment="Center" Width="65"/>
+                <TextBox x:Name="MoveInput1" TextWrapping="Wrap" Text="5,0" FontSize="12" Grid.Column="1" Margin="10,0,10,0" Grid.Row="1" VerticalContentAlignment="Center" Width="65"/>
+                <TextBox x:Name="MoveInput2" TextWrapping="Wrap" Text="5,0" FontSize="12" Grid.Column="2" Margin="10,0,10,0" Grid.Row="1" VerticalContentAlignment="Center" Width="65"/>
 
-                <TextBox x:Name="SpeedInput1" TextWrapping="Wrap" Text="5,0" FontSize="12" Grid.Column="1" Margin="10,0,10,0" Grid.Row="1" VerticalContentAlignment="Center"/>
-                <TextBox x:Name="SpeedInput2" TextWrapping="Wrap" Text="5,0" FontSize="12" Grid.Column="2" Margin="10,0,10,0" Grid.Row="1" VerticalContentAlignment="Center"/>
+                <TextBox x:Name="SpeedInput1" TextWrapping="Wrap" Text="5,0" FontSize="12" Grid.Column="1" Margin="10,0,10,0" Grid.Row="2" VerticalContentAlignment="Center"/>
+                <TextBox x:Name="SpeedInput2" TextWrapping="Wrap" Text="5,0" FontSize="12" Grid.Column="2" Margin="10,0,10,0" Grid.Row="2" VerticalContentAlignment="Center"/>
 
-                <Button x:Name="LeftStep1" Grid.Column="1" Grid.Row="2" Width="25" HorizontalAlignment="Center" Margin="0,0,30,0" Content="←" FontSize="14" Click="LeftStep1_Click" />
-                <Button x:Name="RightStep1" Grid.Column="1" Grid.Row="2" Width="25" HorizontalAlignment="Center" Margin="30,0,0,0" Content="→" FontSize="14" Click="RightStep1_Click" />
+                <Button x:Name="LeftStep1" Grid.Column="1" Grid.Row="3" Width="25" HorizontalAlignment="Center" Margin="0,0,30,0" Content="←" FontSize="14" Click="LeftStep1_Click" />
+                <Button x:Name="RightStep1" Grid.Column="1" Grid.Row="3" Width="25" HorizontalAlignment="Center" Margin="30,0,0,0" Content="→" FontSize="14" Click="RightStep1_Click" />
 
-                <Button x:Name="LeftStep2" Grid.Column="2" Grid.Row="2" Width="25" HorizontalAlignment="Center" Margin="0,0,30,0" FontSize="14" Content="↓" Click="LeftStep2_Click" />
-                <Button x:Name="RightStep2" Grid.Column="2" Grid.Row="2" Width="25" HorizontalAlignment="Center" Margin="30,0,0,0" FontSize="14" Content="↑" Click="RightStep2_Click" />
+                <Button x:Name="LeftStep2" Grid.Column="2" Grid.Row="3" Width="25" HorizontalAlignment="Center" Margin="0,0,30,0" FontSize="14" Content="↓" Click="LeftStep2_Click" />
+                <Button x:Name="RightStep2" Grid.Column="2" Grid.Row="3" Width="25" HorizontalAlignment="Center" Margin="30,0,0,0" FontSize="14" Content="↑" Click="RightStep2_Click" />
 
-                <TextBox x:Name="PauInput1" TextWrapping="Wrap" Text="3,0" FontSize="12" Grid.Column="1" Margin="10,0,10,0" Grid.Row="3" VerticalContentAlignment="Center"/>
-                <TextBox x:Name="PauInput2" TextWrapping="Wrap" Text="3,0" FontSize="12" Grid.Column="2" Margin="10,0,10,0" Grid.Row="3" VerticalContentAlignment="Center"/>
+                <TextBox x:Name="PauInput1" TextWrapping="Wrap" Text="3,0" FontSize="12" Grid.Column="1" Margin="10,0,10,0" Grid.Row="4" VerticalContentAlignment="Center"/>
+                <TextBox x:Name="PauInput2" TextWrapping="Wrap" Text="3,0" FontSize="12" Grid.Column="2" Margin="10,0,10,0" Grid.Row="4" VerticalContentAlignment="Center"/>
 
-                <Button x:Name="WalkingStart1" Content="↺" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="4" Grid.Column="1" Width="40"/>
-                <Button x:Name="WalkingStart2" Content="↺" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="4" Grid.Column="2" Width="40"/>
+                <Button x:Name="WalkingStart1" Content="↺" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="5" Grid.Column="1" Width="40" Click="WalkingStart1_Click"/>
+                <Button x:Name="WalkingStart2" Content="↺" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="5" Grid.Column="2" Width="40" Click="WalkingStart2_Click"/>
 
-                <TextBox x:Name="TarPosInput1" TextWrapping="Wrap" Text="0,0" FontSize="12" Grid.Column="1" Margin="10,0,10,0" Grid.Row="5" VerticalContentAlignment="Center"/>
-                <TextBox x:Name="TarPosInput2" TextWrapping="Wrap" Text="0,0" FontSize="12" Grid.Column="2" Margin="10,0,10,0" Grid.Row="5" VerticalContentAlignment="Center"/>
+                <TextBox x:Name="TarPosInput1" TextWrapping="Wrap" Text="0,0" FontSize="12" Grid.Column="1" Margin="10,0,10,0" Grid.Row="6" VerticalContentAlignment="Center"/>
+                <TextBox x:Name="TarPosInput2" TextWrapping="Wrap" Text="0,0" FontSize="12" Grid.Column="2" Margin="10,0,10,0" Grid.Row="6" VerticalContentAlignment="Center"/>
 
-                <Label x:Name="MoveLabel" Content="Шаг" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="5,0,5,5" HorizontalAlignment="Center" Grid.Column="0" Grid.Row="0"/>
-                <Label x:Name="PauLabel" Content="Пауза" Grid.Row="3" Grid.Column="0" VerticalContentAlignment="Center" Padding="5,0,5,5" HorizontalAlignment="Center"/>
-                <Label x:Name="SpeedLabel" Content="Скр" Grid.Row="1" Grid.Column="0" VerticalContentAlignment="Center" Padding="5,0,5,5" HorizontalAlignment="Center"/>
-                <Label x:Name="TarPosLabel" Content="Ц Поз" Grid.Row="5" Grid.Column="0" VerticalContentAlignment="Center" Padding="5,0,5,5" HorizontalAlignment="Center"/>
+                <Label x:Name="MoveLabel" Content="Шаг" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="5,0,5,5" HorizontalAlignment="Center" Grid.Column="0" Grid.Row="1"/>
+                <Label x:Name="PauLabel" Content="Пауза" Grid.Row="4" Grid.Column="0" VerticalContentAlignment="Center" Padding="5,0,5,5" HorizontalAlignment="Center"/>
+                <Label x:Name="SpeedLabel" Content="Скр" Grid.Row="2" Grid.Column="0" VerticalContentAlignment="Center" Padding="5,0,5,5" HorizontalAlignment="Center"/>
+                <Label x:Name="TarPosLabel" Content="Ц Поз" Grid.Row="6" Grid.Column="0" VerticalContentAlignment="Center" Padding="5,0,5,5" HorizontalAlignment="Center"/>
+                <Label x:Name="CurPosLabel" Content="Тек Поз" Grid.Row="0" Grid.Column="0" VerticalContentAlignment="Center" Padding="5,0,5,5" HorizontalAlignment="Center"/>
 
-                <Button x:Name="TarPosSend1" Content="⌖" HorizontalAlignment="Center" VerticalAlignment="Center" Click="TarPosSend1_Click" Grid.Row="6" Grid.Column="1" Width="40"/>
-                <Button x:Name="TarPosSend2" Content="⌖" HorizontalAlignment="Center" VerticalAlignment="Center" Click="TarPosSend2_Click" Grid.Row="6" Grid.Column="2" Width="40"/>
+                <Label x:Name="CurPosLabel1" Content="0,0" Grid.Row="0" Grid.Column="1" VerticalContentAlignment="Center" Padding="5,0,5,5" HorizontalAlignment="Center"/>
+                <Label x:Name="CurPosLabel2" Content="0,0" Grid.Row="0" Grid.Column="2" VerticalContentAlignment="Center" Padding="5,0,5,5" HorizontalAlignment="Center"/>
+                <Label x:Name="TimerLabel" Content="0,0" Grid.Row="8" Grid.Column="0" VerticalContentAlignment="Center" Padding="5,0,5,5" HorizontalAlignment="Center"/>
+
+                <Button x:Name="TarPosSend1" Content="⌖" HorizontalAlignment="Center" VerticalAlignment="Center" Click="TarPosSend1_Click" Grid.Row="7" Grid.Column="1" Width="40"/>
+                <Button x:Name="TarPosSend2" Content="⌖" HorizontalAlignment="Center" VerticalAlignment="Center" Click="TarPosSend2_Click" Grid.Row="7" Grid.Column="2" Width="40"/>
             </Grid>
         </Viewbox>
         <Viewbox x:Name="ChatView" Grid.Column="2" Margin="10,10,10,10" Grid.Row="1">
