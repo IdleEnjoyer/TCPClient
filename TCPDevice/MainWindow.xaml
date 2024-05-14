@@ -16,6 +16,7 @@
             <ColumnDefinition Width="45*"/>
             <ColumnDefinition Width="70*"/>
         </Grid.ColumnDefinitions>
+
         <Viewbox x:Name="ConnectionView" Grid.Row="1">
             <Grid x:Name="ConnectionGrid" HorizontalAlignment="Center" Height="325">
                 <Grid.RowDefinitions>
@@ -91,7 +92,7 @@
                     <Button x:Name="Demo2Btn" Content="Поляризация" Grid.Column="1" Grid.Row="2" Margin="0,0,0,10" Click="Demo2Btn_Click"/>
                     <Button x:Name="AllButton" Content="Всё" FontSize="12" Grid.Row="3" Grid.Column="1" Margin="0,0,0,10" Click="AllButton_Click"/>
                     <Label x:Name="CurrentDemo" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="14" Grid.Column="1" Grid.Row="4" >
-                        
+
                     </Label>
                 </Grid>
                 <Label x:Name="TimerLabel" Content="Таймер: " VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>

@@ -94,6 +94,7 @@ namespace TCPDevice
                         break;
                     }
                     string Data = Encoding.ASCII.GetString(Buffer, 0, BytesRead);
+                    Data = Data.Substring(0, Data.Length - 2);
                     AddLineToTextBox("Сервер " + System.DateTime.Now.ToString() + ": " + Data, ServerData);
                     //ServerData.Text += "Сервер " + System.DateTime.Now.ToString() + ": " + Data + "\n";
                     ServerData.ScrollToEnd();
@@ -160,6 +161,7 @@ namespace TCPDevice
                 Demo1Btn.IsEnabled = true;
                 Demo2Btn.IsEnabled = true;
                 AllButton.IsEnabled = true;
+                Demo3Cycle = 0;
             }
             catch (Exception ex)
             {
@@ -189,6 +191,7 @@ namespace TCPDevice
                 Demo1Btn.IsEnabled = true;
                 Demo2Btn.IsEnabled = true;
                 AllButton.IsEnabled = true;
+                Demo3Cycle = 0;
             }
             catch (Exception ex)
             {
