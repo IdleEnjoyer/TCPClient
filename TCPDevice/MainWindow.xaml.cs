@@ -12,6 +12,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Media.Animation;
 using System.Timers;
+using System.Windows.Threading;
 
 #pragma warning disable CS8618
 #pragma warning disable CS8602
@@ -28,9 +29,11 @@ namespace TCPDevice
         private int LoopCycle1 = 1;
         private int LoopCycle2 = 1;
         System.Timers.Timer PauseTime;
+        DispatcherTimer DispTimer = new DispatcherTimer();
         public MainWindow()
         {
             InitializeComponent();
+            DispTimer.Interval = TimeSpan.FromMilliseconds(10);
         }
 
         private async void StartConnection_Click(object sender, RoutedEventArgs e)
@@ -121,8 +124,10 @@ namespace TCPDevice
             {
                 SendData("STOP");
                 PauseTime.Stop();
-                PauseTime.Elapsed -= PauseTime_Elapsed;
-
+                PauseTime.Elapsed -= PauseTime1_Elapsed;
+                PauseTime.Elapsed -= PauseTime2_Elapsed;
+                DispTimer.Stop();
+                
             }
             catch (Exception ex)
             {
@@ -276,11 +281,19 @@ namespace TCPDevice
                 PauseTime.AutoReset = true;
                 PauseTime.Elapsed += PauseTime1_Elapsed;
                 PauseTime.Start();
+                DispTimer.Tick += DispTimer_Tick;
+                DispTimer.Start();
             }
             catch(Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
+        }
+
+        private void DispTimer_Tick(object? sender, EventArgs e)
+        {
+            int remainingTime = (int)(double.Parse(PauInput1.Text) * 1000) - (int)TimersElapsed.Elapsed.TotalMilliseconds;
+            TimerLabel.Content = (remainingTime / 1000.0).ToString("0.000");
         }
 
         private void PauseTime1_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
