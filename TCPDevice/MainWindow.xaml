@@ -33,15 +33,15 @@
                 <Button x:Name="StartConnection" Content="Подключиться" Click="StartConnection_Click" Grid.Row="5" Margin="10,10,10,10" FontSize="16"/>
                 <Label x:Name="ConnectionStatus" Content="Отключен" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24" Foreground="Red" Grid.Column="1" Height="42" Width="167"/>
                 <Label x:Name="IPLabel" Content="IP:" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="24" Grid.Row="1" Height="40" Width="35"/>
-                <TextBox x:Name="IPInput" TextWrapping="Wrap" Text="192.168.0.1" FontSize="24" TextAlignment="Justify" Grid.Row="1" Grid.Column="1" VerticalContentAlignment="Center"/>
-                <TextBox x:Name="PortInput" TextWrapping="Wrap" Text="8000" FontSize="24" TextAlignment="Justify" Grid.Column="1" Grid.Row="2" VerticalContentAlignment="Center"/>
+                <TextBox x:Name="IPInput" TextWrapping="Wrap" Text="192.168.0.101" FontSize="24" TextAlignment="Justify" Grid.Row="1" Grid.Column="1" VerticalContentAlignment="Center"/>
+                <TextBox x:Name="PortInput" TextWrapping="Wrap" Text="23" FontSize="24" TextAlignment="Justify" Grid.Column="1" Grid.Row="2" VerticalContentAlignment="Center"/>
                 <Label x:Name="PortLabel" Content="Port:" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="24" Grid.Row="2" Height="42" Width="58"/>
                 <Button x:Name="StopConnection" Content="Отключиться" Click="StopConnection_Click" Grid.Column="1" Grid.Row="5" Width="164" Margin="10,10,10,10" FontSize="16"/>
                 <Label x:Name="ConnectionLabel" Content="Соединение:" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="22" Height="42" Width="137"/>
                 <Label Content="Символ конца:" HorizontalAlignment="Left" Grid.Row="4" VerticalAlignment="Center" FontSize="24" Height="40" Width="174"/>
                 <TextBox x:Name="EndInput" Grid.Row="4" TextWrapping="Wrap" Text="\r\n" FontSize="24" Grid.Column="1" VerticalContentAlignment="Center"/>
                 <Label Content="Символ начала:" HorizontalAlignment="Left" Grid.Row="3" VerticalAlignment="Center" FontSize="24"/>
-                <TextBox x:Name="StartInput" Grid.Column="1" Grid.Row="3" TextWrapping="Wrap" FontSize="24" VerticalContentAlignment="Center"/>
+                <TextBox x:Name="StartInput" Grid.Column="1" Grid.Row="3" TextWrapping="Wrap" FontSize="24" VerticalContentAlignment="Center" Text="^" />
             </Grid>
         </Viewbox>
         <Viewbox x:Name="TitleView" Margin="0,0,0,0" Grid.Row="0">
@@ -50,16 +50,16 @@
         <Viewbox x:Name="PolarisationView" Grid.Column="1" Margin="0,0,0,0" Grid.Row="0" >
             <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Width="269">
                 <Border Height="55" HorizontalAlignment="Left" VerticalAlignment="Center" Width="235" Margin="24,0,0,0" BorderBrush="Black" BorderThickness="1,1,1,1" Background="#FFDDDDDD" >
-                    <CheckBox x:Name="EnabledCheckBox" Content="Поляризация" FontSize="34" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" UseLayoutRounding="False" Checked="EnabledCheckBox_Checked" Unchecked="EnabledCheckBox_Checked" BorderThickness="1,1,1,1"/>
+                    <CheckBox x:Name="EnabledCheckBox" Content="Питание" FontSize="34" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" UseLayoutRounding="False" Checked="EnabledCheckBox_Checked" Unchecked="EnabledCheckBox_Checked" BorderThickness="1,1,1,1"/>
                 </Border>
                 <ComboBox x:Name="PolarisationCmd" HorizontalAlignment="Left" Height="55" VerticalAlignment="Center" Width="19" Margin="5,0,0,0" SelectionChanged="OnSelect">
                     <ComboBox IsSynchronizedWithCurrentItem="False" SelectedIndex="0" Text="Выключение" SelectionChanged="OnSelect" >
                         <Label Content="Выключение"/>
-                        <TextBox Text="EN0 0"/>
+                        <TextBox Text="DIS"/>
                     </ComboBox>
                     <ComboBox SelectedIndex="0" SelectionChanged="OnSelect" >
                         <Label Content="Включение"/>
-                        <TextBox Text="EN0 1"/>
+                        <TextBox Text="EN"/>
                     </ComboBox>
                 </ComboBox>
             </Grid>

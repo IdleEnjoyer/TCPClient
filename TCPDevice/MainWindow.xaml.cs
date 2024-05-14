@@ -13,6 +13,7 @@ using System.Threading;
 using System.Windows.Media.Animation;
 using System.Timers;
 using System.Windows.Threading;
+using System.Diagnostics;
 
 #pragma warning disable CS8618
 #pragma warning disable CS8602
@@ -28,8 +29,9 @@ namespace TCPDevice
         private double CurrentPos2 = 0;
         private int LoopCycle1 = 1;
         private int LoopCycle2 = 1;
-        System.Timers.Timer PauseTime;
-        DispatcherTimer DispTimer = new DispatcherTimer();
+        private System.Timers.Timer PauseTime;
+        private DispatcherTimer DispTimer = new DispatcherTimer();
+        private Stopwatch TimersElapsed = new Stopwatch();
         public MainWindow()
         {
             InitializeComponent();
@@ -127,7 +129,24 @@ namespace TCPDevice
                 PauseTime.Elapsed -= PauseTime1_Elapsed;
                 PauseTime.Elapsed -= PauseTime2_Elapsed;
                 DispTimer.Stop();
-                
+                TimersElapsed.Restart();
+                TimersElapsed.Stop();
+                WalkingStart1.IsEnabled = true;
+                WalkingStart2.IsEnabled = true;
+                MoveInput1.IsEnabled = true;
+                MoveInput2.IsEnabled = true;
+                SpeedInput1.IsEnabled = true;
+                SpeedInput2.IsEnabled = true;
+                LeftStep1.IsEnabled = true;
+                RightStep1.IsEnabled = true;
+                LeftStep2.IsEnabled = true;
+                RightStep2.IsEnabled = true;
+                PauInput1.IsEnabled = true;
+                PauInput2.IsEnabled = true;
+                TarPosInput1.IsEnabled = true;
+                TarPosInput2.IsEnabled = true;
+                TarPosSend1.IsEnabled = true;
+                TarPosSend2.IsEnabled = true;
             }
             catch (Exception ex)
             {
@@ -205,7 +224,7 @@ namespace TCPDevice
         {
             try
             {
-                if (CurrentPos1 - double.Parse(MoveInput1.Text.Replace(".", ",")) > -100.0)
+                if (CurrentPos1 - double.Parse(MoveInput1.Text.Replace(".", ",")) >= -100.0)
                 {
                     CurrentPos1 = CurrentPos1 - double.Parse(MoveInput1.Text.Replace(".", ","));
                     double Speed = double.Parse(SpeedInput1.Text.Replace(".", ","));
@@ -223,7 +242,7 @@ namespace TCPDevice
         {
             try
             {
-                if(CurrentPos1 + double.Parse(MoveInput1.Text.Replace(".", ",")) < 100.0) {
+                if(CurrentPos1 + double.Parse(MoveInput1.Text.Replace(".", ",")) <= 100.0) {
                     CurrentPos1 = CurrentPos1 + double.Parse(MoveInput1.Text.Replace(".", ","));
                     double Speed = double.Parse(SpeedInput1.Text.Replace(".", ","));
                     SendData("MOVEA1 " + CurrentPos1.ToString() + " " + Speed);
@@ -240,7 +259,7 @@ namespace TCPDevice
         {
             try
             {
-                if (CurrentPos2 - double.Parse(MoveInput2.Text.Replace(".", ",")) > -100.0)
+                if (CurrentPos2 - double.Parse(MoveInput2.Text.Replace(".", ",")) >= -100.0)
                 {
                     CurrentPos2 = CurrentPos2 - double.Parse(MoveInput2.Text.Replace(".", ","));
                     double Speed = double.Parse(SpeedInput2.Text.Replace(".", ","));
@@ -258,7 +277,7 @@ namespace TCPDevice
         {
             try
             {
-                if (CurrentPos2 + double.Parse(MoveInput2.Text.Replace(".", ",")) < 100.0)
+                if (CurrentPos2 + double.Parse(MoveInput2.Text.Replace(".", ",")) <= 100.0)
                 {
                     CurrentPos2 = CurrentPos2 + double.Parse(MoveInput2.Text.Replace(".", ","));
                     double Speed = double.Parse(SpeedInput2.Text.Replace(".", ","));
@@ -281,8 +300,25 @@ namespace TCPDevice
                 PauseTime.AutoReset = true;
                 PauseTime.Elapsed += PauseTime1_Elapsed;
                 PauseTime.Start();
-                DispTimer.Tick += DispTimer_Tick;
+                DispTimer.Tick += DispTimer1_Tick;
                 DispTimer.Start();
+                TimersElapsed.Start();
+                WalkingStart1.IsEnabled = false;
+                WalkingStart2.IsEnabled = false;
+                MoveInput1.IsEnabled = false;
+                MoveInput2.IsEnabled = false;
+                SpeedInput1.IsEnabled = false;
+                SpeedInput2.IsEnabled = false;
+                LeftStep1.IsEnabled = false;
+                RightStep1.IsEnabled = false;
+                LeftStep2.IsEnabled = false;
+                RightStep2.IsEnabled = false;
+                PauInput1.IsEnabled = false;
+                PauInput2.IsEnabled = false;
+                TarPosInput1.IsEnabled = false;
+                TarPosInput2.IsEnabled = false;
+                TarPosSend1.IsEnabled = false;
+                TarPosSend2.IsEnabled = false;
             }
             catch(Exception ex)
             {
@@ -290,7 +326,7 @@ namespace TCPDevice
             }
         }
 
-        private void DispTimer_Tick(object? sender, EventArgs e)
+        private void DispTimer1_Tick(object? sender, EventArgs e)
         {
             int remainingTime = (int)(double.Parse(PauInput1.Text) * 1000) - (int)TimersElapsed.Elapsed.TotalMilliseconds;
             TimerLabel.Content = (remainingTime / 1000.0).ToString("0.000");
@@ -301,17 +337,15 @@ namespace TCPDevice
 
             this.Dispatcher.Invoke(() =>
             {
-                if (CurrentPos1 + double.Parse(MoveInput1.Text.Replace(".", ",")) > 100.0)
+                if (CurrentPos1 + double.Parse(MoveInput1.Text.Replace(".", ",")) > 100.0 || (CurrentPos1 - double.Parse(MoveInput1.Text.Replace(".", ",")) < -100.0))
                 {
-                    LoopCycle1 = -1;
-                }
-                else if (CurrentPos1 - double.Parse(MoveInput1.Text.Replace(".", ",")) < -100.0)
-                {
-                    LoopCycle1 = 1;
+                    LoopCycle1 *= -1;
                 }
                 CurrentPos1 = CurrentPos1 + LoopCycle1 * double.Parse(MoveInput1.Text.Replace(".", ","));
                 double Speed = double.Parse(SpeedInput1.Text.Replace(".", ","));
                 SendData("MOVEA1 " + CurrentPos1.ToString() + " " + Speed.ToString());
+                CurPosLabel1.Content = CurrentPos1.ToString();
+                TimersElapsed.Restart();
             });
         }
 
@@ -319,11 +353,30 @@ namespace TCPDevice
         {
             try
             {
-                int Time = (int)(double.Parse(PauInput1.Text) * 1000);
+                int Time = (int)(double.Parse(PauInput2.Text) * 1000);
                 PauseTime = new System.Timers.Timer(Time);
                 PauseTime.AutoReset = true;
                 PauseTime.Elapsed += PauseTime2_Elapsed;
                 PauseTime.Start();
+                DispTimer.Tick += DispTimer2_Tick;
+                DispTimer.Start();
+                TimersElapsed.Start();
+                WalkingStart1.IsEnabled = false;
+                WalkingStart2.IsEnabled = false;
+                MoveInput1.IsEnabled = false;
+                MoveInput2.IsEnabled = false;
+                SpeedInput1.IsEnabled = false;
+                SpeedInput2.IsEnabled = false;
+                LeftStep1.IsEnabled = false;
+                RightStep1.IsEnabled = false;
+                LeftStep2.IsEnabled = false;
+                RightStep2.IsEnabled = false;
+                PauInput1.IsEnabled = false;
+                PauInput2.IsEnabled = false;
+                TarPosInput1.IsEnabled = false;
+                TarPosInput2.IsEnabled = false;
+                TarPosSend1.IsEnabled = false;
+                TarPosSend2.IsEnabled = false;
             }
             catch (Exception ex)
             {
@@ -331,22 +384,26 @@ namespace TCPDevice
             }
         }
 
+        private void DispTimer2_Tick(object? sender, EventArgs e)
+        {
+            int remainingTime = (int)(double.Parse(PauInput2.Text) * 1000) - (int)TimersElapsed.Elapsed.TotalMilliseconds;
+            TimerLabel.Content = (remainingTime / 1000.0).ToString("0.000");
+        }
+
         private void PauseTime2_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
         {
 
             this.Dispatcher.Invoke(() =>
             {
-                if (CurrentPos2 + double.Parse(MoveInput2.Text.Replace(".", ",")) > 100.0)
+                if (CurrentPos2 + double.Parse(MoveInput2.Text.Replace(".", ",")) > 100.0 || (CurrentPos2 - double.Parse(MoveInput2.Text.Replace(".", ",")) < -100.0))
                 {
-                    LoopCycle2 = -1;
+                    LoopCycle2 *= -1;
                 }
-                else if (CurrentPos2 - double.Parse(MoveInput2.Text.Replace(".", ",")) < -100.0)
-                {
-                    LoopCycle2 = 1;
-                }
-                CurrentPos1 = CurrentPos2 + LoopCycle1 * double.Parse(MoveInput2.Text.Replace(".", ","));
+                CurrentPos2 = CurrentPos2 + LoopCycle2 * double.Parse(MoveInput2.Text.Replace(".", ","));
                 double Speed = double.Parse(SpeedInput2.Text.Replace(".", ","));
-                SendData("MOVEA1 " + CurrentPos2.ToString() + " " + Speed.ToString());
+                SendData("MOVEA2 " + CurrentPos2.ToString() + " " + Speed.ToString());
+                CurPosLabel2.Content = CurrentPos2.ToString();
+                TimersElapsed.Restart();
             });
         }
     }
