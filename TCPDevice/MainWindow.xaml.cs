@@ -89,20 +89,6 @@ namespace TCPDevice
             }
         }
 
-        private void StateBtn_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                TextBox? Command = EnabledCmd.SelectedItem as TextBox;
-                string StateData = Command.Text;
-                SendData(StateData);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-        }
-
         private void EnabledCheckBox_Checked(object sender, RoutedEventArgs e)
         {
             try
@@ -125,125 +111,7 @@ namespace TCPDevice
         {
             try
             {
-                TextBox? Command = AbortCmd.SelectedItem as TextBox;
-                string StateData = Command.Text;
-                SendData(StateData);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-        }
-
-        private void ClearBtn_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                TextBox? Command = ClearCmd.SelectedItem as TextBox;
-                string StateData = Command.Text;
-                SendData(StateData);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-        }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                TextBox? Command = ResetCmd.SelectedItem as TextBox;
-                string StateData = Command.Text;
-                SendData(StateData);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-        }
-
-        private void PositionBtn_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                TextBox? Command = PositionCmd.SelectedItem as TextBox;
-                string StateData = Command.Text;
-                SendData(StateData);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-        }
-
-        private void ErrorsBtn_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                TextBox? Command = ErrorCmd.SelectedItem as TextBox;
-                string StateData = Command.Text;
-                SendData(StateData);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-        }
-
-        private void HomeBtn_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                TextBox? Command = HomeCmd.SelectedItem as TextBox;
-                string StateData = Command.Text;
-                SendData(StateData);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-        }
-
-        private void StoppedBtn_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                TextBox? Command = StopCmd.SelectedItem as TextBox;
-                string StateData = Command.Text;
-                SendData(StateData);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-        }
-
-        private void SpeedBtn_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                TextBox? Command = SpeedCmd.SelectedItem as TextBox;
-                string StateData = Command.Text;
-                double Speed = double.Parse(SpeedInput.Text.Replace(".",","));
-                StateData += " " + Speed.ToString().Replace(",", ".");
-                SendData(StateData);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-        }
-
-        private void MoveBtn_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                TextBox? Command = MoveCmd.SelectedItem as TextBox;
-                string StateData = Command.Text;
-                double Movement = double.Parse(MoveInput.Text.Replace(".", ","));
-                StateData += " " + Movement.ToString().Replace(",", ".");
-                SendData(StateData);
+                SendData("STOP");
             }
             catch (Exception ex)
             {
@@ -263,19 +131,30 @@ namespace TCPDevice
             ServerData.ScrollToEnd();
         }
 
-        private void SpdMovSend_Click(object sender, RoutedEventArgs e)
+        private void TarPosSend1_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                TextBox? Command = SpeedCmd.SelectedItem as TextBox;
-                string StateData = Command.Text;
-                double Speed = double.Parse(SpeedInput.Text.Replace(".", ","));
-                StateData += " " + Speed.ToString().Replace(",", ".");
+                double Pos = double.Parse(TarPosInput1.Text.Replace(".", ","));
+                double Speed = double.Parse(SpeedInput1.Text.Replace(".", ","));
+                double Step = double.Parse(MoveInput1.Text.Replace(".", ","));
+                string StateData = "MOVEA1 " + Pos + " " + Step + " " + Speed;
                 SendData(StateData);
-                Command = MoveCmd.SelectedItem as TextBox;
-                StateData = Command.Text;
-                double Movement = double.Parse(MoveInput.Text.Replace(".", ","));
-                StateData += " " + Movement.ToString().Replace(",", ".");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void TarPosSend2_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                double Pos = double.Parse(TarPosInput2.Text.Replace(".", ","));
+                double Speed = double.Parse(SpeedInput2.Text.Replace(".", ","));
+                double Step = double.Parse(MoveInput2.Text.Replace(".", ","));
+                string StateData = "MOVEA1 " + Pos + " " + Step + " " + Speed;
                 SendData(StateData);
             }
             catch (Exception ex)
@@ -302,6 +181,11 @@ namespace TCPDevice
             {
                 SendCmd_Click((TextBox)sender, e);
             }
+        }
+
+        private void LeftStep1_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }
