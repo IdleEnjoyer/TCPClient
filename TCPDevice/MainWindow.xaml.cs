@@ -131,22 +131,10 @@ namespace TCPDevice
                 DispTimer.Stop();
                 TimersElapsed.Restart();
                 TimersElapsed.Stop();
-                WalkingStart1.IsEnabled = true;
-                WalkingStart2.IsEnabled = true;
-                MoveInput1.IsEnabled = true;
-                MoveInput2.IsEnabled = true;
-                SpeedInput1.IsEnabled = true;
-                SpeedInput2.IsEnabled = true;
-                LeftStep1.IsEnabled = true;
-                RightStep1.IsEnabled = true;
-                LeftStep2.IsEnabled = true;
-                RightStep2.IsEnabled = true;
-                PauInput1.IsEnabled = true;
-                PauInput2.IsEnabled = true;
-                TarPosInput1.IsEnabled = true;
-                TarPosInput2.IsEnabled = true;
-                TarPosSend1.IsEnabled = true;
-                TarPosSend2.IsEnabled = true;
+                foreach (UIElement item in CmdGrid.Children)
+                {
+                     item.IsEnabled = true;
+                }
             }
             catch (Exception ex)
             {
@@ -172,7 +160,7 @@ namespace TCPDevice
             {
                 double Pos = double.Parse(TarPosInput1.Text.Replace(".", ","));
                 double Speed = double.Parse(SpeedInput1.Text.Replace(".", ","));
-                string StateData = "MOVEA1 " + Pos + " " + Speed;
+                string StateData = "MOVEA1 " + Pos.ToString().Replace(",",".") + " " + Speed.ToString().Replace(",", ".");
                 CurrentPos1 = Pos;
                 SendData(StateData);
                 CurPosLabel1.Content = CurrentPos1.ToString();
@@ -189,7 +177,7 @@ namespace TCPDevice
             {
                 double Pos = double.Parse(TarPosInput2.Text.Replace(".", ","));
                 double Speed = double.Parse(SpeedInput2.Text.Replace(".", ","));
-                string StateData = "MOVEA2 " + Pos + " " + Speed;
+                string StateData = "MOVEA2 " + Pos.ToString().Replace(",", ".") + " " + Speed.ToString().Replace(",", ".");
                 CurrentPos2 = Pos;
                 SendData(StateData);
                 CurPosLabel2.Content = CurrentPos2.ToString();
@@ -202,8 +190,30 @@ namespace TCPDevice
 
         private void SendCmd_Click(object sender, RoutedEventArgs e)
         {
-            SendData(CommandInput.Text);
-            CommandInput.Text = string.Empty;
+            TextBox TB = (TextBox)sender;
+            if (TB.Name.Contains("TarPosInput1"))
+            {
+                double Pos = double.Parse(TarPosInput1.Text.Replace(".", ","));
+                double Speed = double.Parse(SpeedInput1.Text.Replace(".", ","));
+                string StateData = "MOVEA1 " + Pos.ToString().Replace(",", ".") + " " + Speed.ToString().Replace(",", ".");
+                CurrentPos1 = Pos;
+                SendData(StateData);
+                CurPosLabel1.Content = CurrentPos1.ToString();
+            }
+            else if (TB.Name.Contains("TarPosInput2"))
+            {
+                double Pos = double.Parse(TarPosInput2.Text.Replace(".", ","));
+                double Speed = double.Parse(SpeedInput2.Text.Replace(".", ","));
+                string StateData = "MOVEA2 " + Pos.ToString().Replace(",", ".") + " " + Speed.ToString().Replace(",", ".");
+                CurrentPos2 = Pos;
+                SendData(StateData);
+                CurPosLabel2.Content = CurrentPos2.ToString();
+            }
+            else
+            {
+                SendData(TB.Text);
+            }
+            
         }
 
         private void OnSelect(object sender, SelectionChangedEventArgs e)
@@ -228,7 +238,7 @@ namespace TCPDevice
                 {
                     CurrentPos1 = CurrentPos1 - double.Parse(MoveInput1.Text.Replace(".", ","));
                     double Speed = double.Parse(SpeedInput1.Text.Replace(".", ","));
-                    SendData("MOVEA1 " + CurrentPos1.ToString() + " " + Speed);
+                    SendData("MOVEA1 " + CurrentPos1.ToString().Replace(",", ".") + " " + Speed.ToString().Replace(",", "."));
                     CurPosLabel1.Content = CurrentPos1.ToString();
                 }
             }
@@ -245,7 +255,7 @@ namespace TCPDevice
                 if(CurrentPos1 + double.Parse(MoveInput1.Text.Replace(".", ",")) <= 100.0) {
                     CurrentPos1 = CurrentPos1 + double.Parse(MoveInput1.Text.Replace(".", ","));
                     double Speed = double.Parse(SpeedInput1.Text.Replace(".", ","));
-                    SendData("MOVEA1 " + CurrentPos1.ToString() + " " + Speed);
+                    SendData("MOVEA1 " + CurrentPos1.ToString().Replace(",", ".") + " " + Speed.ToString().Replace(",", "."));
                     CurPosLabel1.Content = CurrentPos1.ToString();
                 }
             }
@@ -263,7 +273,7 @@ namespace TCPDevice
                 {
                     CurrentPos2 = CurrentPos2 - double.Parse(MoveInput2.Text.Replace(".", ","));
                     double Speed = double.Parse(SpeedInput2.Text.Replace(".", ","));
-                    SendData("MOVEA2 " + CurrentPos2.ToString() + " " + Speed);
+                    SendData("MOVEA2 " + CurrentPos2.ToString().Replace(",", ".") + " " + Speed.ToString().Replace(",", "."));
                     CurPosLabel2.Content = CurrentPos2.ToString();
                 }
             }
@@ -281,7 +291,7 @@ namespace TCPDevice
                 {
                     CurrentPos2 = CurrentPos2 + double.Parse(MoveInput2.Text.Replace(".", ","));
                     double Speed = double.Parse(SpeedInput2.Text.Replace(".", ","));
-                    SendData("MOVEA2 " + CurrentPos2.ToString() + " " + Speed);
+                    SendData("MOVEA2 " + CurrentPos2.ToString().Replace(",", ".") + " " + Speed.ToString().Replace(",", "."));
                     CurPosLabel2.Content = CurrentPos2.ToString();
                 }
             }
@@ -303,22 +313,13 @@ namespace TCPDevice
                 DispTimer.Tick += DispTimer1_Tick;
                 DispTimer.Start();
                 TimersElapsed.Start();
-                WalkingStart1.IsEnabled = false;
-                WalkingStart2.IsEnabled = false;
-                MoveInput1.IsEnabled = false;
-                MoveInput2.IsEnabled = false;
-                SpeedInput1.IsEnabled = false;
-                SpeedInput2.IsEnabled = false;
-                LeftStep1.IsEnabled = false;
-                RightStep1.IsEnabled = false;
-                LeftStep2.IsEnabled = false;
-                RightStep2.IsEnabled = false;
-                PauInput1.IsEnabled = false;
-                PauInput2.IsEnabled = false;
-                TarPosInput1.IsEnabled = false;
-                TarPosInput2.IsEnabled = false;
-                TarPosSend1.IsEnabled = false;
-                TarPosSend2.IsEnabled = false;
+                foreach (UIElement item in CmdGrid.Children)
+                {
+                    if (item != AbortBtn && item.GetType() != typeof(Label))
+                    {
+                        item.IsEnabled = false;
+                    }
+                }
             }
             catch(Exception ex)
             {
@@ -343,7 +344,7 @@ namespace TCPDevice
                 }
                 CurrentPos1 = CurrentPos1 + LoopCycle1 * double.Parse(MoveInput1.Text.Replace(".", ","));
                 double Speed = double.Parse(SpeedInput1.Text.Replace(".", ","));
-                SendData("MOVEA1 " + CurrentPos1.ToString() + " " + Speed.ToString());
+                SendData("MOVEA1 " + CurrentPos1.ToString().Replace(",", ".") + " " + Speed.ToString().Replace(",", "."));
                 CurPosLabel1.Content = CurrentPos1.ToString();
                 TimersElapsed.Restart();
             });
@@ -361,22 +362,13 @@ namespace TCPDevice
                 DispTimer.Tick += DispTimer2_Tick;
                 DispTimer.Start();
                 TimersElapsed.Start();
-                WalkingStart1.IsEnabled = false;
-                WalkingStart2.IsEnabled = false;
-                MoveInput1.IsEnabled = false;
-                MoveInput2.IsEnabled = false;
-                SpeedInput1.IsEnabled = false;
-                SpeedInput2.IsEnabled = false;
-                LeftStep1.IsEnabled = false;
-                RightStep1.IsEnabled = false;
-                LeftStep2.IsEnabled = false;
-                RightStep2.IsEnabled = false;
-                PauInput1.IsEnabled = false;
-                PauInput2.IsEnabled = false;
-                TarPosInput1.IsEnabled = false;
-                TarPosInput2.IsEnabled = false;
-                TarPosSend1.IsEnabled = false;
-                TarPosSend2.IsEnabled = false;
+                foreach (UIElement item in CmdGrid.Children)
+                {
+                    if(item != AbortBtn && item.GetType() != typeof(Label))
+                    {
+                        item.IsEnabled = false;
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -401,7 +393,7 @@ namespace TCPDevice
                 }
                 CurrentPos2 = CurrentPos2 + LoopCycle2 * double.Parse(MoveInput2.Text.Replace(".", ","));
                 double Speed = double.Parse(SpeedInput2.Text.Replace(".", ","));
-                SendData("MOVEA2 " + CurrentPos2.ToString() + " " + Speed.ToString());
+                SendData("MOVEA2 " + CurrentPos2.ToString().Replace(",", ".") + " " + Speed.ToString().Replace(",", "."));
                 CurPosLabel2.Content = CurrentPos2.ToString();
                 TimersElapsed.Restart();
             });
