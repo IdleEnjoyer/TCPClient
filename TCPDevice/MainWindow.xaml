@@ -8,15 +8,15 @@
 		Title="MainWindow" Height="490" Width="800" Background="#FFC9C9C9">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="1*"/>
+            <RowDefinition Height="2*"/>
             <RowDefinition Height="7*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
+            <!--<ColumnDefinition Width="45*"/>-->
             <ColumnDefinition Width="45*"/>
-            <ColumnDefinition Width="45*"/>
-            <ColumnDefinition Width="70*"/>
+            <ColumnDefinition Width="35*"/>
         </Grid.ColumnDefinitions>
-        <Viewbox x:Name="ConnectionView" Grid.Row="1">
+        <!--<Viewbox x:Name="ConnectionView" Grid.Row="1">
             <Grid x:Name="ConnectionGrid" HorizontalAlignment="Center" Height="325">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="1*"/>
@@ -43,12 +43,12 @@
                 <Label Content="Символ начала:" HorizontalAlignment="Left" Grid.Row="3" VerticalAlignment="Center" FontSize="24"/>
                 <TextBox x:Name="StartInput" Grid.Column="1" Grid.Row="3" TextWrapping="Wrap" FontSize="24" VerticalContentAlignment="Center" Text="^" />
             </Grid>
-        </Viewbox>
-        <Viewbox x:Name="TitleView" Margin="0,0,0,0" Grid.Row="0">
+        </Viewbox>-->
+        <!--<Viewbox x:Name="TitleView" Margin="0,0,0,0" Grid.Row="0">
             <Label x:Name="DeviceHeader" Content="TCP Клиент" FontSize="36" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Height="82" Width="364"/>
-        </Viewbox>
-        <Viewbox x:Name="PolarisationView" Grid.Column="1" Margin="0,0,0,0" Grid.Row="0" >
-            <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Width="269">
+        </Viewbox>-->
+        <Viewbox x:Name="PolarisationView" Grid.Column="0" Margin="0,25,0,0" Grid.Row="0" >
+            <Grid HorizontalAlignment="Center" VerticalAlignment="Bottom" Width="269">
                 <Border Height="55" HorizontalAlignment="Left" VerticalAlignment="Center" Width="235" Margin="24,0,0,0" BorderBrush="Black" BorderThickness="1,1,1,1" Background="#FFDDDDDD" >
                     <CheckBox x:Name="EnabledCheckBox" Content="Питание" FontSize="34" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" UseLayoutRounding="False" Checked="EnabledCheckBox_Checked" Unchecked="EnabledCheckBox_Checked" BorderThickness="1,1,1,1"/>
                 </Border>
@@ -64,61 +64,8 @@
                 </ComboBox>
             </Grid>
         </Viewbox>
-        <Viewbox Grid.Column="1" Grid.Row="1">
-            <Grid x:Name="CmdGrid" VerticalAlignment="Top" Height="342">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="1*"/>
-                    <RowDefinition Height="1*"/>
-                    <RowDefinition Height="1*"/>
-                    <RowDefinition Height="1*"/>
-                    <RowDefinition Height="1*"/>
-                    <RowDefinition Height="1*"/>
-                    <RowDefinition Height="1*"/>
-                    <RowDefinition Height="1*"/>
-                    <RowDefinition Height="1*"/>
-                    
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1*"/>
-                    <ColumnDefinition Width="2*"/>
-                    <ColumnDefinition Width="2*"/>
-                </Grid.ColumnDefinitions>
-                <Button x:Name="AbortBtn" Content="STOP" Click="AbortBtn_Click" Grid.Column="1" Grid.Row="8" Grid.ColumnSpan="2" Margin="43,0,42,0"/>
-
-                <TextBox x:Name="MoveInput1" TextWrapping="Wrap" Text="5,0" FontSize="12" Grid.Column="1" Margin="10,0,10,0" Grid.Row="1" VerticalContentAlignment="Center" Width="65" VerticalAlignment="Center"/>
-                <TextBox x:Name="MoveInput2" TextWrapping="Wrap" Text="5,0" FontSize="12" Grid.Column="2" Margin="10,0,10,0" Grid.Row="1" VerticalContentAlignment="Center" Width="65" VerticalAlignment="Center"/>
-
-                <TextBox x:Name="SpeedInput1" TextWrapping="Wrap" Text="5,0" FontSize="12" Grid.Column="1" Margin="10,0,10,0" Grid.Row="2" VerticalContentAlignment="Center" VerticalAlignment="Center"/>
-                <TextBox x:Name="SpeedInput2" TextWrapping="Wrap" Text="5,0" FontSize="12" Grid.Column="2" Margin="10,0,10,0" Grid.Row="2" VerticalContentAlignment="Center" VerticalAlignment="Center"/>
-
-                <Button x:Name="LeftStep1" Grid.Column="1" Grid.Row="3" Width="25" HorizontalAlignment="Center" Margin="0,0,30,0" Content="←" FontSize="14" Click="LeftStep1_Click" VerticalAlignment="Center" />
-                <Button x:Name="RightStep1" Grid.Column="1" Grid.Row="3" Width="25" HorizontalAlignment="Center" Margin="30,0,0,0" Content="→" FontSize="14" Click="RightStep1_Click" VerticalAlignment="Center" />
-
-                <Button x:Name="LeftStep2" Grid.Column="2" Grid.Row="3" Width="25" HorizontalAlignment="Center" Margin="0,0,30,0" FontSize="14" Content="↓" Click="LeftStep2_Click" VerticalAlignment="Center" />
-                <Button x:Name="RightStep2" Grid.Column="2" Grid.Row="3" Width="25" HorizontalAlignment="Center" Margin="30,0,0,0" FontSize="14" Content="↑" Click="RightStep2_Click" VerticalAlignment="Center" />
-
-                <TextBox x:Name="PauInput1" TextWrapping="Wrap" Text="3,0" FontSize="12" Grid.Column="1" Margin="10,0,10,0" Grid.Row="4" VerticalContentAlignment="Center" VerticalAlignment="Center"/>
-                <TextBox x:Name="PauInput2" TextWrapping="Wrap" Text="3,0" FontSize="12" Grid.Column="2" Margin="10,0,10,0" Grid.Row="4" VerticalContentAlignment="Center" VerticalAlignment="Center"/>
-
-                <Button x:Name="WalkingStart1" Content="↺" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="5" Grid.Column="1" Width="40" Click="WalkingStart1_Click"/>
-                <Button x:Name="WalkingStart2" Content="↺" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="5" Grid.Column="2" Width="40" Click="WalkingStart2_Click"/>
-
-                <TextBox x:Name="TarPosInput1" KeyDown="OnPress" TextWrapping="Wrap" Text="0,0" FontSize="12" Grid.Column="1" Margin="10,0,10,0" Grid.Row="6" VerticalContentAlignment="Center" VerticalAlignment="Center"/>
-                <TextBox x:Name="TarPosInput2" KeyDown="OnPress" TextWrapping="Wrap" Text="0,0" FontSize="12" Grid.Column="2" Margin="10,0,10,0" Grid.Row="6" VerticalContentAlignment="Center" VerticalAlignment="Center"/>
-
-                <Label x:Name="MoveLabel" Content="Шаг" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="5,0,5,5" HorizontalAlignment="Center" Grid.Column="0" Grid.Row="1" VerticalAlignment="Center"/>
-                <Label x:Name="PauLabel" Content="Пауза" Grid.Row="4" Grid.Column="0" VerticalContentAlignment="Center" Padding="5,0,5,5" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                <Label x:Name="SpeedLabel" Content="Скр" Grid.Row="2" Grid.Column="0" VerticalContentAlignment="Center" Padding="5,0,5,5" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                <Label x:Name="TarPosLabel" Content="Ц Поз" Grid.Row="6" Grid.Column="0" VerticalContentAlignment="Center" Padding="5,0,5,5" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                <Label x:Name="CurPosLabel" Content="Тек Поз" Grid.Row="0" Grid.Column="0" VerticalContentAlignment="Center" Padding="5,0,5,5" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-
-                <Label x:Name="CurPosLabel1" Content="0,0" Grid.Row="0" Grid.Column="1" VerticalContentAlignment="Center" Padding="5,0,5,5" HorizontalAlignment="Center"/>
-                <Label x:Name="CurPosLabel2" Content="0,0" Grid.Row="0" Grid.Column="2" VerticalContentAlignment="Center" Padding="5,0,5,5" HorizontalAlignment="Center"/>
-                <Label x:Name="TimerLabel" Content="0,0" Grid.Row="8" Grid.Column="0" VerticalContentAlignment="Center" Padding="5,0,5,5" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-
-                <Button x:Name="TarPosSend1" Content="⌖" HorizontalAlignment="Center" VerticalAlignment="Center" Click="TarPosSend1_Click" Grid.Row="7" Grid.Column="1" Width="40"/>
-                <Button x:Name="TarPosSend2" Content="⌖" HorizontalAlignment="Center" VerticalAlignment="Center" Click="TarPosSend2_Click" Grid.Row="7" Grid.Column="2" Width="40"/>
-            </Grid>
+        <Viewbox Grid.Column="0" Grid.Row="1">
+            
         </Viewbox>
         <Viewbox x:Name="ChatView" Grid.Column="2" Margin="10,10,10,10" Grid.Row="1">
             <Grid Height="392" Width="380">
@@ -137,9 +84,14 @@
                 </Grid>
             </Grid>
         </Viewbox>
-        <Viewbox Grid.Column="2" Margin="0,0,0,0" Grid.Row="0">
+        <Viewbox Grid.Column="2" Margin="0,25,0,0" Grid.Row="0">
             <Label Content="Сервер" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="28" Height="62" Width="360"/>
         </Viewbox>
+        <Menu Height="25" Grid.ColumnSpan="2" VerticalAlignment="Top">
+            <MenuItem Header="Подключение" Margin="0,3,0,0"/>
+            <MenuItem Header="Состояние: " Margin="0,3,0,0"/>
+            <MenuItem Header="Подключен " Margin="0,3,0,0" Background="Lime"/>
+        </Menu>
 
     </Grid>
 </Window>

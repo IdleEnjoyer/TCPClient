@@ -38,69 +38,69 @@ namespace TCPDevice
             DispTimer.Interval = TimeSpan.FromMilliseconds(10);
         }
 
-        private async void StartConnection_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                IPAddress Address = IPAddress.Parse(IPInput.Text);
-                int Port = int.Parse(PortInput.Text);
+        //private async void StartConnection_Click(object sender, RoutedEventArgs e)
+        //{
+        //    try
+        //    {
+        //        IPAddress Address = IPAddress.Parse(IPInput.Text);
+        //        int Port = int.Parse(PortInput.Text);
 
-                Client = new TcpClient(Address.ToString(), Port);
-                Stream = Client.GetStream();
+        //        Client = new TcpClient(Address.ToString(), Port);
+        //        Stream = Client.GetStream();
 
-                ConnectionStatus.Content = "Подключено!";
-                ConnectionStatus.Foreground = Brushes.Green;
+        //        //this.Owner.ConnectionStatus.Content = "Подключено!";
+        //        //this.Owner.ConnectionStatus.Foreground = Brushes.Green;
 
-                await StartReadingDataAsync();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            }
-        }
+        //        await StartReadingDataAsync();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        //        return;
+        //    }
+        //}
 
-        private void StopConnection_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                Client.Close();
-                ConnectionStatus.Content = "Отключен";
-                ConnectionStatus.Foreground = Brushes.Red;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
+        //private void StopConnection_Click(object sender, RoutedEventArgs e)
+        //{
+        //    try
+        //    {
+        //        Client.Close();
+        //        //this.Owner.ConnectionStatus.Content = "Отключен";
+        //        //this.Owner.ConnectionStatus.Foreground = Brushes.Red;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        //    }
+        //}
 
-        private async Task StartReadingDataAsync()
-        {
-            byte[] Buffer = new byte[1024];
-            while (Client.Connected)
-            {
-                try
-                {
-                    int BytesRead = await Stream.ReadAsync(Buffer);
-                    if (BytesRead == 0) 
-                    {
-                        Client.Close();
-                        ConnectionStatus.Content = "Отключен";
-                        ConnectionStatus.Foreground = Brushes.Red;
-                        MessageBox.Show("Сервер закрыт!", "Внимание", MessageBoxButton.OK, MessageBoxImage.Exclamation);
-                        break;
-                    }
-                    string Data = Encoding.ASCII.GetString(Buffer, 0, BytesRead);
-                    ServerData.Text += "Сервер " + System.DateTime.Now.ToString() + ": " + Data + "\n";
-                    ServerData.ScrollToEnd();
-                }
-                catch (IOException ex)
-                {
-                    MessageBox.Show(ex.Message);
-                    break;
-                }
-            }
-        }
+        //private async Task StartReadingDataAsync()
+        //{
+        //    byte[] Buffer = new byte[1024];
+        //    while (Client.Connected)
+        //    {
+        //        try
+        //        {
+        //            int BytesRead = await Stream.ReadAsync(Buffer);
+        //            if (BytesRead == 0) 
+        //            {
+        //                Client.Close();
+        //                //this.Owner.ConnectionStatus.Content = "Отключен";
+        //                //this.Owner.ConnectionStatus.Foreground = Brushes.Red;
+        //                MessageBox.Show("Сервер закрыт!", "Внимание", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+        //                break;
+        //            }
+        //            string Data = Encoding.ASCII.GetString(Buffer, 0, BytesRead);
+        //            ServerData.Text += "Сервер " + System.DateTime.Now.ToString() + ": " + Data + "\n";
+        //            ServerData.ScrollToEnd();
+        //        }
+        //        catch (IOException ex)
+        //        {
+        //            MessageBox.Show(ex.Message);
+        //            break;
+        //        }
+        //    }
+        //}
 
         private void EnabledCheckBox_Checked(object sender, RoutedEventArgs e)
         {
@@ -124,6 +124,7 @@ namespace TCPDevice
         {
             try
             {
+                this.Owner.Show();
                 SendData("STOP");
                 PauseTime.Stop();
                 PauseTime.Elapsed -= PauseTime1_Elapsed;
@@ -144,14 +145,14 @@ namespace TCPDevice
         
         void SendData(string Data)
         {
-            string EndSymbol = EndInput.Text;
-            string StartSymbol = StartInput.Text;
-            EndSymbol = Regex.Unescape(EndSymbol);
-            string DataString = StartSymbol + Data + EndSymbol;
-            ByteData = System.Text.Encoding.ASCII.GetBytes(DataString);
-            Stream.Write(ByteData, 0, ByteData.Length);
-            ServerData.Text += "Клиент " + System.DateTime.Now.ToString() + ": " + DataString;
-            ServerData.ScrollToEnd();
+            //string EndSymbol = EndInput.Text;
+            //string StartSymbol = StartInput.Text;
+            //EndSymbol = Regex.Unescape(EndSymbol);
+            //string DataString = StartSymbol + Data + EndSymbol;
+            //ByteData = System.Text.Encoding.ASCII.GetBytes(DataString);
+            //Stream.Write(ByteData, 0, ByteData.Length);
+            //ServerData.Text += "Клиент " + System.DateTime.Now.ToString() + ": " + DataString;
+            //ServerData.ScrollToEnd();
         }
 
         private void TarPosSend1_Click(object sender, RoutedEventArgs e)
