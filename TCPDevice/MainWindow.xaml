@@ -12,45 +12,19 @@
             <RowDefinition Height="7*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <!--<ColumnDefinition Width="45*"/>-->
             <ColumnDefinition Width="45*"/>
             <ColumnDefinition Width="35*"/>
         </Grid.ColumnDefinitions>
-        <!--<Viewbox x:Name="ConnectionView" Grid.Row="1">
-            <Grid x:Name="ConnectionGrid" HorizontalAlignment="Center" Height="325">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="1*"/>
-                    <RowDefinition Height="1*"/>
-                    <RowDefinition Height="1*"/>
-                    <RowDefinition Height="1*"/>
-                    <RowDefinition Height="1*"/>
-                    <RowDefinition Height="1*"/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="3*"/>
-                    <ColumnDefinition Width="4*"/>
-                </Grid.ColumnDefinitions>
-                <Button x:Name="StartConnection" Content="Подключиться" Click="StartConnection_Click" Grid.Row="5" Margin="10,10,10,10" FontSize="16"/>
-                <Label x:Name="ConnectionStatus" Content="Отключен" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24" Foreground="Red" Grid.Column="1" Height="42" Width="167"/>
-                <Label x:Name="IPLabel" Content="IP:" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="24" Grid.Row="1" Height="40" Width="35"/>
-                <TextBox x:Name="IPInput" TextWrapping="Wrap" Text="192.168.0.101" FontSize="24" TextAlignment="Justify" Grid.Row="1" Grid.Column="1" VerticalContentAlignment="Center"/>
-                <TextBox x:Name="PortInput" TextWrapping="Wrap" Text="23" FontSize="24" TextAlignment="Justify" Grid.Column="1" Grid.Row="2" VerticalContentAlignment="Center"/>
-                <Label x:Name="PortLabel" Content="Port:" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="24" Grid.Row="2" Height="42" Width="58"/>
-                <Button x:Name="StopConnection" Content="Отключиться" Click="StopConnection_Click" Grid.Column="1" Grid.Row="5" Width="164" Margin="10,10,10,10" FontSize="16"/>
-                <Label x:Name="ConnectionLabel" Content="Соединение:" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="22" Height="42" Width="137"/>
-                <Label Content="Символ конца:" HorizontalAlignment="Left" Grid.Row="4" VerticalAlignment="Center" FontSize="24" Height="40" Width="174"/>
-                <TextBox x:Name="EndInput" Grid.Row="4" TextWrapping="Wrap" Text="\r\n" FontSize="24" Grid.Column="1" VerticalContentAlignment="Center"/>
-                <Label Content="Символ начала:" HorizontalAlignment="Left" Grid.Row="3" VerticalAlignment="Center" FontSize="24"/>
-                <TextBox x:Name="StartInput" Grid.Column="1" Grid.Row="3" TextWrapping="Wrap" FontSize="24" VerticalContentAlignment="Center" Text="^" />
-            </Grid>
-        </Viewbox>-->
-        <!--<Viewbox x:Name="TitleView" Margin="0,0,0,0" Grid.Row="0">
-            <Label x:Name="DeviceHeader" Content="TCP Клиент" FontSize="36" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Height="82" Width="364"/>
-        </Viewbox>-->
         <Viewbox x:Name="PolarisationView" Grid.Column="0" Margin="0,25,0,0" Grid.Row="0" >
             <Grid HorizontalAlignment="Center" VerticalAlignment="Bottom" Width="269">
-                <Border Height="55" HorizontalAlignment="Left" VerticalAlignment="Center" Width="235" Margin="24,0,0,0" BorderBrush="Black" BorderThickness="1,1,1,1" Background="#FFDDDDDD" >
-                    <CheckBox x:Name="EnabledCheckBox" Content="Питание" FontSize="34" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" UseLayoutRounding="False" Checked="EnabledCheckBox_Checked" Unchecked="EnabledCheckBox_Checked" BorderThickness="1,1,1,1"/>
+                <Border Height="55" HorizontalAlignment="Left" VerticalAlignment="Center" Width="235" Margin="24,10,0,10" BorderBrush="Black" BorderThickness="1,1,1,1" Background="#FFDDDDDD" >
+                    <CheckBox x:Name="EnabledCheckBox" Content="Питание" FontSize="22" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" UseLayoutRounding="False" Checked="EnabledCheckBox_Checked" Unchecked="EnabledCheckBox_Checked" BorderThickness="1,1,1,1" HorizontalAlignment="Center" RenderTransformOrigin="0.5,0.5">
+                        <CheckBox.RenderTransform>
+                            <TransformGroup>
+                                <ScaleTransform ScaleX="2" ScaleY="2"/>
+                            </TransformGroup>
+                        </CheckBox.RenderTransform>
+                    </CheckBox>
                 </Border>
                 <ComboBox x:Name="PolarisationCmd" HorizontalAlignment="Left" Height="55" VerticalAlignment="Center" Width="19" Margin="5,0,0,0" SelectionChanged="OnSelect">
                     <ComboBox IsSynchronizedWithCurrentItem="False" SelectedIndex="0" Text="Выключение" SelectionChanged="OnSelect" >
@@ -64,9 +38,63 @@
                 </ComboBox>
             </Grid>
         </Viewbox>
-        <Viewbox Grid.Column="0" Grid.Row="1">
-            
-        </Viewbox>
+        <!--<Viewbox Grid.Column="0" Grid.Row="1">-->
+        <TabControl Grid.Column="0" Grid.Row="1" Background="Gray">
+            <TabItem Header="Tab1">
+                <Grid x:Name="CommandGrid" Margin="20,20,20,10" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="0" Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="220*"/>
+                        <ColumnDefinition Width="40*"/>
+                        <ColumnDefinition Width="50*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="25*"/>
+                        <RowDefinition Height="200*"/>
+                    </Grid.RowDefinitions>
+                    <TextBox x:Name="DemoCommandInput" Grid.Row="0" Grid.Column="0" Width="220"/>
+                    <TextBox x:Name="DemoTimerInput" Grid.Row="0" Grid.Column="1" Width="40"/>
+                    <Button x:Name="AddCommand" Grid.Row="0" Grid.Column="2" Content="Добавить" Click="AddCommand_Click"/>
+                    <ListView x:Name="DemoCommandList" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Height="200" ItemsSource="{Binding Commands}">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBox x:Name="CMD" Text="{Binding CMD}"/>
+                                    <TextBox x:Name="TMR" Text="{Binding TMR}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Tab2">
+                <Button x:Name="AddTab" Width="200" Height="50" Content="Добавить проект" FontSize="20" Click="AddTab_Click" />
+            </TabItem>
+        </TabControl>
+            <!--<Grid x:Name="CommandGrid" Margin="20,20,20,10" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="0" Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions> 
+                <TextBox x:Name="DemoCommandInput" Grid.Row="0" Grid.Column="0" Width="220"/>
+                <TextBox x:Name="DemoTimerInput" Grid.Row="0" Grid.Column="1" Width="40"/>
+                <Button x:Name="AddCommand" Grid.Row="0" Grid.Column="2" Content="Добавить" Click="AddCommand_Click"/>
+                <ListView x:Name="DemoCommandList" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Height="200" ItemsSource="{Binding Commands}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox x:Name="CMD" Text="{Binding CMD}"/>
+                                <TextBox x:Name="TMR" Text="{Binding TMR}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </Grid>-->
+        <!--</Viewbox>-->
         <Viewbox x:Name="ChatView" Grid.Column="2" Margin="10,10,10,10" Grid.Row="1">
             <Grid Height="392" Width="380">
                 <Grid.RowDefinitions>
@@ -90,7 +118,13 @@
         <Menu Height="25" Grid.ColumnSpan="2" VerticalAlignment="Top">
             <MenuItem Header="Подключение" Margin="0,3,0,0"/>
             <MenuItem Header="Состояние: " Margin="0,3,0,0"/>
-            <MenuItem Header="Подключен " Margin="0,3,0,0" Background="Lime"/>
+            <MenuItem x:Name="ConnectionStatus" Header="Подключен " Margin="0,3,0,0" Background="Lime"/>
+            <MenuItem Header="IP: " Margin="0,3,0,0"/>
+            <MenuItem x:Name="IP" Header="" Margin="0,3,0,0"/>
+            <MenuItem x:Name="StartSymbol" Header="Символ начала:" Margin="0,3,0,0"/>
+            <TextBox x:Name="StartSymbolInput" Width="40" Text="^" Margin="0,3,0,0"/>
+            <MenuItem x:Name="EndSymbol" Header="Символ конца:" Margin="0,3,0,0"/>
+            <TextBox x:Name="EndSymbolInput" Width="40" Text="\r\n" Margin="0,3,0,0"/>
         </Menu>
 
     </Grid>

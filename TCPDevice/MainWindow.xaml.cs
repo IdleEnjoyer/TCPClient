@@ -14,6 +14,8 @@ using System.Windows.Media.Animation;
 using System.Timers;
 using System.Windows.Threading;
 using System.Diagnostics;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 #pragma warning disable CS8618
 #pragma warning disable CS8602
@@ -22,13 +24,10 @@ namespace TCPDevice
 {
     public partial class MainWindow : Window
     {
-        private TcpClient Client;
+        private ObservableCollection<Command> Commands = new();
+        public TcpClient Client {get; set;}
         private NetworkStream Stream;
         private byte[] ByteData;
-        private double CurrentPos1 = 0;
-        private double CurrentPos2 = 0;
-        private int LoopCycle1 = 1;
-        private int LoopCycle2 = 1;
         private System.Timers.Timer PauseTime;
         private DispatcherTimer DispTimer = new DispatcherTimer();
         private Stopwatch TimersElapsed = new Stopwatch();
@@ -36,71 +35,79 @@ namespace TCPDevice
         {
             InitializeComponent();
             DispTimer.Interval = TimeSpan.FromMilliseconds(10);
+            DemoCommandList.ItemsSource = Commands;
         }
 
-        //private async void StartConnection_Click(object sender, RoutedEventArgs e)
-        //{
-        //    try
-        //    {
-        //        IPAddress Address = IPAddress.Parse(IPInput.Text);
-        //        int Port = int.Parse(PortInput.Text);
+        public class Command
+        {
+            public string CMD { get; set; }
+            public string TMR { get; set; }
+        }
+        public async void Connect()
+        {
+            try
+            {
+                string ipAddress = ((IPEndPoint)Client.Client.RemoteEndPoint).Address.MapToIPv4().ToString();
+                IP.Header = ipAddress;
+                Stream = Client.GetStream();
 
-        //        Client = new TcpClient(Address.ToString(), Port);
-        //        Stream = Client.GetStream();
+                await StartReadingDataAsync();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Connect init error");
+                return;
+            }
+        }
 
-        //        //this.Owner.ConnectionStatus.Content = "Подключено!";
-        //        //this.Owner.ConnectionStatus.Foreground = Brushes.Green;
+        public void ChangeConnection(bool State)
+        {
+            try
+            {
+                if (State)
+                {
+                    ConnectionStatus.Header = "Подключено";
+                    ConnectionStatus.Background = Brushes.Green;
+                }
+                else
+                {
+                    ConnectionStatus.Header = "Отключено";
+                    ConnectionStatus.Background = Brushes.Red;
+                }
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Status change error");
+            }
+        }
 
-        //        await StartReadingDataAsync();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-        //        return;
-        //    }
-        //}
-
-        //private void StopConnection_Click(object sender, RoutedEventArgs e)
-        //{
-        //    try
-        //    {
-        //        Client.Close();
-        //        //this.Owner.ConnectionStatus.Content = "Отключен";
-        //        //this.Owner.ConnectionStatus.Foreground = Brushes.Red;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-        //    }
-        //}
-
-        //private async Task StartReadingDataAsync()
-        //{
-        //    byte[] Buffer = new byte[1024];
-        //    while (Client.Connected)
-        //    {
-        //        try
-        //        {
-        //            int BytesRead = await Stream.ReadAsync(Buffer);
-        //            if (BytesRead == 0) 
-        //            {
-        //                Client.Close();
-        //                //this.Owner.ConnectionStatus.Content = "Отключен";
-        //                //this.Owner.ConnectionStatus.Foreground = Brushes.Red;
-        //                MessageBox.Show("Сервер закрыт!", "Внимание", MessageBoxButton.OK, MessageBoxImage.Exclamation);
-        //                break;
-        //            }
-        //            string Data = Encoding.ASCII.GetString(Buffer, 0, BytesRead);
-        //            ServerData.Text += "Сервер " + System.DateTime.Now.ToString() + ": " + Data + "\n";
-        //            ServerData.ScrollToEnd();
-        //        }
-        //        catch (IOException ex)
-        //        {
-        //            MessageBox.Show(ex.Message);
-        //            break;
-        //        }
-        //    }
-        //}
+        private async Task StartReadingDataAsync()
+        {
+            byte[] Buffer = new byte[1024];
+            while (Client.Connected)
+            {
+                try
+                {
+                    int BytesRead = await Stream.ReadAsync(Buffer);
+                    if (BytesRead == 0)
+                    {
+                        Client.Close();
+                        ConnectionStatus.Header = "Отключен";
+                        ConnectionStatus.Background = Brushes.Red;
+                        MessageBox.Show("Сервер закрыт!", "Внимание", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                        break;
+                    }
+                    string Data = Encoding.ASCII.GetString(Buffer, 0, BytesRead);
+                    ServerData.Text += "Сервер " + System.DateTime.Now.ToString() + ": " + Data + "\n";
+                    ServerData.ScrollToEnd();
+                }
+                catch (IOException)
+                {
+                    MessageBox.Show("Подключение было прервано!", "Data reading error");
+                    break;
+                }
+            }
+        }
 
         private void EnabledCheckBox_Checked(object sender, RoutedEventArgs e)
         {
@@ -116,105 +123,48 @@ namespace TCPDevice
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show(ex.Message, "Enabling error");
             }
         }
 
-        private void AbortBtn_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                this.Owner.Show();
-                SendData("STOP");
-                PauseTime.Stop();
-                PauseTime.Elapsed -= PauseTime1_Elapsed;
-                PauseTime.Elapsed -= PauseTime2_Elapsed;
-                DispTimer.Stop();
-                TimersElapsed.Restart();
-                TimersElapsed.Stop();
-                foreach (UIElement item in CmdGrid.Children)
-                {
-                     item.IsEnabled = true;
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-        }
+        //private void AbortBtn_Click(object sender, RoutedEventArgs e)
+        //{
+        //    try
+        //    {
+        //        this.Owner.Show();
+        //        SendData("STOP");
+        //        PauseTime.Stop();
+        //        PauseTime.Elapsed -= PauseTime1_Elapsed;
+        //        PauseTime.Elapsed -= PauseTime2_Elapsed;
+        //        DispTimer.Stop();
+        //        TimersElapsed.Restart();
+        //        TimersElapsed.Stop();
+        //        foreach (UIElement item in CmdGrid.Children)
+        //        {
+        //             item.IsEnabled = true;
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show(ex.Message);
+        //    }
+        //}
         
         void SendData(string Data)
         {
-            //string EndSymbol = EndInput.Text;
-            //string StartSymbol = StartInput.Text;
-            //EndSymbol = Regex.Unescape(EndSymbol);
-            //string DataString = StartSymbol + Data + EndSymbol;
-            //ByteData = System.Text.Encoding.ASCII.GetBytes(DataString);
-            //Stream.Write(ByteData, 0, ByteData.Length);
-            //ServerData.Text += "Клиент " + System.DateTime.Now.ToString() + ": " + DataString;
-            //ServerData.ScrollToEnd();
-        }
-
-        private void TarPosSend1_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                double Pos = double.Parse(TarPosInput1.Text.Replace(".", ","));
-                double Speed = double.Parse(SpeedInput1.Text.Replace(".", ","));
-                string StateData = "MOVEA1 " + Pos.ToString().Replace(",",".") + " " + Speed.ToString().Replace(",", ".");
-                CurrentPos1 = Pos;
-                SendData(StateData);
-                CurPosLabel1.Content = CurrentPos1.ToString();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-        }
-
-        private void TarPosSend2_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                double Pos = double.Parse(TarPosInput2.Text.Replace(".", ","));
-                double Speed = double.Parse(SpeedInput2.Text.Replace(".", ","));
-                string StateData = "MOVEA2 " + Pos.ToString().Replace(",", ".") + " " + Speed.ToString().Replace(",", ".");
-                CurrentPos2 = Pos;
-                SendData(StateData);
-                CurPosLabel2.Content = CurrentPos2.ToString();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
+            string EndSymbol = EndSymbolInput.Text;
+            string StartSymbol = StartSymbolInput.Text;
+            EndSymbol = Regex.Unescape(EndSymbol);
+            string DataString = StartSymbol + Data + EndSymbol;
+            ByteData = System.Text.Encoding.ASCII.GetBytes(DataString);
+            Stream.Write(ByteData, 0, ByteData.Length);
+            ServerData.Text += "Клиент " + System.DateTime.Now.ToString() + ": " + DataString;
+            ServerData.ScrollToEnd();
         }
 
         private void SendCmd_Click(object sender, RoutedEventArgs e)
         {
-            TextBox TB = (TextBox)sender;
-            if (TB.Name.Contains("TarPosInput1"))
-            {
-                double Pos = double.Parse(TarPosInput1.Text.Replace(".", ","));
-                double Speed = double.Parse(SpeedInput1.Text.Replace(".", ","));
-                string StateData = "MOVEA1 " + Pos.ToString().Replace(",", ".") + " " + Speed.ToString().Replace(",", ".");
-                CurrentPos1 = Pos;
-                SendData(StateData);
-                CurPosLabel1.Content = CurrentPos1.ToString();
-            }
-            else if (TB.Name.Contains("TarPosInput2"))
-            {
-                double Pos = double.Parse(TarPosInput2.Text.Replace(".", ","));
-                double Speed = double.Parse(SpeedInput2.Text.Replace(".", ","));
-                string StateData = "MOVEA2 " + Pos.ToString().Replace(",", ".") + " " + Speed.ToString().Replace(",", ".");
-                CurrentPos2 = Pos;
-                SendData(StateData);
-                CurPosLabel2.Content = CurrentPos2.ToString();
-            }
-            else
-            {
-                SendData(TB.Text);
-            }
-            
+            SendData(CommandInput.Text);
         }
 
         private void OnSelect(object sender, SelectionChangedEventArgs e)
@@ -231,173 +181,15 @@ namespace TCPDevice
             }
         }
 
-        private void LeftStep1_Click(object sender, RoutedEventArgs e)
+        private void AddCommand_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                if (CurrentPos1 - double.Parse(MoveInput1.Text.Replace(".", ",")) >= -100.0)
-                {
-                    CurrentPos1 = CurrentPos1 - double.Parse(MoveInput1.Text.Replace(".", ","));
-                    double Speed = double.Parse(SpeedInput1.Text.Replace(".", ","));
-                    SendData("MOVEA1 " + CurrentPos1.ToString().Replace(",", ".") + " " + Speed.ToString().Replace(",", "."));
-                    CurPosLabel1.Content = CurrentPos1.ToString();
-                }
-            }
-            catch(Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
+            Command Input = new Command { CMD = DemoCommandInput.Text, TMR = DemoTimerInput.Text };
+            Commands.Add(Input);
         }
 
-        private void RightStep1_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                if(CurrentPos1 + double.Parse(MoveInput1.Text.Replace(".", ",")) <= 100.0) {
-                    CurrentPos1 = CurrentPos1 + double.Parse(MoveInput1.Text.Replace(".", ","));
-                    double Speed = double.Parse(SpeedInput1.Text.Replace(".", ","));
-                    SendData("MOVEA1 " + CurrentPos1.ToString().Replace(",", ".") + " " + Speed.ToString().Replace(",", "."));
-                    CurPosLabel1.Content = CurrentPos1.ToString();
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-        }
-
-        private void LeftStep2_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                if (CurrentPos2 - double.Parse(MoveInput2.Text.Replace(".", ",")) >= -100.0)
-                {
-                    CurrentPos2 = CurrentPos2 - double.Parse(MoveInput2.Text.Replace(".", ","));
-                    double Speed = double.Parse(SpeedInput2.Text.Replace(".", ","));
-                    SendData("MOVEA2 " + CurrentPos2.ToString().Replace(",", ".") + " " + Speed.ToString().Replace(",", "."));
-                    CurPosLabel2.Content = CurrentPos2.ToString();
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-        }
-
-        private void RightStep2_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                if (CurrentPos2 + double.Parse(MoveInput2.Text.Replace(".", ",")) <= 100.0)
-                {
-                    CurrentPos2 = CurrentPos2 + double.Parse(MoveInput2.Text.Replace(".", ","));
-                    double Speed = double.Parse(SpeedInput2.Text.Replace(".", ","));
-                    SendData("MOVEA2 " + CurrentPos2.ToString().Replace(",", ".") + " " + Speed.ToString().Replace(",", "."));
-                    CurPosLabel2.Content = CurrentPos2.ToString();
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-        }
-
-        private void WalkingStart1_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                int Time = (int)(double.Parse(PauInput1.Text) * 1000);
-                PauseTime = new System.Timers.Timer(Time);
-                PauseTime.AutoReset = true;
-                PauseTime.Elapsed += PauseTime1_Elapsed;
-                PauseTime.Start();
-                DispTimer.Tick += DispTimer1_Tick;
-                DispTimer.Start();
-                TimersElapsed.Start();
-                foreach (UIElement item in CmdGrid.Children)
-                {
-                    if (item != AbortBtn && item.GetType() != typeof(Label))
-                    {
-                        item.IsEnabled = false;
-                    }
-                }
-            }
-            catch(Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-        }
-
-        private void DispTimer1_Tick(object? sender, EventArgs e)
-        {
-            int remainingTime = (int)(double.Parse(PauInput1.Text) * 1000) - (int)TimersElapsed.Elapsed.TotalMilliseconds;
-            TimerLabel.Content = (remainingTime / 1000.0).ToString("0.000");
-        }
-
-        private void PauseTime1_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
+        private void AddTab_Click(object sender, RoutedEventArgs e)
         {
 
-            this.Dispatcher.Invoke(() =>
-            {
-                if (CurrentPos1 + double.Parse(MoveInput1.Text.Replace(".", ",")) > 100.0 || (CurrentPos1 - double.Parse(MoveInput1.Text.Replace(".", ",")) < -100.0))
-                {
-                    LoopCycle1 *= -1;
-                }
-                CurrentPos1 = CurrentPos1 + LoopCycle1 * double.Parse(MoveInput1.Text.Replace(".", ","));
-                double Speed = double.Parse(SpeedInput1.Text.Replace(".", ","));
-                SendData("MOVEA1 " + CurrentPos1.ToString().Replace(",", ".") + " " + Speed.ToString().Replace(",", "."));
-                CurPosLabel1.Content = CurrentPos1.ToString();
-                TimersElapsed.Restart();
-            });
-        }
-
-        private void WalkingStart2_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                int Time = (int)(double.Parse(PauInput2.Text) * 1000);
-                PauseTime = new System.Timers.Timer(Time);
-                PauseTime.AutoReset = true;
-                PauseTime.Elapsed += PauseTime2_Elapsed;
-                PauseTime.Start();
-                DispTimer.Tick += DispTimer2_Tick;
-                DispTimer.Start();
-                TimersElapsed.Start();
-                foreach (UIElement item in CmdGrid.Children)
-                {
-                    if(item != AbortBtn && item.GetType() != typeof(Label))
-                    {
-                        item.IsEnabled = false;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-        }
-
-        private void DispTimer2_Tick(object? sender, EventArgs e)
-        {
-            int remainingTime = (int)(double.Parse(PauInput2.Text) * 1000) - (int)TimersElapsed.Elapsed.TotalMilliseconds;
-            TimerLabel.Content = (remainingTime / 1000.0).ToString("0.000");
-        }
-
-        private void PauseTime2_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
-        {
-
-            this.Dispatcher.Invoke(() =>
-            {
-                if (CurrentPos2 + double.Parse(MoveInput2.Text.Replace(".", ",")) > 100.0 || (CurrentPos2 - double.Parse(MoveInput2.Text.Replace(".", ",")) < -100.0))
-                {
-                    LoopCycle2 *= -1;
-                }
-                CurrentPos2 = CurrentPos2 + LoopCycle2 * double.Parse(MoveInput2.Text.Replace(".", ","));
-                double Speed = double.Parse(SpeedInput2.Text.Replace(".", ","));
-                SendData("MOVEA2 " + CurrentPos2.ToString().Replace(",", ".") + " " + Speed.ToString().Replace(",", "."));
-                CurPosLabel2.Content = CurrentPos2.ToString();
-                TimersElapsed.Restart();
-            });
         }
     }
 }
