@@ -35,7 +35,8 @@
                 </Grid.ColumnDefinitions>
                 <Label x:Name="AxisName" Content="Ось:" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Grid.Column="0" Grid.Row="0" FontSize="20"/>
                 <TextBox x:Name="Axis" Text="ОСЬ 1" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Grid.Column="1" Grid.Row="0" FontSize="20"/>
-                <TextBox x:Name="Prop" Text="СВОЙСТВО 1" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Grid.Column="0" Grid.Row="1" FontSize="14"/>
+                <TextBox x:Name="Prop" Text="СВОЙСТВО 1" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Grid.Column="0" Grid.Row="1" FontSize="14" HorizontalAlignment="Left" Margin="0,10,0,10" Width="90"/>
+                <TextBox x:Name="Amount" Text="0" Grid.Column="0" Grid.Row="1" FontSize="16" HorizontalAlignment="Right" VerticalContentAlignment="Center" Margin="0,10,0,10" Width="30" HorizontalContentAlignment="Center"/>
             </Grid>
         </ScrollViewer>
         

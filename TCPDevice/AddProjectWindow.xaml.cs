@@ -24,6 +24,14 @@ namespace TCPDevice
         public AddProjectWindow()
         {
             InitializeComponent();
+
+            Button BT = new Button();
+            BT.Name = "Button";
+            BT.Content = Prop.Text;
+            BT.Margin = new Thickness(10, 10, 10, 10);
+            Grid.SetRow(BT, 1);
+            Grid.SetColumn(BT, 1);
+            ProjectGrid.Children.Add(BT);
         }
 
         private void AddAxisBttn_Click(object sender, RoutedEventArgs e)
@@ -46,16 +54,40 @@ namespace TCPDevice
         {
             PropAmount++;
             TextBox NewProp = new TextBox();
+            NewProp.HorizontalAlignment = HorizontalAlignment.Left;
+            NewProp.Width = 90;
             NewProp.Text = $"СВОЙСТВО {PropAmount}";
             NewProp.FontSize = 14;
             NewProp.HorizontalContentAlignment = HorizontalAlignment.Center;
             NewProp.VerticalContentAlignment = VerticalAlignment.Center;
             NewProp.Name = $"PropR{PropAmount}";
+            NewProp.Margin = new Thickness(0, 10, 0, 10);
             ProjectGrid.Height += 50;
             Grid.SetColumn(NewProp, 0);
             Grid.SetRow(NewProp, PropAmount);
             ProjectGrid.RowDefinitions.Add(new RowDefinition());
             ProjectGrid.Children.Add(NewProp);
+
+            TextBox NewNum = new TextBox();
+            NewNum.HorizontalAlignment = HorizontalAlignment.Right;
+            NewNum.Width = 30;
+            NewNum.Text = "0";
+            NewNum.FontSize = 16;
+            NewNum.HorizontalContentAlignment = HorizontalAlignment.Center;
+            NewNum.VerticalContentAlignment = VerticalAlignment.Center;
+            NewNum.Name = "Amount";
+            NewNum.Margin = new Thickness(0, 10, 0, 10);
+            Grid.SetColumn(NewNum, 0);
+            Grid.SetRow(NewNum, PropAmount);
+            ProjectGrid.Children.Add(NewNum);
+
+            Button BT = new Button();
+            BT.Name = "Button";
+            BT.Content = Prop.Text;
+            BT.Margin = new Thickness(10, 10, 10, 10);
+            Grid.SetRow(BT, PropAmount);
+            Grid.SetColumn(BT, 1);
+            ProjectGrid.Children.Add(BT);
         }
 
         private void RemoveAxisBttn_Click(object sender, RoutedEventArgs e)
