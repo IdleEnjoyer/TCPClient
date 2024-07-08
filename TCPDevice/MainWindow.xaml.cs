@@ -44,8 +44,6 @@ namespace TCPDevice
             DemoCommandList.ItemsSource = Commands;
         }
 
-
-
         public class Command
         {
             public string CMD { get; set; }
@@ -152,17 +150,16 @@ namespace TCPDevice
 
         private void SendCmd_Click(object sender, RoutedEventArgs e)
         {
-            SendData(CommandInput.Text);
-        }
-
-        private void SendCmd1_Click(object sender, RoutedEventArgs e)
-        {
-            SendData(CommandInput1.Text);
-        }
-
-        private void SendCmd2_Click(object sender, RoutedEventArgs e)
-        {
-            SendData(CommandInput2.Text);
+            Button? BTN = sender as Button;
+            Grid? GRD = BTN.Parent as Grid;
+            foreach(UIElement Child in GRD.Children)
+            {
+                if(Grid.GetColumn(Child) == 0 && Grid.GetRow(Child) == Grid.GetRow(BTN))
+                {
+                    TextBox? TB = Child as TextBox;
+                    SendData(TB.Text);
+                }
+            }
         }
 
         private void OnSelect(object sender, SelectionChangedEventArgs e)
@@ -175,7 +172,8 @@ namespace TCPDevice
         {
             if(e.Key == Key.Enter)
             {
-                SendCmd_Click((TextBox)sender, e);
+                TextBox? TB = sender as TextBox;
+                SendData(TB.Text);
             }
         }
 
@@ -212,7 +210,7 @@ namespace TCPDevice
                 DispTimer.Start();
                 CommandGrid.IsEnabled = false;
             }
-            catch (Exception ex)
+            catch (Exception )
             {
                 MessageBox.Show("Очередь таймера пуста");
             }
@@ -226,7 +224,6 @@ namespace TCPDevice
 
         private void PauseTime_Elapsed(object? sender, ElapsedEventArgs e)
         {
-            //SendData("Check" + TimerIntervals[CurrentTimerInterval]);
             try
             {
                 Application.Current.Dispatcher.Invoke(() =>
@@ -329,6 +326,40 @@ namespace TCPDevice
             catch
             {
                 MessageBox.Show("Что-то пошло не так");
+            }
+        }
+
+        private void StopConnection_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Client.Close();
+                ChangeConnection(Client.Connected);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Connection stop error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void StartConnection_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                IPAddress Address = IPAddress.Parse(IPInput.Text);
+                int Port = int.Parse(PortInput.Text);
+
+
+                Client = new TcpClient(Address.ToString(), Port);
+
+                Connect();
+                ChangeConnection(Client.Connected);
+            }
+            catch (Exception ex)
+            {
+                ChangeConnection(Client.Connected);
+                MessageBox.Show(ex.Message, "Connection start error", MessageBoxButton.OK, MessageBoxImage.Question);
+                return;
             }
         }
     }
