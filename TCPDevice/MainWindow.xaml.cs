@@ -72,13 +72,13 @@ namespace TCPDevice
             {
                 if (State)
                 {
-                    ConnectionStatus.Header = "Подключено";
-                    ConnectionStatus.Background = Brushes.Green;
+                    ConnectionStatus.Content = "Подключено";
+                    ConnectionStatus.Foreground = Brushes.Green;
                 }
                 else
                 {
-                    ConnectionStatus.Header = "Отключено";
-                    ConnectionStatus.Background = Brushes.Red;
+                    ConnectionStatus.Content = "Отключено";
+                    ConnectionStatus.Foreground = Brushes.Red;
                 }
             }
             catch(Exception ex)
@@ -98,8 +98,8 @@ namespace TCPDevice
                     if (BytesRead == 0)
                     {
                         Client.Close();
-                        ConnectionStatus.Header = "Отключен";
-                        ConnectionStatus.Background = Brushes.Red;
+                        ConnectionStatus.Content = "Отключен";
+                        ConnectionStatus.Foreground = Brushes.Red;
                         MessageBox.Show("Сервер закрыт!", "Внимание", MessageBoxButton.OK, MessageBoxImage.Exclamation);
                         break;
                     }
@@ -115,25 +115,8 @@ namespace TCPDevice
             }
         }
 
-        private void EnabledCheckBox_Checked(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                ComboBox? EnabledCB = PolarisationCmd.Items.GetItemAt(1) as ComboBox;
-                TextBox? EnabledTB = EnabledCB.Items.GetItemAt(1) as TextBox;
-                ComboBox? DisabledCB = PolarisationCmd.Items.GetItemAt(0) as ComboBox;
-                TextBox? DisabledTB = DisabledCB.Items.GetItemAt(1) as TextBox;
-                string StateData = "";
-                StateData = EnabledCheckBox.IsChecked == true ? StateData += EnabledTB.Text : StateData += DisabledTB.Text;
-                SendData(StateData);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "Enabling error");
-            }
-        }
         
-        void SendData(string Data)
+        public void SendData(string Data)
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
@@ -208,7 +191,6 @@ namespace TCPDevice
                 TimersElapsed.Start();
                 DispTimer.Tick += DispTimer_Tick;
                 DispTimer.Start();
-                CommandGrid.IsEnabled = false;
             }
             catch (Exception )
             {
@@ -260,7 +242,7 @@ namespace TCPDevice
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show(ex.Message + "\n" + Commands.Count.ToString() + "\n" + Buttons.Count.ToString());
             }
         }
 
@@ -298,8 +280,8 @@ namespace TCPDevice
 
         private bool IsNumber(string text)
         {
-            Regex NumRegex = new Regex("[^0-9]+");
-            return !NumRegex.IsMatch(text);
+            Regex NumRegex = new Regex("((\\+|-)?([0-9]+)(\\.[0-9]+)?)|((\\+|-)?\\.?[0-9]+)");
+            return NumRegex.IsMatch(text);
         }
 
         private void Import_Click(object sender, RoutedEventArgs e)
@@ -316,16 +298,16 @@ namespace TCPDevice
                 {
                     Words.Add(ImportFileStream.ReadLine().Split('\t'));
                     Command C = new Command();
-                    C.CMD = $"{Words[i][0]} {Words[i][1]}";
-                    C.TMR = $"{Words[i][2]}";
+                    C.CMD = $"{Words[i][0]}";
+                    C.TMR = $"{Words[i][1]}";
                     Commands.Add(C);
                     i++;
                 }
                 MessageBox.Show("Импорт выполнен успешно");
             }
-            catch
+            catch (Exception ex)
             {
-                MessageBox.Show("Что-то пошло не так");
+                MessageBox.Show("Что-то пошло не так: " + ex.Message);
             }
         }
 
@@ -361,6 +343,39 @@ namespace TCPDevice
                 MessageBox.Show(ex.Message, "Connection start error", MessageBoxButton.OK, MessageBoxImage.Question);
                 return;
             }
+        }
+
+        private void Export_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                SaveFileDialog SFD = new SaveFileDialog();
+                SFD.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory;
+                SFD.ShowDialog();
+                FileStream FS = File.Create(SFD.FileName);
+                StreamWriter SW = new StreamWriter(FS);
+
+                foreach (Command Com in Commands)
+                {
+                    if (Com == Commands.Last())
+                    {
+                        SW.Write(Com.CMD + "\t" + Com.TMR);
+                    }
+                    else
+                    {
+                        SW.WriteLine(Com.CMD + "\t" + Com.TMR);
+                    }
+                    
+                }
+                SW.Close();
+                FS.Close();
+                SFD.Reset();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            
         }
     }
 }

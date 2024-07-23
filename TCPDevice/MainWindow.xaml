@@ -25,6 +25,7 @@
                         </Grid.ColumnDefinitions>
 
                         <Label x:Name="ConnectionStatusLabel" Content="Соединение: " Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="24"/>
+                        <Label x:Name="ConnectionStatus" Content="Отключено" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" Foreground="Red"/>
 
                         <Button x:Name="StartConnection" Content="Подключиться"  Grid.Row="5" Margin="10,10,10,10" FontSize="16" Click="StartConnection_Click"/>
                         <Button x:Name="StopConnection" Content="Отключиться"  Grid.Column="1" Grid.Row="5" Width="164" Margin="10,10,10,10" FontSize="16" Click="StopConnection_Click"/>
@@ -45,42 +46,20 @@
         <TabItem Header="Устройство">
             <Grid Background="#FFBDBDBD">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="1*"/>
                     <RowDefinition Height="7*"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="9*"/>
                     <ColumnDefinition Width="7*"/>
                 </Grid.ColumnDefinitions>
-                <Viewbox x:Name="PowerView" Grid.Column="0" Margin="0,25,0,0" Grid.Row="0" >
-                    <Grid HorizontalAlignment="Center" VerticalAlignment="Bottom" Width="269">
-                        <Border Height="55" HorizontalAlignment="Left" VerticalAlignment="Center" Width="235" Margin="24,10,0,10" BorderBrush="Black" BorderThickness="1,1,1,1" Background="#FFDDDDDD" >
-                            <CheckBox x:Name="EnabledCheckBox" Content="Питание" FontSize="22" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" UseLayoutRounding="False" Checked="EnabledCheckBox_Checked" Unchecked="EnabledCheckBox_Checked" BorderThickness="1,1,1,1" HorizontalAlignment="Center" RenderTransformOrigin="0.5,0.5">
-                                <CheckBox.RenderTransform>
-                                    <TransformGroup>
-                                        <ScaleTransform ScaleX="2" ScaleY="2"/>
-                                    </TransformGroup>
-                                </CheckBox.RenderTransform>
-                            </CheckBox>
-                        </Border>
-                        <ComboBox x:Name="PolarisationCmd" HorizontalAlignment="Left" Height="55" VerticalAlignment="Center" Width="19" Margin="5,0,0,0" SelectionChanged="OnSelect">
-                            <ComboBox IsSynchronizedWithCurrentItem="False" SelectedIndex="0" Text="Выключение" SelectionChanged="OnSelect" >
-                                <Label Content="Выключение"/>
-                                <TextBox Text="DIS"/>
-                            </ComboBox>
-                            <ComboBox SelectedIndex="0" SelectionChanged="OnSelect" >
-                                <Label Content="Включение"/>
-                                <TextBox Text="EN"/>
-                            </ComboBox>
-                        </ComboBox>
-                    </Grid>
-                </Viewbox>
-                <TabControl x:Name="TabProgram" Grid.Column="0" Grid.Row="1" Background="Gray">
+                
+                <TabControl x:Name="TabProgram" Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Background="Gray" Margin="0,25,0,0">
                     <TabItem Header="Таймер">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="1*"/>
-                                <RowDefinition Height="6*"/>
+                                <RowDefinition Height="14*"/>
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="1*"/>
@@ -88,11 +67,18 @@
                                 <ColumnDefinition Width="1*"/>
                                 <ColumnDefinition Width="2*"/>
                             </Grid.ColumnDefinitions>
-                            <Button x:Name="TimerStart" Content="Старт" Click="TimerStart_Click" Grid.Column="0" Grid.Row="0" Margin="5,5,5,5" FontSize="20"/>
-                            <Button x:Name="TimerStop" Content="Стоп" Click="TimerStop_Click" Grid.Column="1" Grid.Row="0" Margin="5,5,5,5" FontSize="20"/>
-                            <Button x:Name="Import" Content="Импорт" Click="Import_Click" Grid.Column="2" Grid.Row="0" Margin="5,5,5,5" FontSize="20" />
-                            <Label x:Name="TimerLabel" Content="Время" FontSize="24" Grid.Column="3" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            <Grid x:Name="CommandGrid" Margin="20,20,20,10" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="4">
+                            <Menu Height="25" VerticalAlignment="Top" Grid.ColumnSpan="4">
+                                <Button x:Name="TimerStart" Content="Старт" Click="TimerStart_Click" FontSize="14"/>
+                                <Button x:Name="TimerStop" Content="Стоп" Click="TimerStop_Click" FontSize="14"/>
+                                <Button x:Name="Import" Content="Импорт" Click="Import_Click" FontSize="14"/>
+                                <Button x:Name="Export" Content="Экспорт" Click="Export_Click" FontSize="14"/>
+                                
+                            </Menu>
+                            <Label x:Name="TimerLabel" Content="Время" FontSize="20" Grid.Row="1" Grid.ColumnSpan="4" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                            
+                            
+                            
+                            <Grid x:Name="CommandGrid" Margin="20,40,20,10" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="4">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="22*"/>
                                     <ColumnDefinition Width="4*"/>
@@ -102,10 +88,10 @@
                                     <RowDefinition Height="1*"/>
                                     <RowDefinition Height="8*"/>
                                 </Grid.RowDefinitions>
-                                <TextBox x:Name="DemoCommandInput" Grid.Row="0" Grid.Column="0" Width="220"/>
+                                <TextBox x:Name="DemoCommandInput" Grid.Row="0" Grid.Column="0" Width="300"/>
                                 <TextBox x:Name="DemoTimerInput" Grid.Row="0" Grid.Column="1" Width="40" PreviewTextInput="TMR_PreviewTextInput"/>
                                 <Button x:Name="AddCommand" Grid.Row="0" Grid.Column="2" Content="Добавить" Click="AddCommand_Click"/>
-                                <ListView x:Name="DemoCommandList" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Height="200" ItemsSource="{Binding Commands}">
+                                <ListView x:Name="DemoCommandList" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Height="280" ItemsSource="{Binding Commands}">
                                     <ListView.ItemTemplate>
                                         <DataTemplate>
                                             <StackPanel x:Name="CMDList" Orientation="Horizontal">
@@ -136,7 +122,7 @@
                             <ColumnDefinition Width="4*"/>
                             <ColumnDefinition Width="1  *"/>
                         </Grid.ColumnDefinitions>
-                        <TextBox x:Name="ServerData" TextWrapping="Wrap" VerticalScrollBarVisibility="Visible" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" IsReadOnly="True" FontFamily="Global Monospace" Grid.ColumnSpan="2"/>
+                        <TextBox x:Name="ServerData" TextWrapping="Wrap" VerticalScrollBarVisibility="Visible" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" IsReadOnly="True" FontFamily="Global Monospace" Grid.ColumnSpan="2" Margin="0,-16,0,0"/>
                         <Button x:Name="SendCmd" Content="Отправить" Margin="0,0,0,0" Click="SendCmd_Click" Grid.Column="1" Grid.Row="1"/>
                         <TextBox x:Name="CommandInput" TextWrapping="Wrap" Margin="0,0,0,0" KeyDown="OnPress" Grid.Row="1"/>
                         <Button x:Name="SendCmd1" Content="Отправить" Margin="0,0,0,0" Click="SendCmd_Click" Grid.Column="1" Grid.Row="2"/>
@@ -149,11 +135,11 @@
                     <Label Content="Сервер" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="28" Height="62" Width="360"/>
                 </Viewbox>
                 <Menu Height="25" Grid.ColumnSpan="2" VerticalAlignment="Top">
-                    <MenuItem Header="Состояние" Margin="0,3,0,0">
-                        <MenuItem x:Name="ConnectionStatus" Header="Подключен " Margin="0,3,0,0" Background="Lime"/>
-                        <MenuItem Header="IP: " Margin="0,3,0,0"/>
-                        <MenuItem x:Name="IP" Header="" Margin="0,3,0,0"/>
-                    </MenuItem>
+                    <MenuItem Header="Состояние" Margin="0,3,0,0"/>
+                    <!--<MenuItem x:Name="ConnectionStatus" Header="Подключен " Margin="0,3,0,0" Background="Lime"/>-->
+                    <MenuItem Header="IP: " Margin="0,3,0,0"/>
+                    <MenuItem x:Name="IP" Header="" Margin="0,3,0,0"/>
+
                     <MenuItem x:Name="StartSymbol" Header="Символ начала:" Margin="0,3,0,0"/>
                     <TextBox x:Name="StartSymbolInput" Width="40" Text="^" Margin="0,3,0,0"/>
                     <MenuItem x:Name="EndSymbol" Header="Символ конца:" Margin="0,3,0,0"/>
