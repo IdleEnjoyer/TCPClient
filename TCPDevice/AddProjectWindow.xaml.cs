@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -9,6 +11,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
@@ -28,29 +31,78 @@ namespace TCPDevice
         {
             InitializeComponent();
 
-            Button BT = new Button();
-            BT.Name = "Button";
-            BT.Content = Prop.Text;
-            BT.Margin = new Thickness(10, 10, 10, 10);
-            Grid.SetRow(BT, 1);
-            Grid.SetColumn(BT, 1);
-            ProjectGrid.Children.Add(BT);
+            AddChoice(1, ProjectGrid.RowDefinitions.Count - 1);
+        }
+
+        private void AddChoice(int Column, int Row)
+        {
+            ComboBox Choice = new ComboBox();
+            Choice.Height = 25;
+            Choice.Width = 100;
+            Choice.Name = "Choice";
+            Choice.VerticalAlignment = VerticalAlignment.Top;
+            Choice.SelectionChanged += Choice_SelectionChanged;
+            Grid.SetColumn(Choice, Column);
+            Grid.SetRow(Choice, Row);
+            ProjectGrid.Children.Add(Choice);
+
+            ComboBoxItem None = new ComboBoxItem();
+            None.Content = "Ничего";
+            None.Name = "None";
+            Choice.Items.Add(None);
+
+            ComboBoxItem LabelItem = new ComboBoxItem();
+            LabelItem.Content = "Надпись";
+            LabelItem.Name = "Label";
+            Choice.Items.Add(LabelItem);
+
+            ComboBoxItem Button = new ComboBoxItem();
+            Button.Content = "Кнопка";
+            Button.Name = "Button";
+            Choice.Items.Add(Button);
+
+            ComboBoxItem Input = new ComboBoxItem();
+            Input.Content = "Поле ввода";
+            Input.Name = "Input";
+            Choice.Items.Add(Input);
         }
 
         private void AddAxisBttn_Click(object sender, RoutedEventArgs e)
         {
             AxisAmount++;
+            ProjectGrid.Width += 120;
+            ProjectGrid.ColumnDefinitions.Add(new ColumnDefinition());
+
+            //<TextBox x:Name="Axis" Text="ОСЬ 1" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Grid.Column="1" Grid.Row="0" FontSize="16" Margin="0,20,0,0" VerticalAlignment="Bottom" Height="25"/>
             TextBox NewAxis = new TextBox();
             NewAxis.Text = $"ОСЬ {AxisAmount}";
-            NewAxis.FontSize = 20;
+            NewAxis.Height = 25;
+            NewAxis.VerticalAlignment = VerticalAlignment.Bottom;
+            NewAxis.FontSize = 16;
             NewAxis.HorizontalContentAlignment = HorizontalAlignment.Center;
             NewAxis.VerticalContentAlignment = VerticalAlignment.Center;
             NewAxis.Name = $"AxisC{AxisAmount}";
-            ProjectGrid.Width += 100;
             Grid.SetColumn(NewAxis, AxisAmount);
             Grid.SetRow(NewAxis, 0);
-            ProjectGrid.ColumnDefinitions.Add(new ColumnDefinition());
             ProjectGrid.Children.Add(NewAxis);
+
+            //<Button x:Name="RemoveAxis" Content="X" Grid.Column="1" Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Right" Height="25" Width="25" Click="RemoveAxis_Click"/>
+            Button Remove = new Button();
+            Remove.Name = "RemoveAxis";
+            Remove.Content = "X";
+            Remove.VerticalAlignment = VerticalAlignment.Top;
+            Remove.HorizontalAlignment = HorizontalAlignment.Right;
+            Remove.Height = 25;
+            Remove.Width = 25;
+            Remove.Click += RemoveAxis_Click;
+            Grid.SetColumn(Remove, AxisAmount);
+            Grid.SetRow(Remove, 0);
+            ProjectGrid.Children.Add(Remove);
+
+            for (int i = 1; i < ProjectGrid.RowDefinitions.Count; i++)
+            {
+                AddChoice(AxisAmount, i);
+            }
         }
 
         private void AddPropBttn_Click(object sender, RoutedEventArgs e)
@@ -59,6 +111,7 @@ namespace TCPDevice
 
             ProjectGrid.Height += 50;
             ProjectGrid.RowDefinitions.Add(new RowDefinition());
+            
             //<TextBox x:Name="Prop" Text="СВОЙСТВО 1" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Grid.Column="0" Grid.Row="1" FontSize="14" HorizontalAlignment="Left" Margin="0,20,0,0" Width="95" VerticalAlignment="Bottom" Height="25"/>
             TextBox NewProp = new TextBox();
             NewProp.HorizontalAlignment = HorizontalAlignment.Left;
@@ -73,23 +126,6 @@ namespace TCPDevice
             Grid.SetColumn(NewProp, 0);
             Grid.SetRow(NewProp, ProjectGrid.RowDefinitions.Count - 1);
             ProjectGrid.Children.Add(NewProp);
-
-
-            //<TextBox x:Name="Amount" Text="1" Grid.Column="0" Grid.Row="1" FontSize="16" HorizontalAlignment="Right" VerticalContentAlignment="Center" Margin="0,20,0,0" Width="25" HorizontalContentAlignment="Center" PreviewTextInput="Amount_PreviewTextInput" TextChanged="Amount_TextChanged" LostFocus="Amount_LostFocus" VerticalAlignment="Bottom" Height="25" Initialized="Amount_Initialized"/>
-            //TextBox NewNum = new TextBox();
-            //NewNum.HorizontalAlignment = HorizontalAlignment.Right;
-            //NewNum.VerticalAlignment = VerticalAlignment.Bottom;
-            //NewNum.Width = 25;
-            //NewNum.Height = 25;
-            //NewNum.Text = "1";
-            //NewNum.FontSize = 16;
-            //NewNum.HorizontalContentAlignment = HorizontalAlignment.Center;
-            //NewNum.VerticalContentAlignment = VerticalAlignment.Center;
-            //NewNum.Name = "Amount";
-            //NewNum.PreviewTextInput += Amount_PreviewTextInput;
-            //Grid.SetColumn(NewNum, 0);
-            //Grid.SetRow(NewNum, LastPropID);
-            //ProjectGrid.Children.Add(NewNum);
 
             //<Button x:Name="RemoveProp" Content="X" Grid.Column="0" Grid.Row="1" VerticalAlignment="Top" HorizontalAlignment="Right" Height="25" Width="25" Click="RemoveProp_Click"/>
             Button Remove = new Button();
@@ -132,55 +168,67 @@ namespace TCPDevice
             Grid.SetRow(Decrement, ProjectGrid.RowDefinitions.Count - 1);
             ProjectGrid.Children.Add(Decrement);
 
-
-            Button BT = new Button();
-            BT.Name = "Button";
-            BT.Content = Prop.Text;
-            BT.Margin = new Thickness(10, 10, 10, 10);
-            Grid.SetRow(BT, ProjectGrid.RowDefinitions.Count - 1);
-            Grid.SetColumn(BT, 1);
-            ProjectGrid.Children.Add(BT);
+            for (int i = 1; i < ProjectGrid.ColumnDefinitions.Count; i++)
+            {
+                AddChoice(i, ProjectGrid.RowDefinitions.Count - 1);
+            }
         }
 
-        //private void RemoveAxisBttn_Click(object sender, RoutedEventArgs e)
-        //{
-        //    for(int i = 0; i < ProjectGrid.Children.Count; i++)
-        //    {
-        //        UIElement Child = ProjectGrid.Children[i];
-        //        if (Child.GetType() == typeof(TextBox))
-        //        {
-        //            TextBox AxisToRemove = (TextBox)Child;
-        //            if (AxisToRemove.Name == $"AxisC{AxisAmount}")
-        //            {
-        //                AxisAmount--;
-        //                ProjectGrid.Width -= 100;
-        //                ProjectGrid.ColumnDefinitions.RemoveAt(ProjectGrid.ColumnDefinitions.Count - 1);
-        //                ProjectGrid.Children.Remove(Child);
-        //                return;
-        //            }
-        //        }
-        //    }
-        //}
-
-        //private void RemovePropBttn_Click(object sender, RoutedEventArgs e)
-        //{
-        //    List<UIElement> EList = new List<UIElement>();
-        //    for (int i = 0; i < ProjectGrid.Children.Count; i++)
-        //    {
-        //        UIElement Child = ProjectGrid.Children[i];
-        //        if (Grid.GetRow(Child) >= LastPropID)
-        //        {
-        //            EList.Add(Child);
-        //        }
-        //    }
-        //    foreach (UIElement Child in EList)
-        //    {
-        //        ProjectGrid.Children.Remove(Child);
-        //    }
-        //    ProjectGrid.RowDefinitions.RemoveRange(LastPropID, LastPropAmount);
-        //    ProjectGrid.Height -= 50 * LastPropAmount;
-        //    LastPropID = LastPropID - LastPropAmount;
-        //}
+        private void Choice_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ComboBox? Choice = sender as ComboBox;
+            ComboBoxItem? Item = Choice.SelectedItem as ComboBoxItem;
+            if (Item.Name == "Button" || Item.Name == "Label")
+            {
+                if(e.RemovedItems.Count != 0)
+                {
+                    ComboBoxItem Prev = e.RemovedItems[0] as ComboBoxItem;
+                    if (Prev.Name != "Button" && Prev.Name != "Label")
+                    {
+                        TextBox TB = new TextBox();
+                        TB.Name = "Command";
+                        TB.Width = 100;
+                        TB.Height = 25;
+                        TB.VerticalAlignment = VerticalAlignment.Bottom;
+                        Grid.SetColumn(TB, Grid.GetColumn(Choice));
+                        Grid.SetRow(TB, Grid.GetRow(Choice));
+                        ProjectGrid.Children.Add(TB);
+                    }
+                }
+                else
+                {
+                    TextBox TB = new TextBox();
+                    TB.Name = "Command";
+                    TB.Width = 100;
+                    TB.Height = 25;
+                    TB.VerticalAlignment = VerticalAlignment.Bottom;
+                    Grid.SetColumn(TB, Grid.GetColumn(Choice));
+                    Grid.SetRow(TB, Grid.GetRow(Choice));
+                    ProjectGrid.Children.Add(TB);
+                }
+                
+            }
+            else
+            {
+                UIElement Delete = null;
+                foreach (UIElement Child in ProjectGrid.Children)
+                {
+                    if (Child.GetType() == typeof(TextBox))
+                    {
+                        TextBox TB = (TextBox)Child;
+                        if (TB.Name == "Command" && Grid.GetRow(TB) == Grid.GetRow(Choice) && Grid.GetColumn(TB) == Grid.GetColumn(Choice))
+                        {
+                            Delete = TB;
+                            break;
+                        }
+                    }
+                }
+                if (Delete != null)
+                {
+                    ProjectGrid.Children.Remove(Delete);
+                }
+            }
+        }
 
         private void OnPress(object sender, KeyEventArgs e)
         {
@@ -262,7 +310,8 @@ namespace TCPDevice
             int NextIndex = Index + 1;
             foreach (UIElement Child in ProjectGrid.Children)
             {
-                if (Child.GetType() == typeof(TextBox)) {
+                if (Child.GetType() == typeof(TextBox)) 
+                {
                     TextBox? TB = Child as TextBox;
                     if(Grid.GetRow(TB) > Index && TB.Name == "Prop")
                     {
@@ -273,11 +322,16 @@ namespace TCPDevice
             }
             ProjectGrid.RowDefinitions.Add(new RowDefinition());
             ProjectGrid.Height += 50;
-            foreach (UIElement Child in ProjectGrid.Children) { 
-                if(Grid.GetRow(Child) >= NextIndex)
+            foreach (UIElement Child in ProjectGrid.Children)
+            {
+                if (Grid.GetRow(Child) >= NextIndex)
                 {
                     Grid.SetRow(Child, Grid.GetRow(Child) + 1);
                 }
+            }
+            for(int i = 1; i < ProjectGrid.ColumnDefinitions.Count; i++)
+            {
+                AddChoice(i, NextIndex);
             }
         }
 
@@ -302,15 +356,158 @@ namespace TCPDevice
             }
             if((NextIndex != Index + 1 || Last) && Index != ProjectGrid.RowDefinitions.Count - 1)
             {
-                ProjectGrid.RowDefinitions.Remove(ProjectGrid.RowDefinitions.Last());
-                ProjectGrid.Height -= 50;
+                List<UIElement> L = new List<UIElement>();
                 foreach (UIElement Child in ProjectGrid.Children)
                 {
+                    if (Grid.GetRow(Child) == NextIndex - 1 && NextIndex - 1 != Index)
+                    {
+                        L.Add(Child);
+                    }
                     if (Grid.GetRow(Child) >= NextIndex)
                     {
                         Grid.SetRow(Child, Grid.GetRow(Child) - 1);
                     }
+
                 }
+                ProjectGrid.RowDefinitions.Remove(ProjectGrid.RowDefinitions.Last());
+                ProjectGrid.Height -= 50;
+                for (int i = 0; i < L.Count; i++)
+                {
+                    ProjectGrid.Children.Remove(L[i]);
+                }
+                
+            }
+        }
+
+        private void RemoveAxis_Click(object sender, RoutedEventArgs e)
+        {
+            List<UIElement> Elems = new List<UIElement>();
+            Button? BT = sender as Button;
+            int Index = Grid.GetColumn(BT);
+            foreach(UIElement Child in ProjectGrid.Children)
+            {
+                if(Index == Grid.GetColumn(Child))
+                {
+                    Elems.Add(Child);
+                }
+            }
+            foreach (UIElement Child in Elems)
+            {
+                ProjectGrid.Children.Remove(Child);
+            }
+            foreach(UIElement Child in ProjectGrid.Children)
+            {
+                if(Grid.GetColumn(Child) > Index)
+                {
+                    Grid.SetColumn(Child, Grid.GetColumn(Child) - 1);
+                }
+            }
+            AxisAmount--;
+            ProjectGrid.Width -= 120;
+            ProjectGrid.ColumnDefinitions.Remove(ProjectGrid.ColumnDefinitions.Last());
+        }
+
+        bool FillCheck()
+        {
+            bool FilledOut = true;
+            List<UIElement> Check = new List<UIElement>();
+            List<UIElement> Delete = new List<UIElement>();
+            foreach (UIElement Child in ProjectGrid.Children)
+            {
+                if (Child.GetType() == typeof(TextBox))
+                {
+                    TextBox? TB = Child as TextBox;
+                    if (TB.Text == string.Empty)
+                    {
+                        TB.BorderBrush = Brushes.Red;
+                        FilledOut = false;
+                    }
+                    else
+                    {
+                        TB.BorderBrush = Brushes.Green;
+                    }
+                }
+                if (Child.GetType() == typeof(ComboBox))
+                {
+                    ComboBox? CB = Child as ComboBox;
+                    CB.OverridesDefaultStyle = true;
+
+                    if (CB.SelectedIndex == -1)
+                    {
+                        Border BD = new Border();
+                        BD.BorderBrush = Brushes.Red;
+                        BD.BorderThickness = new Thickness(2);
+                        Grid.SetColumn(BD, Grid.GetColumn(CB));
+                        Grid.SetRow(BD, Grid.GetRow(CB));
+                        Check.Add(BD);
+                        FilledOut = false;
+                    }
+                }
+                if (Child.GetType() == typeof(Border))
+                {
+                    Border? BD = Child as Border;
+                    Delete.Add(BD);
+                }
+            }
+            foreach (UIElement Elem in Check)
+            {
+                ProjectGrid.Children.Add(Elem);
+            }
+            foreach (UIElement Elem in Delete)
+            {
+                ProjectGrid.Children.Remove(Elem);
+            }
+            return FilledOut;
+        }
+
+        private void Completion_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show(FillCheck().ToString());
+            if (!FillCheck())
+            {
+                MessageBox.Show("Не все поля заполнены!");
+            }
+            else
+            {
+
+            }
+        }
+
+        private void Export_Click(object sender, RoutedEventArgs e)
+        {
+            if(FillCheck())
+            {
+                string XAMLString = XamlWriter.Save(ProjectGrid);
+                SaveFileDialog SFD = new SaveFileDialog();
+                SFD.ShowDialog(this);
+                if (SFD.FileName != null)
+                {
+                    FileStream FS = File.Create(SFD.FileName);
+                    StreamWriter SW = new StreamWriter(FS);
+                    SW.Write(XAMLString, 0, XAMLString.Length);
+                    SW.Close();
+                    FS.Close();
+                }
+                SFD.Reset();
+            }
+            else
+            {
+                MessageBox.Show("Не все поля заполнены!");
+            }
+        }
+
+        private void Import_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog OFD = new OpenFileDialog();
+            OFD.ShowDialog();
+            if(OFD.FileName != null)
+            {
+                string XAMLImport;
+                FileStream FS = File.OpenRead(OFD.FileName);
+                StreamReader SR = new StreamReader(FS);
+                XAMLImport = SR.ReadToEnd();
+                Grid? Import = XamlReader.Parse(XAMLImport) as Grid;
+                ProjectGrid = Import;
             }
         }
     }
