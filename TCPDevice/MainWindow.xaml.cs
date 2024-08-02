@@ -18,6 +18,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Microsoft.Win32;
+using System.Windows.Markup;
 
 #pragma warning disable CS8618
 #pragma warning disable CS8602
@@ -375,7 +376,31 @@ namespace TCPDevice
             {
                 MessageBox.Show(ex.Message);
             }
-            
+        }
+
+        public void CreateDevice(string XamlString)
+        {
+            TabItem? TI = AddTab.Parent as TabItem;
+            TI.Content = null;
+            ScrollViewer SV = new ScrollViewer();
+            //<ScrollViewer x:Name="Viewer" Grid.Row="1" Grid.ColumnSpan="4" HorizontalScrollBarVisibility="Visible">
+            SV.Name = "Viewer";
+            SV.HorizontalScrollBarVisibility = ScrollBarVisibility.Visible;
+            SV.Background = new SolidColorBrush(Color.FromRgb(0xC9,0xC9,0xC9));
+            Grid? GR = XamlReader.Parse(XamlString) as Grid;
+            foreach(UIElement Child in GR.Children)
+            {
+                if(Child.GetType() == typeof(Button))
+                {
+                    Button? BT = Child as Button;
+                    BT.Click += (sender, e) =>
+                    {
+                        MessageBox.Show(BT.Resources["Command"].ToString());
+                    };
+                }
+            }
+            SV.Content = GR;
+            TI.Content = SV;
         }
     }
 }

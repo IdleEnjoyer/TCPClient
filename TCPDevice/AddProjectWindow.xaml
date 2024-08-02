@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TCPDevice"
         mc:Ignorable="d"
-        Title="Конструктор" Height="450" Width="600" KeyUp="OnPress">
+        Title="Конструктор" Height="450" Width="600">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="1*"/>
@@ -21,7 +21,7 @@
             <Button x:Name="AddPropBttn" Content="Добавить Свойство" Click="AddPropBttn_Click"/>
             <Button x:Name="Completion" Content="Закончить" Click="Completion_Click"/>
         </Menu>
-        <ScrollViewer Grid.Row="1" Grid.ColumnSpan="4" HorizontalScrollBarVisibility="Visible">
+        <ScrollViewer x:Name="Viewer" Grid.Row="1" Grid.ColumnSpan="4" HorizontalScrollBarVisibility="Visible">
             <Grid x:Name="ProjectGrid" ShowGridLines="True" Width="240" Height="100" HorizontalAlignment="Left" VerticalAlignment="Top">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="1*"/>
