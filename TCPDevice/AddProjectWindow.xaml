@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TCPDevice"
         mc:Ignorable="d"
-        Title="Конструктор" Height="450" Width="600">
+        Title="Конструктор" Height="450" Width="600"
+        Closed="Window_Closed">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="1*"/>
@@ -13,15 +14,14 @@
         </Grid.RowDefinitions>
         <Menu x:Name="ControlMenu" Height="25" VerticalAlignment="Top" >
             <MenuItem Header="Файл">
-                <Button x:Name="Export" Content="Экспорт" Click="Export_Click"/>
-                <Button x:Name="Import" Content="Импорт" Click="Import_Click"/>
-                <Button x:Name="Save" Content="Сохранить"/>
+                <MenuItem x:Name="Export" Header="Экспорт" Click="Export_Click"/>
+                <MenuItem x:Name="Import" Header="Импорт" Click="Import_Click"/>
             </MenuItem>
-            <Button x:Name="AddAxisBttn" Content="Добавить Ось" Click="AddAxisBttn_Click"/>
-            <Button x:Name="AddPropBttn" Content="Добавить Свойство" Click="AddPropBttn_Click"/>
-            <Button x:Name="Completion" Content="Закончить" Click="Completion_Click"/>
+            <MenuItem x:Name="AddAxisBttn" Header="Добавить Ось" Click="AddAxisBttn_Click"/>
+            <MenuItem x:Name="AddPropBttn" Header="Добавить Свойство" Click="AddPropBttn_Click"/>
+            <MenuItem x:Name="Completion" Header="Закончить" Click="Completion_Click"/>
         </Menu>
-        <ScrollViewer x:Name="Viewer" Grid.Row="1" Grid.ColumnSpan="4" HorizontalScrollBarVisibility="Visible">
+        <ScrollViewer x:Name="Viewer" Grid.Row="1" HorizontalScrollBarVisibility="Visible">
             <Grid x:Name="ProjectGrid" ShowGridLines="True" Width="240" Height="100" HorizontalAlignment="Left" VerticalAlignment="Top">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="1*"/>

@@ -53,7 +53,7 @@
                     <ColumnDefinition Width="9*"/>
                     <ColumnDefinition Width="7*"/>
                 </Grid.ColumnDefinitions>
-                
+
                 <TabControl x:Name="TabProgram" Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Background="Gray" Margin="0,25,0,0">
                     <TabItem x:Name="TimerTab" Header="Таймер">
                         <Grid>
@@ -72,13 +72,13 @@
                                 <Button x:Name="TimerStop" Content="Стоп" Click="TimerStop_Click" FontSize="14"/>
                                 <Button x:Name="Import" Content="Импорт" Click="Import_Click" FontSize="14"/>
                                 <Button x:Name="Export" Content="Экспорт" Click="Export_Click" FontSize="14"/>
-                                
+
                             </Menu>
                             <Label x:Name="TimerLabel" Content="Время" FontSize="20" Grid.Row="1" Grid.ColumnSpan="4" HorizontalAlignment="Center" VerticalAlignment="Top"/>
-                            
-                            
-                            
-                            <Grid x:Name="CommandGrid" Margin="20,40,20,10" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="4">
+
+
+
+                            <Grid x:Name="CommandGrid" Margin="20,40,20,10" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="4">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="22*"/>
                                     <ColumnDefinition Width="4*"/>
@@ -86,12 +86,12 @@
                                 </Grid.ColumnDefinitions>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="1*"/>
-                                    <RowDefinition Height="8*"/>
+                                    <RowDefinition Height="12*"/>
                                 </Grid.RowDefinitions>
-                                <TextBox x:Name="DemoCommandInput" Grid.Row="0" Grid.Column="0" Width="300"/>
-                                <TextBox x:Name="DemoTimerInput" Grid.Row="0" Grid.Column="1" Width="40" PreviewTextInput="TMR_PreviewTextInput"/>
-                                <Button x:Name="AddCommand" Grid.Row="0" Grid.Column="2" Content="Добавить" Click="AddCommand_Click"/>
-                                <ListView x:Name="DemoCommandList" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Height="280" ItemsSource="{Binding Commands}">
+                                <TextBox x:Name="DemoCommandInput" Height="20" Grid.Row="0" Grid.Column="0" />
+                                <TextBox x:Name="DemoTimerInput" Height="20" Grid.Row="0" Grid.Column="1" PreviewTextInput="TMR_PreviewTextInput"/>
+                                <Button x:Name="AddCommand" Height="20" Grid.Row="0" Grid.Column="2" Content="Добавить" Click="AddCommand_Click"/>
+                                <ListView x:Name="DemoCommandList" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" ItemsSource="{Binding Commands}">
                                     <ListView.ItemTemplate>
                                         <DataTemplate>
                                             <StackPanel x:Name="CMDList" Orientation="Horizontal">
@@ -110,36 +110,33 @@
                         <Button x:Name="AddTab" Width="200" Height="50" Content="Добавить проект" FontSize="20" Click="AddTab_Click" />
                     </TabItem>
                 </TabControl>
-                <Viewbox x:Name="ChatView" Grid.Column="2" Margin="10,10,10,10" Grid.Row="1">
-                    <Grid x:Name="ChatGrid" Height="400" Width="380">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="19*"/>
-                            <RowDefinition Height="1*"/>
-                            <RowDefinition Height="1*"/>
-                            <RowDefinition Height="1*"/>
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="4*"/>
-                            <ColumnDefinition Width="1  *"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBox x:Name="ServerData" TextWrapping="Wrap" VerticalScrollBarVisibility="Visible" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" IsReadOnly="True" FontFamily="Global Monospace" Grid.ColumnSpan="2" Margin="0,-16,0,0"/>
-                        <Button x:Name="SendCmd" Content="Отправить" Margin="0,0,0,0" Click="SendCmd_Click" Grid.Column="1" Grid.Row="1"/>
-                        <TextBox x:Name="CommandInput" TextWrapping="Wrap" Margin="0,0,0,0" KeyDown="OnPress" Grid.Row="1"/>
-                        <Button x:Name="SendCmd1" Content="Отправить" Margin="0,0,0,0" Click="SendCmd_Click" Grid.Column="1" Grid.Row="2"/>
-                        <TextBox x:Name="CommandInput1" TextWrapping="Wrap" Margin="0,0,0,0" KeyDown="OnPress" Grid.Row="2" />
-                        <Button x:Name="SendCmd2" Content="Отправить" Margin="0,0,0,0" Click="SendCmd_Click" Grid.Column="1" Grid.Row="3"/>
-                        <TextBox x:Name="CommandInput2" TextWrapping="Wrap" Margin="0,0,0,0" KeyDown="OnPress" Grid.Row="3"/>
-                    </Grid>
-                </Viewbox>
-                <Viewbox Grid.Column="2" Margin="0,25,0,0" Grid.Row="0">
-                    <Label Content="Сервер" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="28" Height="62" Width="360"/>
-                </Viewbox>
+                <Grid x:Name="ChatGrid" Grid.Column="1" Grid.RowSpan="2" Margin="0,24.8,0,0" >
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="19*"/>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="1*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="4*"/>
+                        <ColumnDefinition Width="1  *"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox x:Name="ServerData" TextWrapping="Wrap" VerticalScrollBarVisibility="Visible" IsReadOnly="True" FontFamily="Global Monospace" Grid.ColumnSpan="2" Grid.Row="0"/>
+                    <Button x:Name="SendCmd" Height="20" Content="Отправить" FontSize="10" Margin="0,0,0,0" Click="SendCmd_Click" Grid.Column="1" Grid.Row="1"/>
+                    <TextBox x:Name="CommandInput" Height="20" TextWrapping="Wrap" Margin="0,0,0,0" KeyDown="OnPress" Grid.Row="1"/>
+                    <Button x:Name="SendCmd1" Height="20" Content="Отправить" FontSize="10" Margin="0,0,0,0" Click="SendCmd_Click" Grid.Column="1" Grid.Row="2"/>
+                    <TextBox x:Name="CommandInput1" Height="20" TextWrapping="Wrap" Margin="0,0,0,0" KeyDown="OnPress" Grid.Row="2" />
+                    <Button x:Name="SendCmd2" Height="20" Content="Отправить" FontSize="10" Margin="0,0,0,0" Click="SendCmd_Click" Grid.Column="1" Grid.Row="3"/>
+                    <TextBox x:Name="CommandInput2" Height="20" TextWrapping="Wrap" Margin="0,0,0,0" KeyDown="OnPress" Grid.Row="3"/>
+                </Grid>
                 <Menu Height="25" Grid.ColumnSpan="2" VerticalAlignment="Top">
-                    <MenuItem Header="Состояние" Margin="0,3,0,0"/>
-                    <!--<MenuItem x:Name="ConnectionStatus" Header="Подключен " Margin="0,3,0,0" Background="Lime"/>-->
+                    <MenuItem Header="Устройство" Margin="0,3,0,0">
+                        <MenuItem x:Name="Create" Header="Создать" Click="AddTab_Click"/>
+                        <MenuItem x:Name="Open" Header="Открыть" Click="Open_Click"/>
+                        <MenuItem x:Name="Redact" Header="Редактировать" Click="Redact_Click"/>
+                    </MenuItem>
                     <MenuItem Header="IP: " Margin="0,3,0,0"/>
                     <MenuItem x:Name="IP" Header="" Margin="0,3,0,0"/>
-
                     <MenuItem x:Name="StartSymbol" Header="Символ начала:" Margin="0,3,0,0"/>
                     <TextBox x:Name="StartSymbolInput" Width="40" Text="^" Margin="0,3,0,0"/>
                     <MenuItem x:Name="EndSymbol" Header="Символ конца:" Margin="0,3,0,0"/>

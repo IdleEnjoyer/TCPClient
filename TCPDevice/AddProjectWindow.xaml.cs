@@ -1,7 +1,9 @@
 ﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
@@ -277,6 +279,7 @@ namespace TCPDevice
             Button? BT = sender as Button;
             int Index = Grid.GetRow(BT);
             int NextIndex = Index + 1;
+            bool Last = true;
             foreach (UIElement Child in ProjectGrid.Children)
             {
                 if (Child.GetType() == typeof(TextBox))
@@ -285,9 +288,14 @@ namespace TCPDevice
                     if (Grid.GetRow(TB) > Index && TB.Name.Contains("Prop"))
                     {
                         NextIndex = Grid.GetRow(TB);
+                        Last = false;
                         break;
                     }
                 }
+            }
+            if (Last)
+            {
+                NextIndex = ProjectGrid.RowDefinitions.Count;
             }
             ProjectGrid.RowDefinitions.Add(new RowDefinition());
             ProjectGrid.Height += 50;
@@ -323,26 +331,35 @@ namespace TCPDevice
                     }
                 }
             }
+            if (Last)
+            {
+                NextIndex = ProjectGrid.RowDefinitions.Count;
+            }
             if ((NextIndex != Index + 1 || Last) && Index != ProjectGrid.RowDefinitions.Count - 1)
             {
-                List<UIElement> L = new List<UIElement>();
+                List<UIElement> Deletion = new List<UIElement>();
+                List<UIElement> Move = new List<UIElement>();
                 foreach (UIElement Child in ProjectGrid.Children)
                 {
-                    if (Grid.GetRow(Child) == NextIndex && NextIndex != Index)
+                    if (Grid.GetRow(Child) == NextIndex - 1 && NextIndex != Index)
                     {
-                        L.Add(Child);
+                        Deletion.Add(Child);
                     }
                     if (Grid.GetRow(Child) >= NextIndex)
                     {
-                        Grid.SetRow(Child, Grid.GetRow(Child) - 1);
+                        Move.Add(Child);
                     }
 
                 }
                 ProjectGrid.RowDefinitions.Remove(ProjectGrid.RowDefinitions.Last());
                 ProjectGrid.Height -= 50;
-                for (int i = 0; i < L.Count; i++)
+                for (int i = 0; i < Deletion.Count; i++)
                 {
-                    ProjectGrid.Children.Remove(L[i]);
+                    ProjectGrid.Children.Remove(Deletion[i]);
+                }
+                for(int i =0; i < Move.Count; i++)
+                {
+                    Grid.SetRow(Move[i], Grid.GetRow(Move[i]) - 1);
                 }
             }
         }
@@ -409,58 +426,68 @@ namespace TCPDevice
                         Check.Add(BD);
                         FilledOut = false;
                     }
-                    //else
-                    //{
-                    //    int Index = Grid.GetRow(CB);
-                    //    int LastTBIndex = 1;
-                    //    int NextTBIndex = 1;
-                    //    foreach(UIElement TEMP in ProjectGrid.Children)
-                    //    {
-                    //        if(TEMP.GetType() == typeof(TextBox) && Grid.GetColumn(TEMP) == 0)
-                    //        {
-                    //            LastTBIndex = Grid.GetRow(TEMP);
-                    //        }
-                    //        if(TEMP.GetType() == typeof(TextBox) && Grid.GetRow(TEMP) > Index)
-                    //        {
-                    //            NextTBIndex = Grid.GetRow(TEMP);
-                    //            break;
-                    //        }
-                    //    }
-                    //    List<UIElement> ComboBoxes = new List<UIElement>();
-                    //    foreach(UIElement TEMP in ProjectGrid.Children)
-                    //    {
-                    //        if(Grid.GetRow(TEMP) >= LastTBIndex && Grid.GetRow(TEMP) < NextTBIndex && TEMP.GetType() == typeof(ComboBox) && (ComboBox)TEMP != CB && Grid.GetColumn(TEMP) == Grid.GetColumn(CB))
-                    //        {
-                    //            ComboBox? aCB = TEMP as ComboBox;
-                    //            ComboBoxes.Add(aCB);
-                    //        }
-                    //    }
-                    //    int buttonCount = 0;
-                    //    int inputCount = 0;
-                    //    foreach(UIElement Elem in ComboBoxes)
-                    //    {
-                    //        ComboBox? comboBox = Elem as ComboBox;
-                    //        ComboBoxItem? CBI = comboBox.SelectedItem as ComboBoxItem;
-                    //        if (CBI.Name.Contains("Button"))
-                    //        {
-                    //            buttonCount++;
-                    //        }
-                    //        if (CBI.Name.Contains("Input"))
-                    //        {
-                    //            inputCount++;
-                    //        }
-                    //    }
-                    //    if (buttonCount > 2)
-                    //    {
-                    //        MessageBox.Show("Нельзя создать больше 2х кнопок в свойсте!");
-                    //        FilledOut = false;
-                    //    }
-                    //    if (inputCount > 1 && buttonCount == 2)
-                    //    {
-                    //        MessageBox.Show("Нельзя создать больше 1го поля ввода, когда есть 2 кнопки!");
-                    //        FilledOut = false;
-                    //    }
-                    //}
+                    else
+                    {
+                        int Index = Grid.GetRow(CB);
+                        int LastTBIndex = 1;
+                        int NextTBIndex = 1;
+                        bool Last = true;
+                        foreach (UIElement TEMP in ProjectGrid.Children)
+                        {
+                            if (TEMP.GetType() == typeof(TextBox) && Grid.GetColumn(TEMP) == 0 && Grid.GetRow(TEMP) < Index)
+                            {
+                                LastTBIndex = Grid.GetRow(TEMP);
+                            }
+                            if (TEMP.GetType() == typeof(TextBox) && Grid.GetColumn(TEMP) == 0 && Grid.GetRow(TEMP) > Index)
+                            {
+                                NextTBIndex = Grid.GetRow(TEMP);
+                                Last = false;
+                                break;
+                            }
+                        }
+                        if (Last)
+                        {
+                            NextTBIndex = ProjectGrid.RowDefinitions.Count;
+                        }
+                        List<UIElement> ComboBoxes = new List<UIElement>();
+                        foreach (UIElement TEMP in ProjectGrid.Children)
+                        {
+                            if (Grid.GetRow(TEMP) >= LastTBIndex && Grid.GetRow(TEMP) < NextTBIndex && TEMP.GetType() == typeof(ComboBox) && Grid.GetColumn(TEMP) == Grid.GetColumn(CB))
+                            {
+                                ComboBox? aCB = TEMP as ComboBox;
+                                //MessageBox.Show("Check");
+                                ComboBoxes.Add(TEMP);
+                            }
+                        }
+                        int buttonCount = 0;
+                        int inputCount = 0;
+                        foreach (UIElement Elem in ComboBoxes)
+                        {
+                            ComboBox? comboBox = Elem as ComboBox;
+                            ComboBoxItem? CBI = comboBox.SelectedItem as ComboBoxItem;
+                            if (CBI.Name.Contains("Button"))
+                            {
+                                
+                                buttonCount++;
+                            }
+                            if (CBI.Name.Contains("Input"))
+                            {
+                                inputCount++;
+                            }
+                        }
+                        if (buttonCount > 2)
+                        {
+                            throw new System.Exception("Нельзя создать больше 2х кнопок в свойсте!");
+                        }
+                        if (inputCount > 1 && buttonCount == 2)
+                        {
+                            throw new System.Exception("Нельзя создать больше 1го поля ввода, когда есть 2 кнопки!");
+                        }
+                        if (inputCount > 1 && buttonCount < 1)
+                        {
+                            throw new System.Exception("Нет кнопок для отправки команд");
+                        }
+                    }
                 }
                 if (Child.GetType() == typeof(Border))
                 {
@@ -481,208 +508,271 @@ namespace TCPDevice
 
         private void Completion_Click(object sender, RoutedEventArgs e)
         {
-            if (!FillCheck())
+            try
             {
-                MessageBox.Show("Не все поля заполнены!");
-            }
-            else
-            {
-                List<UIElement> Deletion = new List<UIElement>();
-                List<UIElement> Addition = new List<UIElement>();
-                for (int i = 0; i < ProjectGrid.Children.Count; i++)
+                if (!FillCheck())
                 {
-                    UIElement Child = ProjectGrid.Children[i];
-                    if (Child.GetType() == typeof(Button))
+                    MessageBox.Show("Не все поля заполнены!");
+                }
+                else
+                {
+                    string XamlString = XamlWriter.Save(ProjectGrid)+"\n";
+                    List<UIElement> Deletion = new List<UIElement>();
+                    List<UIElement> Addition = new List<UIElement>();
+                    for (int i = 0; i < ProjectGrid.Children.Count; i++)
                     {
-                        Deletion.Add(Child);
-                    }
-                    if (Child.GetType() == typeof(TextBox) && (Grid.GetRow(Child) == 0 || Grid.GetColumn(Child) == 0))
-                    {
-                        Deletion.Add(Child);
-                        TextBox? TB = Child as TextBox;
-                        Label Replace = new Label();
-                        Replace.Name = TB.Name;
-                        Replace.Content = TB.Text;
-                        Replace.FontSize = 16;
-                        Replace.HorizontalAlignment = HorizontalAlignment.Center;
-                        Replace.VerticalAlignment = VerticalAlignment.Center;
-                        Grid.SetColumn(Replace, Grid.GetColumn(TB));
-                        Grid.SetRow(Replace, Grid.GetRow(TB));
-                        Addition.Add(Replace);
-                    }
-                    if (Child.GetType() == typeof(ComboBox))
-                    {
-                        ComboBox? CB = Child as ComboBox;
-                        ComboBoxItem? CBI = CB.SelectedItem as ComboBoxItem;
-                        if (CBI.Name.Contains("None"))
+                        UIElement Child = ProjectGrid.Children[i];
+                        if (Child.GetType() == typeof(Button))
                         {
                             Deletion.Add(Child);
                         }
-                        if (CBI.Name.Contains("Input"))
+                        if (Child.GetType() == typeof(TextBox) && (Grid.GetRow(Child) == 0 || Grid.GetColumn(Child) == 0))
                         {
                             Deletion.Add(Child);
-                            TextBox Input = new TextBox();
-                            Input.Name = CBI.Name;
-                            Input.VerticalAlignment = VerticalAlignment.Center;
-                            Input.FontSize = 16;
-                            Grid.SetColumn(Input, Grid.GetColumn(CB));
-                            Grid.SetRow(Input, Grid.GetRow(CB));
-                            Addition.Add(Input);
+                            TextBox? TB = Child as TextBox;
+                            Label Replace = new Label();
+                            Replace.Name = TB.Name;
+                            Replace.Content = TB.Text;
+                            Replace.FontSize = 16;
+                            Replace.HorizontalAlignment = HorizontalAlignment.Center;
+                            Replace.VerticalAlignment = VerticalAlignment.Center;
+                            Grid.SetColumn(Replace, Grid.GetColumn(TB));
+                            Grid.SetRow(Replace, Grid.GetRow(TB));
+                            Addition.Add(Replace);
                         }
-                        if (CBI.Name.Contains("Button"))
+                        if (Child.GetType() == typeof(ComboBox))
                         {
-                            Deletion.Add(CB);
-                            Button Command = new Button();
-                            Command.Name = CBI.Name;
-                            Command.Content = "Отправить";
-                            Command.VerticalAlignment = VerticalAlignment.Center;
-                            Command.HorizontalAlignment = HorizontalAlignment.Center;
-                            Command.FontSize = 16;
-                            foreach (UIElement TEMP in ProjectGrid.Children)
+                            ComboBox? CB = Child as ComboBox;
+                            ComboBoxItem? CBI = CB.SelectedItem as ComboBoxItem;
+                            if (CBI.Name.Contains("None"))
                             {
-                                if (TEMP.GetType() == typeof(TextBox) && Grid.GetRow(TEMP) == Grid.GetRow(CB) && Grid.GetColumn(TEMP) == Grid.GetColumn(CB))
-                                {
-                                    TextBox? TB = TEMP as TextBox;
-                                    Command.Resources.Add("Command", TB.Text);
-                                    Deletion.Add(TEMP);
-                                    break;
-                                }
+                                Deletion.Add(Child);
                             }
-                            Grid.SetColumn(Command, Grid.GetColumn(CB));
-                            Grid.SetRow(Command, Grid.GetRow(CB));
-                            Addition.Add(Command);
-                        }
-                        if (CBI.Name.Contains("Label"))
-                        {
+                            if (CBI.Name.Contains("Input"))
+                            {
+                                Deletion.Add(Child);
+                                TextBox Input = new TextBox();
+                                Input.Name = CBI.Name;
+                                Input.VerticalAlignment = VerticalAlignment.Center;
+                                Input.FontSize = 16;
+                                Input.Resources.Add("First", " ");
+                                Input.Resources.Add("Second", " ");
+                                Grid.SetColumn(Input, Grid.GetColumn(CB));
+                                Grid.SetRow(Input, Grid.GetRow(CB));
+                                Addition.Add(Input);
+                            }
+                            if (CBI.Name.Contains("Button"))
+                            {
+                                Deletion.Add(CB);
+                                Button Command = new Button();
+                                Command.Name = CBI.Name;
+                                Command.Content = "Отправить";
+                                Command.VerticalAlignment = VerticalAlignment.Center;
+                                Command.HorizontalAlignment = HorizontalAlignment.Center;
+                                Command.FontSize = 16;
+                                foreach (UIElement TEMP in ProjectGrid.Children)
+                                {
+                                    if (TEMP.GetType() == typeof(TextBox) && Grid.GetRow(TEMP) == Grid.GetRow(CB) && Grid.GetColumn(TEMP) == Grid.GetColumn(CB))
+                                    {
+                                        TextBox? TB = TEMP as TextBox;
+                                        Command.Resources.Add("Command", TB.Text);
+                                        Deletion.Add(TEMP);
+                                        break;
+                                    }
+                                }
+                                Grid.SetColumn(Command, Grid.GetColumn(CB));
+                                Grid.SetRow(Command, Grid.GetRow(CB));
+                                Addition.Add(Command);
+                            }
+                            if (CBI.Name.Contains("Label"))
+                            {
 
-                            Deletion.Add(CB);
-                            Label L = new Label();
-                            L.Name = CBI.Name;
-                            foreach (UIElement TEMP in ProjectGrid.Children)
-                            {
-                                if (TEMP.GetType() == typeof(TextBox) && Grid.GetRow(TEMP) == Grid.GetRow(CB) && Grid.GetColumn(TEMP) == Grid.GetColumn(CB))
+                                Deletion.Add(CB);
+                                Label L = new Label();
+                                L.Name = CBI.Name;
+                                foreach (UIElement TEMP in ProjectGrid.Children)
                                 {
-                                    TextBox? TB = TEMP as TextBox;
-                                    L.Content = TB.Text;
-                                    Deletion.Add(TEMP);
-                                    break;
+                                    if (TEMP.GetType() == typeof(TextBox) && Grid.GetRow(TEMP) == Grid.GetRow(CB) && Grid.GetColumn(TEMP) == Grid.GetColumn(CB))
+                                    {
+                                        TextBox? TB = TEMP as TextBox;
+                                        L.Content = TB.Text;
+                                        Deletion.Add(TEMP);
+                                        break;
+                                    }
                                 }
+                                L.HorizontalAlignment = HorizontalAlignment.Center;
+                                L.VerticalAlignment = VerticalAlignment.Center;
+                                L.FontSize = 16;
+                                Grid.SetColumn(L, Grid.GetColumn(CB));
+                                Grid.SetRow(L, Grid.GetRow(CB));
+                                Addition.Add(L);
                             }
-                            L.HorizontalAlignment = HorizontalAlignment.Center;
-                            L.VerticalAlignment = VerticalAlignment.Center;
-                            L.FontSize = 16;
-                            Grid.SetColumn(L, Grid.GetColumn(CB));
-                            Grid.SetRow(L, Grid.GetRow(CB));
-                            Addition.Add(L);
                         }
                     }
+                    foreach (UIElement Elem in Deletion)
+                    {
+                        ProjectGrid.Children.Remove(Elem);
+                    }
+                    foreach (UIElement Elem in Addition)
+                    {
+                        ProjectGrid.Children.Add(Elem);
+                    }
+                    ((MainWindow)Owner).CreateDevice(XamlWriter.Save(ProjectGrid));
+                    XamlString += XamlWriter.Save(ProjectGrid);
+                    SaveProject(XamlString);
                 }
-                foreach (UIElement Elem in Deletion)
-                {
-                    ProjectGrid.Children.Remove(Elem);
-                }
-                foreach (UIElement Elem in Addition)
-                {
-                    ProjectGrid.Children.Add(Elem);
-                }
-                ((MainWindow)Owner).CreateDevice(XamlWriter.Save(ProjectGrid));
+                this.Close();
+            }
+            catch(System.Exception ex)
+            {
+                MessageBox.Show(ex.Message);
             }
         }
 
         private void Export_Click(object sender, RoutedEventArgs e)
         {
-            if (FillCheck())
+            ExportProject();
+        }
+
+        void ExportProject()
+        {
+            try
             {
-                string XAMLString = XamlWriter.Save(ProjectGrid);
-                SaveFileDialog SFD = new SaveFileDialog();
-                SFD.ShowDialog(this);
-                if (SFD.FileName != null)
+                if (FillCheck())
                 {
-                    FileStream FS = File.Create(SFD.FileName);
+                    string XAMLString = XamlWriter.Save(ProjectGrid);
+                    SaveFileDialog SFD = new SaveFileDialog();
+                    SFD.DefaultExt = ".proj";
+                    SFD.Filter = "Устройство (*.proj)|*.proj";
+                    SFD.ShowDialog(this);
+                    if (SFD.FileName != null)
+                    {
+                        FileStream FS = File.Create(SFD.FileName);
+                        StreamWriter SW = new StreamWriter(FS);
+                        SW.Write(XAMLString, 0, XAMLString.Length);
+                        SW.Close();
+                        FS.Close();
+                    }
+                    SFD.Reset();
+                }
+                else
+                {
+                    MessageBox.Show("Не все поля заполнены!");
+                }
+            }
+            catch (System.Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        void SaveProject(string XamlString)
+        {
+            try
+            {
+                if (FillCheck())
+                {
+                    //string XAMLString = XamlWriter.Save(ProjectGrid);
+                    string FileName = $"Устройство_{DateTime.Today.Day}_{DateTime.Today.Month}_{DateTime.Today.Year}_{DateTime.Now.Hour}_{DateTime.Now.Minute}_{DateTime.Now.Second}.tesart";
+                    FileStream FS = File.Create(FileName);
                     StreamWriter SW = new StreamWriter(FS);
-                    SW.Write(XAMLString, 0, XAMLString.Length);
+                    SW.Write(XamlString, 0, XamlString.Length);
+                    App.Current.Properties["LastOpenedProject"] = FileName;
                     SW.Close();
                     FS.Close();
                 }
-                SFD.Reset();
+                else
+                {
+                    MessageBox.Show("Не все поля заполнены!");
+                }
             }
-            else
+            catch (System.Exception ex)
             {
-                MessageBox.Show("Не все поля заполнены!");
+                MessageBox.Show(ex.Message);
             }
         }
 
         private void Import_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog OFD = new OpenFileDialog();
+            OFD.Filter = "Устройство (*.proj)|*.proj";
             OFD.ShowDialog();
             if (OFD.FileName != null)
             {
-                string XAMLImport;
-                FileStream FS = File.OpenRead(OFD.FileName);
-                StreamReader SR = new StreamReader(FS);
-                XAMLImport = SR.ReadToEnd();
-                Grid? Import = XamlReader.Parse(XAMLImport) as Grid;
-
-                ProjectGrid.Children.RemoveRange(0, ProjectGrid.Children.Count);
-
-                ProjectGrid.Height = Import.Height;
-                ProjectGrid.Width = Import.Width;
-
-                ProjectGrid.ColumnDefinitions.RemoveRange(0, ProjectGrid.ColumnDefinitions.Count);
-                foreach (ColumnDefinition CD in Import.ColumnDefinitions)
-                {
-                    ProjectGrid.ColumnDefinitions.Add(new ColumnDefinition());
-                }
-                ProjectGrid.RowDefinitions.RemoveRange(0, ProjectGrid.RowDefinitions.Count);
-                foreach (RowDefinition RD in Import.RowDefinitions)
-                {
-                    ProjectGrid.RowDefinitions.Add(new RowDefinition());
-                }
-
-                PropAmount = 0;
-                for (int i = Import.Children.Count - 1; i >= 0; i--)
-                {
-                    UIElement Child = Import.Children[i];
-                    Import.Children.Remove(Child);
-                    ProjectGrid.Children.Add(Child);
-                    if (Child.GetType() == typeof(TextBox))
-                    {
-                        TextBox? TB = Child as TextBox;
-                        if (TB.Name.Contains("Prop"))
-                        {
-                            PropAmount++;
-                        }
-                    }
-                    if (Child.GetType() == typeof(Button))
-                    {
-                        Button? BT = Child as Button;
-                        if (BT.Name.Contains("Incr"))
-                        {
-                            BT.Click += Incr_Click;
-                        }
-                        if (BT.Name.Contains("Decr"))
-                        {
-                            BT.Click += Decr_Click;
-                        }
-                        if (BT.Name.Contains("RemoveProp"))
-                        {
-                            BT.Click += RemoveProp_Click;
-                        }
-                        if (BT.Name.Contains("RemoveAxis"))
-                        {
-                            BT.Click += RemoveAxis_Click;
-                        }
-                    }
-                    if (Child.GetType() == typeof(ComboBox))
-                    {
-                        ComboBox? CB = Child as ComboBox;
-                        CB.SelectionChanged += Choice_SelectionChanged;
-                    }
-                }
-
-                AxisAmount = Import.ColumnDefinitions.Count - 1;
+                ImportProject(OFD.FileName);
             }
+        }
+
+        public void ImportProject(string FilePath)
+        {
+            FileStream FS = File.OpenRead(FilePath);
+            StreamReader SR = new StreamReader(FS);
+            string XAMLImport = SR.ReadLine();
+            Grid? Import = XamlReader.Parse(XAMLImport) as Grid;
+
+            ProjectGrid.Children.RemoveRange(0, ProjectGrid.Children.Count);
+
+            ProjectGrid.Height = Import.Height;
+            ProjectGrid.Width = Import.Width;
+
+            ProjectGrid.ColumnDefinitions.RemoveRange(0, ProjectGrid.ColumnDefinitions.Count);
+            foreach (ColumnDefinition CD in Import.ColumnDefinitions)
+            {
+                ProjectGrid.ColumnDefinitions.Add(new ColumnDefinition());
+            }
+            ProjectGrid.RowDefinitions.RemoveRange(0, ProjectGrid.RowDefinitions.Count);
+            foreach (RowDefinition RD in Import.RowDefinitions)
+            {
+                ProjectGrid.RowDefinitions.Add(new RowDefinition());
+            }
+
+            PropAmount = 0;
+            for (int i = Import.Children.Count - 1; i >= 0; i--)
+            {
+                UIElement Child = Import.Children[i];
+                Import.Children.Remove(Child);
+                ProjectGrid.Children.Add(Child);
+                if (Child.GetType() == typeof(TextBox))
+                {
+                    TextBox? TB = Child as TextBox;
+                    if (TB.Name.Contains("Prop"))
+                    {
+                        PropAmount++;
+                    }
+                }
+                if (Child.GetType() == typeof(Button))
+                {
+                    Button? BT = Child as Button;
+                    if (BT.Name.Contains("Incr"))
+                    {
+                        BT.Click += Incr_Click;
+                    }
+                    if (BT.Name.Contains("Decr"))
+                    {
+                        BT.Click += Decr_Click;
+                    }
+                    if (BT.Name.Contains("RemoveProp"))
+                    {
+                        BT.Click += RemoveProp_Click;
+                    }
+                    if (BT.Name.Contains("RemoveAxis"))
+                    {
+                        BT.Click += RemoveAxis_Click;
+                    }
+                }
+                if (Child.GetType() == typeof(ComboBox))
+                {
+                    ComboBox? CB = Child as ComboBox;
+                    CB.SelectionChanged += Choice_SelectionChanged;
+                }
+            }
+
+            AxisAmount = Import.ColumnDefinitions.Count - 1;
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            this.Owner.Focus();
         }
     }
 }

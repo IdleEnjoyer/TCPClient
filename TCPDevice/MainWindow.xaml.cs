@@ -19,6 +19,8 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Microsoft.Win32;
 using System.Windows.Markup;
+using static System.Net.Mime.MediaTypeNames;
+using System.Security.Cryptography;
 
 #pragma warning disable CS8618
 #pragma warning disable CS8602
@@ -37,12 +39,17 @@ namespace TCPDevice
         private Stopwatch TimersElapsed = new Stopwatch();
         private int CurrentTimerInterval = 0;
         private List<int> TimerIntervals = new List<int>();
+        bool Saved = false;
 
         public MainWindow()
         {
             InitializeComponent();
             DispTimer.Interval = TimeSpan.FromMilliseconds(10);
             DemoCommandList.ItemsSource = Commands;
+            if (App.Current.Properties["LastOpenedProject"].ToString() != "None")
+            {
+                OpenProject(App.Current.Properties["LastOpenedProject"].ToString());
+            }
         }
 
         public class Command
@@ -90,46 +97,60 @@ namespace TCPDevice
 
         private async Task StartReadingDataAsync()
         {
-            byte[] Buffer = new byte[1024];
-            while (Client.Connected)
+            try
             {
-                try
+                byte[] Buffer = new byte[1024];
+                while (Client.Connected)
                 {
-                    int BytesRead = await Stream.ReadAsync(Buffer);
-                    if (BytesRead == 0)
+                    try
                     {
-                        Client.Close();
-                        ConnectionStatus.Content = "Отключен";
-                        ConnectionStatus.Foreground = Brushes.Red;
-                        MessageBox.Show("Сервер закрыт!", "Внимание", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                        int BytesRead = await Stream.ReadAsync(Buffer);
+                        if (BytesRead == 0)
+                        {
+                            Client.Close();
+                            ConnectionStatus.Content = "Отключен";
+                            ConnectionStatus.Foreground = Brushes.Red;
+                            MessageBox.Show("Сервер закрыт!", "Внимание", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                            break;
+                        }
+                        string Data = Encoding.ASCII.GetString(Buffer, 0, BytesRead);
+                        ServerData.Text += "Сервер " + System.DateTime.Now.ToString() + ": " + Data + "\n";
+                        ServerData.ScrollToEnd();
+                    }
+                    catch (IOException)
+                    {
+                        MessageBox.Show("Подключение было прервано!", "Data reading error");
                         break;
                     }
-                    string Data = Encoding.ASCII.GetString(Buffer, 0, BytesRead);
-                    ServerData.Text += "Сервер " + System.DateTime.Now.ToString() + ": " + Data + "\n";
-                    ServerData.ScrollToEnd();
                 }
-                catch (IOException)
-                {
-                    MessageBox.Show("Подключение было прервано!", "Data reading error");
-                    break;
-                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
             }
         }
 
         
         public void SendData(string Data)
         {
-            Application.Current.Dispatcher.Invoke(() =>
+            try
             {
-                string EndSymbol = EndSymbolInput.Text;
-                string StartSymbol = StartSymbolInput.Text;
-                EndSymbol = Regex.Unescape(EndSymbol);
-                string DataString = StartSymbol + Data + EndSymbol;
-                ByteData = System.Text.Encoding.ASCII.GetBytes(DataString);
-                Stream.Write(ByteData, 0, ByteData.Length);
-                ServerData.Text += "Клиент " + System.DateTime.Now.ToString() + ": " + DataString;
-                ServerData.ScrollToEnd();
-            });
+                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                {
+                    string EndSymbol = EndSymbolInput.Text;
+                    string StartSymbol = StartSymbolInput.Text;
+                    EndSymbol = Regex.Unescape(EndSymbol);
+                    string DataString = StartSymbol + Data + EndSymbol;
+                    ByteData = System.Text.Encoding.ASCII.GetBytes(DataString);
+                    Stream.Write(ByteData, 0, ByteData.Length);
+                    ServerData.Text += "Клиент " + System.DateTime.Now.ToString() + ": " + DataString;
+                    ServerData.ScrollToEnd();
+                });
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show("Не удалось отправить команду!\nПроверьте подключение!");
+            }
         }
 
         private void SendCmd_Click(object sender, RoutedEventArgs e)
@@ -209,7 +230,7 @@ namespace TCPDevice
         {
             try
             {
-                Application.Current.Dispatcher.Invoke(() =>
+                System.Windows.Application.Current.Dispatcher.Invoke(() =>
                 {
                     
                     if (CurrentTimerInterval >= TimerIntervals.Count - 1)
@@ -281,7 +302,7 @@ namespace TCPDevice
 
         private bool IsNumber(string text)
         {
-            Regex NumRegex = new Regex("((\\+|-)?([0-9]+)(\\.[0-9]+)?)|((\\+|-)?\\.?[0-9]+)");
+            Regex NumRegex = new Regex("[+-]?(\\d*\\.\\d+|\\d+\\.\\d*|\\d+)");
             return NumRegex.IsMatch(text);
         }
 
@@ -331,7 +352,7 @@ namespace TCPDevice
             {
                 IPAddress Address = IPAddress.Parse(IPInput.Text);
                 int Port = int.Parse(PortInput.Text);
-
+                
 
                 Client = new TcpClient(Address.ToString(), Port);
 
@@ -340,7 +361,7 @@ namespace TCPDevice
             }
             catch (Exception ex)
             {
-                ChangeConnection(Client.Connected);
+                ChangeConnection(false);
                 MessageBox.Show(ex.Message, "Connection start error", MessageBoxButton.OK, MessageBoxImage.Question);
                 return;
             }
@@ -380,8 +401,7 @@ namespace TCPDevice
 
         public void CreateDevice(string XamlString)
         {
-            TabItem? TI = AddTab.Parent as TabItem;
-            TI.Content = null;
+            DeviceTab.Content = null;
             ScrollViewer SV = new ScrollViewer();
             //<ScrollViewer x:Name="Viewer" Grid.Row="1" Grid.ColumnSpan="4" HorizontalScrollBarVisibility="Visible">
             SV.Name = "Viewer";
@@ -395,12 +415,132 @@ namespace TCPDevice
                     Button? BT = Child as Button;
                     BT.Click += (sender, e) =>
                     {
-                        MessageBox.Show(BT.Resources["Command"].ToString());
+                        int Index = Grid.GetRow(BT);
+                        int LastTBIndex = 1;
+                        int NextTBIndex = 1;
+                        bool Last = true;
+                        foreach (UIElement TEMP in GR.Children)
+                        {
+                            if (TEMP.GetType() == typeof(TextBox) && Grid.GetColumn(TEMP) == 0 && Grid.GetRow(TEMP) < Index)
+                            {
+                                LastTBIndex = Grid.GetRow(TEMP);
+                            }
+                            if (TEMP.GetType() == typeof(TextBox) && Grid.GetColumn(TEMP) == 0 && Grid.GetRow(TEMP) > Index)
+                            {
+                                NextTBIndex = Grid.GetRow(TEMP);
+                                Last = false;
+                                break;
+                            }
+                        }
+                        if (Last)
+                        {
+                            NextTBIndex = GR.RowDefinitions.Count;
+                        }
+                        List<TextBox> Inputs = new List<TextBox>();
+                        foreach (UIElement TEMP in GR.Children)
+                        {
+                            if (Grid.GetRow(TEMP) >= LastTBIndex && Grid.GetRow(TEMP) < NextTBIndex && TEMP.GetType() == typeof(TextBox) && Grid.GetColumn(TEMP) == Grid.GetColumn(BT))
+                            {
+                                TextBox? aTB = TEMP as TextBox;
+                                Inputs.Add(aTB);
+                            }
+                        }
+                        if (Inputs.Count > 1)
+                        {
+                            string Command = "";
+                            foreach (TextBox TB in Inputs)
+                            {
+                                Command += TB.Text + " ";
+                            }
+                            SendData(BT.Resources["Command"].ToString() + " " + Command);
+                        }
+                        if (Inputs.Count == 1)
+                        {
+                            if (Inputs[0].Resources["First"].ToString() == " ")
+                            {
+                                Inputs[0].Resources["First"] = BT.Name;
+                            }
+                            if (Inputs[0].Resources["First"].ToString() == BT.Name)
+                            {
+                                string Command = BT.Resources["Command"].ToString() + " " + Inputs[0].Text;
+                                SendData(Command);
+                            }
+                            else
+                            {
+                                if (Inputs[0].Resources["Second"].ToString() == " ")
+                                {
+                                    Inputs[0].Resources["Second"] = BT.Name;
+                                }
+                                if (Inputs[0].Resources["Second"].ToString() == BT.Name)
+                                {
+                                    string Command = BT.Resources["Command"].ToString() + " -" + Inputs[0].Text;
+                                    SendData(Command);
+                                }
+                            }
+                        }
+                        if (Inputs.Count == 0)
+                        {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
+                            SendData(BT.Resources["Command"].ToString());
+                        }
+                    };
+                }
+                if(Child.GetType() == typeof(TextBox))
+                {
+                    TextBox? TB = Child as TextBox;
+                    TB.LostFocus += (sender, e) =>
+                    {
+                        if (!IsNumber(TB.Text))
+                        {
+                            TB.Text = "1.0";
+                        }
                     };
                 }
             }
             SV.Content = GR;
-            TI.Content = SV;
+            DeviceTab.Content = SV;
+            DeviceTab.Header = "Устройство";
+        }
+
+
+        private void Open_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                OpenFileDialog OFD = new OpenFileDialog();
+                OFD.Filter = "Устройство (*.tesart)|*.tesart";
+                OFD.ShowDialog();
+                if(OFD.FileName != string.Empty)
+                {
+                    StreamReader SR = new StreamReader(OFD.FileName);
+                    string temp = SR.ReadLine();
+                    string XamlString = SR.ReadLine();
+                    App.Current.Properties["LastOpenedProject"] = OFD.FileName;
+                    CreateDevice(XamlString);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+        }
+
+        void OpenProject(string FilePath)
+        {
+            if(File.Exists(FilePath))
+            {
+                StreamReader SR = new StreamReader(FilePath);
+                string temp = SR.ReadLine();
+                string XamlString = SR.ReadLine();
+                CreateDevice(XamlString);
+            }
+        }
+
+        private void Redact_Click(object sender, RoutedEventArgs e)
+        {
+            AddProjectWindow APW = new AddProjectWindow();
+            APW.Owner = this;
+            APW.Show();
+            APW.ImportProject(App.Current.Properties["LastOpenedProject"].ToString());
         }
     }
 }
