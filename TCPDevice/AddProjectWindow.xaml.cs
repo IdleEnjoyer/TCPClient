@@ -44,22 +44,22 @@ namespace TCPDevice
 
             ComboBoxItem None = new ComboBoxItem();
             None.Content = "Ничего";
-            None.Name = $"None{Column}{Row}";
+            None.Name = $"None_{Column}_{Row}";
             Choice.Items.Add(None);
 
             ComboBoxItem LabelItem = new ComboBoxItem();
             LabelItem.Content = "Надпись";
-            LabelItem.Name = $"Label{Column}{Row}";
+            LabelItem.Name = $"Label_{Column}_{Row}";
             Choice.Items.Add(LabelItem);
 
             ComboBoxItem Button = new ComboBoxItem();
             Button.Content = "Кнопка";
-            Button.Name = $"Button{Column}{Row}";
+            Button.Name = $"Button_{Column}_{Row}";
             Choice.Items.Add(Button);
 
             ComboBoxItem Input = new ComboBoxItem();
             Input.Content = "Поле ввода";
-            Input.Name = $"Input{Column}{Row}";
+            Input.Name = $"Input_{Column}_{Row}";
             Choice.Items.Add(Input);
         }
 
@@ -182,7 +182,7 @@ namespace TCPDevice
                     if (!Prev.Name.Contains("Button") && !Prev.Name.Contains("Label"))
                     {
                         TextBox TB = new TextBox();
-                        TB.Name = $"Command{AxisAmount}{PropAmount}";
+                        TB.Name = $"Command_{Grid.GetColumn(Choice)}_{Grid.GetRow(Choice)}";
                         TB.Width = 100;
                         TB.Height = 25;
                         TB.VerticalAlignment = VerticalAlignment.Bottom;
@@ -194,7 +194,7 @@ namespace TCPDevice
                 else
                 {
                     TextBox TB = new TextBox();
-                    TB.Name = $"Command{AxisAmount}{PropAmount}";
+                    TB.Name = $"Command_{Grid.GetColumn(Choice)}_{Grid.GetRow(Choice)}";
                     TB.Width = 100;
                     TB.Height = 25;
                     TB.VerticalAlignment = VerticalAlignment.Bottom;
@@ -434,9 +434,10 @@ namespace TCPDevice
                         bool Last = true;
                         foreach (UIElement TEMP in ProjectGrid.Children)
                         {
-                            if (TEMP.GetType() == typeof(TextBox) && Grid.GetColumn(TEMP) == 0 && Grid.GetRow(TEMP) < Index)
+                            if (TEMP.GetType() == typeof(TextBox) && Grid.GetColumn(TEMP) == 0 && Grid.GetRow(TEMP) <= Index)
                             {
                                 LastTBIndex = Grid.GetRow(TEMP);
+                                continue;
                             }
                             if (TEMP.GetType() == typeof(TextBox) && Grid.GetColumn(TEMP) == 0 && Grid.GetRow(TEMP) > Index)
                             {
@@ -454,8 +455,6 @@ namespace TCPDevice
                         {
                             if (Grid.GetRow(TEMP) >= LastTBIndex && Grid.GetRow(TEMP) < NextTBIndex && TEMP.GetType() == typeof(ComboBox) && Grid.GetColumn(TEMP) == Grid.GetColumn(CB))
                             {
-                                ComboBox? aCB = TEMP as ComboBox;
-                                //MessageBox.Show("Check");
                                 ComboBoxes.Add(TEMP);
                             }
                         }
@@ -465,27 +464,27 @@ namespace TCPDevice
                         {
                             ComboBox? comboBox = Elem as ComboBox;
                             ComboBoxItem? CBI = comboBox.SelectedItem as ComboBoxItem;
-                            if (CBI.Name.Contains("Button"))
+                            if (CBI.Name.Contains("Button") && CBI.IsSelected)
                             {
                                 
                                 buttonCount++;
                             }
-                            if (CBI.Name.Contains("Input"))
+                            if (CBI.Name.Contains("Input") && CBI.IsSelected)
                             {
                                 inputCount++;
                             }
                         }
                         if (buttonCount > 2)
                         {
-                            throw new System.Exception("Нельзя создать больше 2х кнопок в свойсте!");
+                            throw new System.Exception($"Нельзя создать больше 2х кнопок в свойстве {LastTBIndex} - {NextTBIndex}!");
                         }
                         if (inputCount > 1 && buttonCount == 2)
                         {
-                            throw new System.Exception("Нельзя создать больше 1го поля ввода, когда есть 2 кнопки!");
+                            throw new System.Exception($"Нельзя создать больше 1го поля ввода, когда есть 2 кнопки в свойстве {LastTBIndex} - {NextTBIndex}!");
                         }
                         if (inputCount > 1 && buttonCount < 1)
                         {
-                            throw new System.Exception("Нет кнопок для отправки команд");
+                            throw new System.Exception($"Нет кнопок для отправки команд в свойстве {LastTBIndex} - {NextTBIndex}");
                         }
                     }
                 }
@@ -516,7 +515,7 @@ namespace TCPDevice
                 }
                 else
                 {
-                    string XamlString = XamlWriter.Save(ProjectGrid)+"\n";
+                    string XamlString = XamlWriter.Save(ProjectGrid)+'\n';
                     List<UIElement> Deletion = new List<UIElement>();
                     List<UIElement> Addition = new List<UIElement>();
                     for (int i = 0; i < ProjectGrid.Children.Count; i++)
@@ -555,6 +554,7 @@ namespace TCPDevice
                                 Input.Name = CBI.Name;
                                 Input.VerticalAlignment = VerticalAlignment.Center;
                                 Input.FontSize = 16;
+                                Input.Text = "1.0";
                                 Input.Resources.Add("First", " ");
                                 Input.Resources.Add("Second", " ");
                                 Grid.SetColumn(Input, Grid.GetColumn(CB));
@@ -566,7 +566,7 @@ namespace TCPDevice
                                 Deletion.Add(CB);
                                 Button Command = new Button();
                                 Command.Name = CBI.Name;
-                                Command.Content = "Отправить";
+                                Command.Width = 100;
                                 Command.VerticalAlignment = VerticalAlignment.Center;
                                 Command.HorizontalAlignment = HorizontalAlignment.Center;
                                 Command.FontSize = 16;
@@ -575,6 +575,7 @@ namespace TCPDevice
                                     if (TEMP.GetType() == typeof(TextBox) && Grid.GetRow(TEMP) == Grid.GetRow(CB) && Grid.GetColumn(TEMP) == Grid.GetColumn(CB))
                                     {
                                         TextBox? TB = TEMP as TextBox;
+                                        Command.Content = TB.Text;
                                         Command.Resources.Add("Command", TB.Text);
                                         Deletion.Add(TEMP);
                                         break;
@@ -617,9 +618,8 @@ namespace TCPDevice
                     {
                         ProjectGrid.Children.Add(Elem);
                     }
-                    ((MainWindow)Owner).CreateDevice(XamlWriter.Save(ProjectGrid));
                     XamlString += XamlWriter.Save(ProjectGrid);
-                    SaveProject(XamlString);
+                    ((MainWindow)Owner).CreateDevice(XamlString);
                 }
                 this.Close();
             }
@@ -654,32 +654,6 @@ namespace TCPDevice
                         FS.Close();
                     }
                     SFD.Reset();
-                }
-                else
-                {
-                    MessageBox.Show("Не все поля заполнены!");
-                }
-            }
-            catch (System.Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-        }
-
-        void SaveProject(string XamlString)
-        {
-            try
-            {
-                if (FillCheck())
-                {
-                    //string XAMLString = XamlWriter.Save(ProjectGrid);
-                    string FileName = $"Устройство_{DateTime.Today.Day}_{DateTime.Today.Month}_{DateTime.Today.Year}_{DateTime.Now.Hour}_{DateTime.Now.Minute}_{DateTime.Now.Second}.tesart";
-                    FileStream FS = File.Create(FileName);
-                    StreamWriter SW = new StreamWriter(FS);
-                    SW.Write(XamlString, 0, XamlString.Length);
-                    App.Current.Properties["LastOpenedProject"] = FileName;
-                    SW.Close();
-                    FS.Close();
                 }
                 else
                 {
@@ -727,9 +701,10 @@ namespace TCPDevice
             }
 
             PropAmount = 0;
-            for (int i = Import.Children.Count - 1; i >= 0; i--)
+            int ChCount = Import.Children.Count;
+            for (int i = 0; i < ChCount; i++)
             {
-                UIElement Child = Import.Children[i];
+                UIElement Child = Import.Children[0];
                 Import.Children.Remove(Child);
                 ProjectGrid.Children.Add(Child);
                 if (Child.GetType() == typeof(TextBox))

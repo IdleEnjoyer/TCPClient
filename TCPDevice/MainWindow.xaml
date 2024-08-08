@@ -5,7 +5,8 @@
 		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:local="clr-namespace:TCPDevice"
 		mc:Ignorable="d"
-		Title="MainWindow" Height="490" Width="800" Background="#FFC9C9C9">
+		Title="MainWindow" Height="490" Width="800" Background="#FFC9C9C9"
+        Closing="Window_Closing">
     <TabControl>
         <TabItem Header="Подключение">
             <Grid Background="#FFBDBDBD">
@@ -133,6 +134,7 @@
                     <MenuItem Header="Устройство" Margin="0,3,0,0">
                         <MenuItem x:Name="Create" Header="Создать" Click="AddTab_Click"/>
                         <MenuItem x:Name="Open" Header="Открыть" Click="Open_Click"/>
+                        <MenuItem x:Name="Save" Header="Сохранить" Click="Save_Click"/>
                         <MenuItem x:Name="Redact" Header="Редактировать" Click="Redact_Click"/>
                     </MenuItem>
                     <MenuItem Header="IP: " Margin="0,3,0,0"/>

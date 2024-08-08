@@ -39,6 +39,7 @@ namespace TCPDevice
         private Stopwatch TimersElapsed = new Stopwatch();
         private int CurrentTimerInterval = 0;
         private List<int> TimerIntervals = new List<int>();
+        string CurrentDevice = "";
         bool Saved = false;
 
         public MainWindow()
@@ -49,6 +50,7 @@ namespace TCPDevice
             if (App.Current.Properties["LastOpenedProject"].ToString() != "None")
             {
                 OpenProject(App.Current.Properties["LastOpenedProject"].ToString());
+                Saved = true;
             }
         }
 
@@ -401,13 +403,15 @@ namespace TCPDevice
 
         public void CreateDevice(string XamlString)
         {
+            CurrentDevice = XamlString;
+            string[] Lines = CurrentDevice.Split('\n');
             DeviceTab.Content = null;
             ScrollViewer SV = new ScrollViewer();
             //<ScrollViewer x:Name="Viewer" Grid.Row="1" Grid.ColumnSpan="4" HorizontalScrollBarVisibility="Visible">
             SV.Name = "Viewer";
             SV.HorizontalScrollBarVisibility = ScrollBarVisibility.Visible;
             SV.Background = new SolidColorBrush(Color.FromRgb(0xC9,0xC9,0xC9));
-            Grid? GR = XamlReader.Parse(XamlString) as Grid;
+            Grid? GR = XamlReader.Parse(Lines[1]) as Grid;
             foreach(UIElement Child in GR.Children)
             {
                 if(Child.GetType() == typeof(Button))
@@ -421,11 +425,11 @@ namespace TCPDevice
                         bool Last = true;
                         foreach (UIElement TEMP in GR.Children)
                         {
-                            if (TEMP.GetType() == typeof(TextBox) && Grid.GetColumn(TEMP) == 0 && Grid.GetRow(TEMP) < Index)
+                            if (TEMP.GetType() == typeof(Label) && Grid.GetColumn(TEMP) == 0 && Grid.GetRow(TEMP) <= Index)
                             {
                                 LastTBIndex = Grid.GetRow(TEMP);
                             }
-                            if (TEMP.GetType() == typeof(TextBox) && Grid.GetColumn(TEMP) == 0 && Grid.GetRow(TEMP) > Index)
+                            if (TEMP.GetType() == typeof(Label) && Grid.GetColumn(TEMP) == 0 && Grid.GetRow(TEMP) > Index)
                             {
                                 NextTBIndex = Grid.GetRow(TEMP);
                                 Last = false;
@@ -508,12 +512,12 @@ namespace TCPDevice
             {
                 OpenFileDialog OFD = new OpenFileDialog();
                 OFD.Filter = "Устройство (*.tesart)|*.tesart";
+                OFD.InitialDirectory = System.IO.Directory.GetCurrentDirectory();
                 OFD.ShowDialog();
                 if(OFD.FileName != string.Empty)
                 {
                     StreamReader SR = new StreamReader(OFD.FileName);
-                    string temp = SR.ReadLine();
-                    string XamlString = SR.ReadLine();
+                    string XamlString = SR.ReadLine() + '\n' + SR.ReadLine();
                     App.Current.Properties["LastOpenedProject"] = OFD.FileName;
                     CreateDevice(XamlString);
                 }
@@ -529,18 +533,54 @@ namespace TCPDevice
             if(File.Exists(FilePath))
             {
                 StreamReader SR = new StreamReader(FilePath);
-                string temp = SR.ReadLine();
-                string XamlString = SR.ReadLine();
+                string XamlString = SR.ReadLine() + '\n' + SR.ReadLine();
                 CreateDevice(XamlString);
             }
         }
 
         private void Redact_Click(object sender, RoutedEventArgs e)
         {
+            Saved = false;
             AddProjectWindow APW = new AddProjectWindow();
             APW.Owner = this;
             APW.Show();
             APW.ImportProject(App.Current.Properties["LastOpenedProject"].ToString());
+        }
+
+        private void Save_Click(object sender, RoutedEventArgs e)
+        {
+            SaveProject(CurrentDevice);
+            Saved = true;
+        }
+
+        void SaveProject(string XamlString)
+        {
+            try
+            {
+                //string XAMLString = XamlWriter.Save(ProjectGrid);
+                string FileName = $"Устройство_{DateTime.Today.Day}_{DateTime.Today.Month}_{DateTime.Today.Year}_{DateTime.Now.Hour}_{DateTime.Now.Minute}_{DateTime.Now.Second}.tesart";
+                FileStream FS = File.Create(FileName);
+                StreamWriter SW = new StreamWriter(FS);
+                SW.Write(XamlString, 0, XamlString.Length);
+                App.Current.Properties["LastOpenedProject"] = FileName;
+                SW.Close();
+                FS.Close();
+            }
+            catch (System.Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (!Saved)
+            {
+                if(MessageBox.Show("Последний проект не был сохранён, всё равно выйти?", "Выход" , MessageBoxButton.YesNo) == MessageBoxResult.No)
+                {
+                    e.Cancel = true;
+                }
+            }
         }
     }
 }
