@@ -49,7 +49,7 @@ namespace TCPDevice
             DemoCommandList.ItemsSource = Commands;
             if (App.Current.Properties["LastOpenedProject"].ToString() != "None")
             {
-                OpenProject(App.Current.Properties["LastOpenedProject"].ToString());
+                CreateDevice(App.Current.Properties["LastOpenedProject"].ToString());
                 Saved = true;
             }
         }
@@ -454,7 +454,7 @@ namespace TCPDevice
                             string Command = "";
                             foreach (TextBox TB in Inputs)
                             {
-                                Command += TB.Text + " ";
+                                Command += TB.Text.Replace(",",".") + " ";
                             }
                             SendData(BT.Resources["Command"].ToString() + " " + Command);
                         }
@@ -466,7 +466,7 @@ namespace TCPDevice
                             }
                             if (Inputs[0].Resources["First"].ToString() == BT.Name)
                             {
-                                string Command = BT.Resources["Command"].ToString() + " " + Inputs[0].Text;
+                                string Command = BT.Resources["Command"].ToString() + " " + Inputs[0].Text.Replace(",",".");
                                 SendData(Command);
                             }
                             else
@@ -477,7 +477,7 @@ namespace TCPDevice
                                 }
                                 if (Inputs[0].Resources["Second"].ToString() == BT.Name)
                                 {
-                                    string Command = BT.Resources["Command"].ToString() + " -" + Inputs[0].Text;
+                                    string Command = BT.Resources["Command"].ToString() + " -" + Inputs[0].Text.Replace(",",".");
                                     SendData(Command);
                                 }
                             }
@@ -518,7 +518,7 @@ namespace TCPDevice
                 {
                     StreamReader SR = new StreamReader(OFD.FileName);
                     string XamlString = SR.ReadLine() + '\n' + SR.ReadLine();
-                    App.Current.Properties["LastOpenedProject"] = OFD.FileName;
+                    App.Current.Properties["LastOpenedProject"] = XamlString;
                     CreateDevice(XamlString);
                 }
             }
@@ -528,15 +528,15 @@ namespace TCPDevice
             }
         }
 
-        void OpenProject(string FilePath)
-        {
-            if(File.Exists(FilePath))
-            {
-                StreamReader SR = new StreamReader(FilePath);
-                string XamlString = SR.ReadLine() + '\n' + SR.ReadLine();
-                CreateDevice(XamlString);
-            }
-        }
+        //void OpenProject(string XamlString)
+        //{
+        //    if(File.Exists(FilePath))
+        //    {
+        //        StreamReader SR = new StreamReader(FilePath);
+        //        string XamlString = SR.ReadLine() + '\n' + SR.ReadLine();
+        //        CreateDevice(XamlString);
+        //    }
+        //}
 
         private void Redact_Click(object sender, RoutedEventArgs e)
         {
@@ -557,14 +557,21 @@ namespace TCPDevice
         {
             try
             {
-                //string XAMLString = XamlWriter.Save(ProjectGrid);
-                string FileName = $"Устройство_{DateTime.Today.Day}_{DateTime.Today.Month}_{DateTime.Today.Year}_{DateTime.Now.Hour}_{DateTime.Now.Minute}_{DateTime.Now.Second}.tesart";
-                FileStream FS = File.Create(FileName);
-                StreamWriter SW = new StreamWriter(FS);
-                SW.Write(XamlString, 0, XamlString.Length);
-                App.Current.Properties["LastOpenedProject"] = FileName;
-                SW.Close();
-                FS.Close();
+                SaveFileDialog SFD = new SaveFileDialog();
+                SFD.Filter = "Устройство (*.tesart)|*.tesart";
+                SFD.ShowDialog();
+                if(SFD.FileName != null)
+                {
+                    //string XAMLString = XamlWriter.Save(ProjectGrid);
+                    //string FileName = $"Устройство_{DateTime.Today.Day}_{DateTime.Today.Month}_{DateTime.Today.Year}_{DateTime.Now.Hour}_{DateTime.Now.Minute}_{DateTime.Now.Second}.tesart";
+                    FileStream FS = File.Create(SFD.FileName);
+                    StreamWriter SW = new StreamWriter(FS);
+                    SW.Write(XamlString, 0, XamlString.Length);
+                    App.Current.Properties["LastOpenedProject"] = XamlString;
+                    SW.Close();
+                    FS.Close();
+                }
+                SFD.Reset();
             }
             catch (System.Exception ex)
             {

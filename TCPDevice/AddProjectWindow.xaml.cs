@@ -20,6 +20,7 @@ namespace TCPDevice
     /// </summary>
     public partial class AddProjectWindow : Window
     {
+        Random rng = new Random();
         int AxisAmount = 1;
         int PropAmount = 1;
         List<int> Amounts = new List<int>();
@@ -35,7 +36,7 @@ namespace TCPDevice
             ComboBox Choice = new ComboBox();
             Choice.Height = 25;
             Choice.Width = 100;
-            Choice.Name = $"Choice{Column}{Row}";
+            Choice.Name = $"Choice_{Column}_{Row}_{rng.Next()}";
             Choice.VerticalAlignment = VerticalAlignment.Top;
             Choice.SelectionChanged += Choice_SelectionChanged;
             Grid.SetColumn(Choice, Column);
@@ -44,22 +45,22 @@ namespace TCPDevice
 
             ComboBoxItem None = new ComboBoxItem();
             None.Content = "Ничего";
-            None.Name = $"None_{Column}_{Row}";
+            None.Name = $"None_{Column}_{Row}_{rng.Next()}";
             Choice.Items.Add(None);
 
             ComboBoxItem LabelItem = new ComboBoxItem();
             LabelItem.Content = "Надпись";
-            LabelItem.Name = $"Label_{Column}_{Row}";
+            LabelItem.Name = $"Label_{Column}_{Row}_{rng.Next()}";
             Choice.Items.Add(LabelItem);
 
             ComboBoxItem Button = new ComboBoxItem();
             Button.Content = "Кнопка";
-            Button.Name = $"Button_{Column}_{Row}";
+            Button.Name = $"Button_{Column}_{Row}_{rng.Next()}";
             Choice.Items.Add(Button);
 
             ComboBoxItem Input = new ComboBoxItem();
             Input.Content = "Поле ввода";
-            Input.Name = $"Input_{Column}_{Row}";
+            Input.Name = $"Input_{Column}_{Row}_{rng.Next()}";
             Choice.Items.Add(Input);
         }
 
@@ -677,11 +678,12 @@ namespace TCPDevice
             }
         }
 
-        public void ImportProject(string FilePath)
+        public void ImportProject(string XamlString)
         {
-            FileStream FS = File.OpenRead(FilePath);
-            StreamReader SR = new StreamReader(FS);
-            string XAMLImport = SR.ReadLine();
+            //FileStream FS = File.OpenRead(FilePath);
+            //StreamReader SR = new StreamReader(FS);
+            //string XAMLImport = SR.ReadLine();
+            string XamlImport = XamlString.Split('\n')[1];
             Grid? Import = XamlReader.Parse(XAMLImport) as Grid;
 
             ProjectGrid.Children.RemoveRange(0, ProjectGrid.Children.Count);
