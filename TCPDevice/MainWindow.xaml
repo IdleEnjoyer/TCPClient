@@ -56,6 +56,9 @@
                 </Grid.ColumnDefinitions>
 
                 <TabControl x:Name="TabProgram" Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Background="Gray" Margin="0,25,0,0">
+                    <TabItem x:Name="DeviceTab" Header="Добавить Устр-во">
+                        <Button x:Name="AddTab" Width="200" Height="50" Content="Добавить проект" FontSize="20" Click="AddTab_Click" />
+                    </TabItem>
                     <TabItem x:Name="TimerTab" Header="Таймер">
                         <Grid>
                             <Grid.RowDefinitions>
@@ -106,9 +109,6 @@
                             </Grid>
                         </Grid>
 
-                    </TabItem>
-                    <TabItem x:Name="DeviceTab" Header="Добавить Устр-во">
-                        <Button x:Name="AddTab" Width="200" Height="50" Content="Добавить проект" FontSize="20" Click="AddTab_Click" />
                     </TabItem>
                 </TabControl>
                 <Grid x:Name="ChatGrid" Grid.Column="1" Grid.RowSpan="2" Margin="0,24.8,0,0" >

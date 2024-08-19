@@ -516,7 +516,7 @@ namespace TCPDevice
                 }
                 else
                 {
-                    string XamlString = XamlWriter.Save(ProjectGrid)+'\n';
+                    string XamlString = XamlWriter.Save(ProjectGrid)+'\t';
                     List<UIElement> Deletion = new List<UIElement>();
                     List<UIElement> Addition = new List<UIElement>();
                     for (int i = 0; i < ProjectGrid.Children.Count; i++)
@@ -674,7 +674,71 @@ namespace TCPDevice
             OFD.ShowDialog();
             if (OFD.FileName != null)
             {
-                ImportProject(OFD.FileName);
+                FileStream FS = File.OpenRead(OFD.FileName);
+                StreamReader SR = new StreamReader(FS);
+                string XamlImport = SR.ReadLine().Split('\t')[0];
+                //string XamlImport = XamlString.Split('\n')[1];
+                Grid? Import = XamlReader.Parse(XamlImport) as Grid;
+
+                ProjectGrid.Children.RemoveRange(0, ProjectGrid.Children.Count);
+
+                ProjectGrid.Height = Import.Height;
+                ProjectGrid.Width = Import.Width;
+
+                ProjectGrid.ColumnDefinitions.RemoveRange(0, ProjectGrid.ColumnDefinitions.Count);
+                foreach (ColumnDefinition CD in Import.ColumnDefinitions)
+                {
+                    ProjectGrid.ColumnDefinitions.Add(new ColumnDefinition());
+                }
+                ProjectGrid.RowDefinitions.RemoveRange(0, ProjectGrid.RowDefinitions.Count);
+                foreach (RowDefinition RD in Import.RowDefinitions)
+                {
+                    ProjectGrid.RowDefinitions.Add(new RowDefinition());
+                }
+
+                PropAmount = 0;
+                int ChCount = Import.Children.Count;
+                for (int i = 0; i < ChCount; i++)
+                {
+                    UIElement Child = Import.Children[0];
+                    Import.Children.Remove(Child);
+                    ProjectGrid.Children.Add(Child);
+                    if (Child.GetType() == typeof(TextBox))
+                    {
+                        TextBox? TB = Child as TextBox;
+                        if (TB.Name.Contains("Prop"))
+                        {
+                            PropAmount++;
+                        }
+                    }
+                    if (Child.GetType() == typeof(Button))
+                    {
+                        Button? BT = Child as Button;
+                        if (BT.Name.Contains("Incr"))
+                        {
+                            BT.Click += Incr_Click;
+                        }
+                        if (BT.Name.Contains("Decr"))
+                        {
+                            BT.Click += Decr_Click;
+                        }
+                        if (BT.Name.Contains("RemoveProp"))
+                        {
+                            BT.Click += RemoveProp_Click;
+                        }
+                        if (BT.Name.Contains("RemoveAxis"))
+                        {
+                            BT.Click += RemoveAxis_Click;
+                        }
+                    }
+                    if (Child.GetType() == typeof(ComboBox))
+                    {
+                        ComboBox? CB = Child as ComboBox;
+                        CB.SelectionChanged += Choice_SelectionChanged;
+                    }
+                }
+
+                AxisAmount = Import.ColumnDefinitions.Count - 1;
             }
         }
 
@@ -683,8 +747,8 @@ namespace TCPDevice
             //FileStream FS = File.OpenRead(FilePath);
             //StreamReader SR = new StreamReader(FS);
             //string XAMLImport = SR.ReadLine();
-            string XamlImport = XamlString.Split('\n')[1];
-            Grid? Import = XamlReader.Parse(XAMLImport) as Grid;
+            string XamlImport = XamlString.Split('\t')[0];
+            Grid? Import = XamlReader.Parse(XamlImport) as Grid;
 
             ProjectGrid.Children.RemoveRange(0, ProjectGrid.Children.Count);
 

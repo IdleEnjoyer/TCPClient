@@ -40,15 +40,17 @@ namespace TCPDevice
         private int CurrentTimerInterval = 0;
         private List<int> TimerIntervals = new List<int>();
         string CurrentDevice = "";
-        bool Saved = false;
+        bool Saved = true;
 
         public MainWindow()
         {
             InitializeComponent();
             DispTimer.Interval = TimeSpan.FromMilliseconds(10);
             DemoCommandList.ItemsSource = Commands;
-            if (App.Current.Properties["LastOpenedProject"].ToString() != "None")
+            
+            if (!App.Current.Properties["LastOpenedProject"].ToString().Contains("NULL"))
             {
+                //MessageBox.Show(App.Current.Properties["LastOpenedProject"].ToString());
                 CreateDevice(App.Current.Properties["LastOpenedProject"].ToString());
                 Saved = true;
             }
@@ -192,6 +194,7 @@ namespace TCPDevice
 
         private void AddTab_Click(object sender, RoutedEventArgs e)
         {
+            Saved = false;
             AddProjectWindow NewTab = new AddProjectWindow();
             NewTab.Owner = this;
             NewTab.Show();
@@ -404,7 +407,7 @@ namespace TCPDevice
         public void CreateDevice(string XamlString)
         {
             CurrentDevice = XamlString;
-            string[] Lines = CurrentDevice.Split('\n');
+            string[] Lines = CurrentDevice.Split('\t');
             DeviceTab.Content = null;
             ScrollViewer SV = new ScrollViewer();
             //<ScrollViewer x:Name="Viewer" Grid.Row="1" Grid.ColumnSpan="4" HorizontalScrollBarVisibility="Visible">
@@ -517,10 +520,12 @@ namespace TCPDevice
                 if(OFD.FileName != string.Empty)
                 {
                     StreamReader SR = new StreamReader(OFD.FileName);
-                    string XamlString = SR.ReadLine() + '\n' + SR.ReadLine();
+                    string XamlString = SR.ReadLine() + '\t' + SR.ReadLine();
                     App.Current.Properties["LastOpenedProject"] = XamlString;
                     CreateDevice(XamlString);
+                    SR.Dispose();
                 }
+                OFD.Reset();
             }
             catch (Exception ex)
             {
