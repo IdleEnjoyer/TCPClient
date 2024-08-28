@@ -47,7 +47,6 @@ namespace TCPDevice
             InitializeComponent();
             DispTimer.Interval = TimeSpan.FromMilliseconds(10);
             DemoCommandList.ItemsSource = Commands;
-            
             if (!App.Current.Properties["LastOpenedProject"].ToString().Contains("NULL"))
             {
                 //MessageBox.Show(App.Current.Properties["LastOpenedProject"].ToString());
@@ -118,7 +117,7 @@ namespace TCPDevice
                             break;
                         }
                         string Data = Encoding.ASCII.GetString(Buffer, 0, BytesRead);
-                        ServerData.Text += "Сервер " + System.DateTime.Now.ToString() + ": " + Data + "\n";
+                        ServerData.Text += "Сервер " + System.DateTime.Now.ToLongTimeString() + ": " + Data;
                         ServerData.ScrollToEnd();
                     }
                     catch (IOException)
@@ -130,6 +129,7 @@ namespace TCPDevice
             }
             catch (Exception ex)
             {
+                ChangeConnection(false);
                 MessageBox.Show(ex.Message);
             }
         }
@@ -212,7 +212,7 @@ namespace TCPDevice
                 PauseTime = new System.Timers.Timer();
                 PauseTime.Elapsed += PauseTime_Elapsed;
                 SendData(Commands[CurrentTimerInterval].CMD);
-                PauseTime.Interval = TimerIntervals[0]*1000;
+                PauseTime.Interval = TimerIntervals[0];
                 DemoCommandList.SelectedItem = DemoCommandList.Items[0];
                 PauseTime.Start();
                 TimersElapsed.Start();
@@ -227,7 +227,7 @@ namespace TCPDevice
 
         private void DispTimer_Tick(object? sender, EventArgs e)
         {
-            int TimeElapsed = TimerIntervals[CurrentTimerInterval] * 1000 - (int)TimersElapsed.Elapsed.TotalMilliseconds;
+            int TimeElapsed = TimerIntervals[CurrentTimerInterval] - (int)TimersElapsed.Elapsed.TotalMilliseconds;
             TimerLabel.Content = $"{TimeSpan.FromMilliseconds(TimeElapsed).TotalSeconds:F3}";
         }
 
@@ -247,7 +247,7 @@ namespace TCPDevice
                         CurrentTimerInterval++;
                     }
                     SendData(Commands[CurrentTimerInterval].CMD);
-                    PauseTime.Interval = TimerIntervals[CurrentTimerInterval] * 1000;
+                    PauseTime.Interval = TimerIntervals[CurrentTimerInterval];
                     DemoCommandList.SelectedItem = DemoCommandList.Items[CurrentTimerInterval];
                     TimersElapsed.Restart();
                 });
@@ -533,16 +533,6 @@ namespace TCPDevice
             }
         }
 
-        //void OpenProject(string XamlString)
-        //{
-        //    if(File.Exists(FilePath))
-        //    {
-        //        StreamReader SR = new StreamReader(FilePath);
-        //        string XamlString = SR.ReadLine() + '\n' + SR.ReadLine();
-        //        CreateDevice(XamlString);
-        //    }
-        //}
-
         private void Redact_Click(object sender, RoutedEventArgs e)
         {
             Saved = false;
@@ -580,7 +570,6 @@ namespace TCPDevice
             }
             catch (System.Exception ex)
             {
-                MessageBox.Show(ex.Message);
             }
         }
 
