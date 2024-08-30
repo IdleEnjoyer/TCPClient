@@ -146,6 +146,12 @@
                 </Menu>
             </Grid>
         </TabItem>
+        <TabItem Header="Servotronix">
+            <Menu Height="25" VerticalAlignment="Top">
+                <MenuItem Header="Порт:"/>
+                <ComboBox Name="PortNumber"/>
+            </Menu>
+        </TabItem>
     </TabControl>
 
 </Window>

@@ -8,6 +8,7 @@ using System.Windows.Media;
 using System.Net.Sockets;
 using System.Net;
 using System.IO;
+using System.IO.Ports;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Media.Animation;
@@ -41,7 +42,7 @@ namespace TCPDevice
         private List<int> TimerIntervals = new List<int>();
         string CurrentDevice = "";
         bool Saved = true;
-
+        string[] ComPorts;
         public MainWindow()
         {
             InitializeComponent();
@@ -53,6 +54,7 @@ namespace TCPDevice
                 CreateDevice(App.Current.Properties["LastOpenedProject"].ToString());
                 Saved = true;
             }
+            
         }
 
         public class Command
