@@ -7,6 +7,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Net.Sockets;
 using System.Net;
+using System.Management;
 using System.IO;
 using System.IO.Ports;
 using System.Text.RegularExpressions;
@@ -37,16 +38,22 @@ namespace TCPDevice
         private byte[] ByteData;
         private System.Timers.Timer PauseTime;
         private DispatcherTimer DispTimer = new DispatcherTimer();
+        private DispatcherTimer PortCheckTimer = new DispatcherTimer();
         private Stopwatch TimersElapsed = new Stopwatch();
         private int CurrentTimerInterval = 0;
         private List<int> TimerIntervals = new List<int>();
-        string CurrentDevice = "";
-        bool Saved = true;
-        string[] ComPorts;
+        private string CurrentDevice = "";
+        private bool Saved = true;
+        private SerialPortTracker PortTracker;
+        private List<SerialPort> Ports = new List<SerialPort>();
         public MainWindow()
         {
             InitializeComponent();
-            DispTimer.Interval = TimeSpan.FromMilliseconds(10);
+            PortTracker =  = new SerialPortTracker();
+            DataContext = PortTracker;
+            DispTimer.Interval = TimeSpan.FromMilliseconds(100);
+            PortCheckTimer.Tick += PortCheckTimer_Tick;
+            PortCheckTimer.Start();
             DemoCommandList.ItemsSource = Commands;
             if (!App.Current.Properties["LastOpenedProject"].ToString().Contains("NULL"))
             {
@@ -54,7 +61,11 @@ namespace TCPDevice
                 CreateDevice(App.Current.Properties["LastOpenedProject"].ToString());
                 Saved = true;
             }
-            
+        }
+
+        private void PortCheckTimer_Tick(object? sender, EventArgs e)
+        {
+            PortTracker.CheckSerialPorts();
         }
 
         public class Command
@@ -584,6 +595,65 @@ namespace TCPDevice
                     e.Cancel = true;
                 }
             }
+        }
+
+        private void PortNumber_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                if (e.RemovedItems.Count > 0)
+                {
+                    PortTracker.GetPort(e.RemovedItems[0].ToString()).Close();
+                }
+                if (!PortTracker.GetPort(PortNumber.SelectedItem.ToString()).IsOpen)
+                {
+                    PortTracker.GetPort(PortNumber.SelectedItem.ToString()).Open();
+                }
+                PortOpened.Header = $"Opened: {PortTracker.GetPort(PortNumber.SelectedItem.ToString()).IsOpen}";
+            }
+            catch (Exception ex)
+            {
+                PortTracker.GetPort(PortNumber.SelectedItem.ToString()).Close();
+                MessageBox.Show(ex.Message);
+                PortOpened.Header = $"Opened: False";
+            }
+        }
+
+        private void ComInput_KeyDown(object sender, KeyEventArgs e)
+        {
+            try
+            {
+                if (e.Key == Key.Enter)
+                {
+                    //MessageBox.Show(Port.IsOpen.ToString());
+                }
+                if (e.Key == Key.F1)
+                {
+                    
+                    MessageBox.Show((PortTracker.AvailablePorts.ToArray().SequenceEqual(SerialPort.GetPortNames()).ToString()));
+                }
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void ComSend_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Ports.Find(Item => Item.PortName == PortNumber.SelectedItem.ToString()).Write("Hello");
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(Ports.Count.ToString());
+            }
+        }
+
+        public void ComDataRecieve(string Data)
+        {
+            ComData.Text += Data;
         }
     }
 }
