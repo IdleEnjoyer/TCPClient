@@ -24,12 +24,6 @@ namespace TCPDevice
             owner = MW;
         }
 
-        public SerialPortTracker()
-        {
-            ComPortsNames = new ObservableCollection<string>();
-            SerialPorts = new List<SerialPort>();
-        }
-
         public void CheckSerialPorts()
         {
             Application.Current.Dispatcher.Invoke(() =>

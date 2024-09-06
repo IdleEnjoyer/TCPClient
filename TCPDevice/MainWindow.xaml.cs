@@ -45,11 +45,11 @@ namespace TCPDevice
         private string CurrentDevice = "";
         private bool Saved = true;
         private SerialPortTracker PortTracker;
-        private List<SerialPort> Ports = new List<SerialPort>();
+
         public MainWindow()
         {
             InitializeComponent();
-            PortTracker =  = new SerialPortTracker();
+            PortTracker = new SerialPortTracker(this);
             DataContext = PortTracker;
             DispTimer.Interval = TimeSpan.FromMilliseconds(100);
             PortCheckTimer.Tick += PortCheckTimer_Tick;
@@ -625,7 +625,10 @@ namespace TCPDevice
             {
                 if (e.Key == Key.Enter)
                 {
-                    //MessageBox.Show(Port.IsOpen.ToString());
+                    if (PortNumber.SelectedIndex != -1)
+                    {
+                        PortTracker.GetPort(PortNumber.SelectedItem.ToString()).Write(ComInput.Text);
+                    }
                 }
                 if (e.Key == Key.F1)
                 {
@@ -643,17 +646,23 @@ namespace TCPDevice
         {
             try
             {
-                Ports.Find(Item => Item.PortName == PortNumber.SelectedItem.ToString()).Write("Hello");
+                if(PortNumber.SelectedIndex != -1)
+                {
+                    PortTracker.GetPort(PortNumber.SelectedItem.ToString()).Write(ComInput.Text);
+                }
             }
             catch(Exception ex)
             {
-                MessageBox.Show(Ports.Count.ToString());
+                
             }
         }
 
         public void ComDataRecieve(string Data)
         {
-            ComData.Text += Data;
+            this.Dispatcher.Invoke(() =>
+            {
+                ComData.Text += Data;
+            });
         }
     }
 }
