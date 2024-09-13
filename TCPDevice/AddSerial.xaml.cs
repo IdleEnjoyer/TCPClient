@@ -1,34 +1,60 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text.RegularExpressions;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Media;
-
-#pragma warning disable CS8602
+using System.IO.Ports;
+using System.Windows.Media.Imaging;
+using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace TCPDevice
 {
     /// <summary>
-    /// Логика взаимодействия для AddProjectWindow.xaml
+    /// Логика взаимодействия для AddSerial.xaml
     /// </summary>
-    public partial class AddProjectWindow : Window
+    public partial class AddSerial : Window
     {
         Random rng = new Random();
         int AxisAmount = 1;
         int PropAmount = 1;
         List<int> Amounts = new List<int>();
-        public AddProjectWindow()
+        ObservableCollection<string> Ports = new ObservableCollection<string>();
+        DispatcherTimer PortCheck = new DispatcherTimer();
+        public AddSerial()
         {
             InitializeComponent();
-
+            SerialPort1.ItemsSource = Ports;
+            PortCheck.Interval = TimeSpan.FromMilliseconds(100);
+            PortCheck.Tick += PortCheck_Tick;
+            PortCheck.Start();
             AddChoice(1, ProjectGrid.RowDefinitions.Count - 1);
+        }
+
+        private void PortCheck_Tick(object? sender, EventArgs e)
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                string[] portNames = SerialPort.GetPortNames();
+                if (!Ports.ToArray().SequenceEqual(portNames))
+                {
+                    Ports.Clear();
+                    foreach (string portName in portNames)
+                    {
+                        Ports.Add(portName);
+                    }
+                }
+            });
         }
 
         private void AddChoice(int Column, int Row)
@@ -95,6 +121,18 @@ namespace TCPDevice
             Grid.SetColumn(Remove, AxisAmount);
             Grid.SetRow(Remove, 0);
             ProjectGrid.Children.Add(Remove);
+
+            //< ComboBox x: Name = "SerialPort1" Grid.Column = "1" Grid.Row = "0" Height = "25" VerticalAlignment = "Top" Width = "60" HorizontalAlignment = "Left" />
+            ComboBox PortChoice = new ComboBox();
+            PortChoice.Name = $"SerialPort{AxisAmount}";
+            PortChoice.Height = 25;
+            PortChoice.Width = 60;
+            PortChoice.VerticalAlignment = VerticalAlignment.Top;
+            PortChoice.HorizontalAlignment = HorizontalAlignment.Left;
+            PortChoice.ItemsSource = Ports;
+            Grid.SetColumn(PortChoice, AxisAmount);
+            Grid.SetRow(PortChoice, 0);
+            ProjectGrid.Children.Add(PortChoice);
 
             for (int i = 1; i < ProjectGrid.RowDefinitions.Count; i++)
             {
@@ -358,7 +396,7 @@ namespace TCPDevice
                 {
                     ProjectGrid.Children.Remove(Deletion[i]);
                 }
-                for(int i =0; i < Move.Count; i++)
+                for (int i = 0; i < Move.Count; i++)
                 {
                     Grid.SetRow(Move[i], Grid.GetRow(Move[i]) - 1);
                 }
@@ -413,7 +451,7 @@ namespace TCPDevice
                         TB.BorderBrush = Brushes.Green;
                     }
                 }
-                if (Child.GetType() == typeof(ComboBox))
+                if (Child.GetType() == typeof(ComboBox) && !((ComboBox)Child).Name.Contains("Serial"))
                 {
                     ComboBox? CB = Child as ComboBox;
 
@@ -467,7 +505,7 @@ namespace TCPDevice
                             ComboBoxItem? CBI = comboBox.SelectedItem as ComboBoxItem;
                             if (CBI.Name.Contains("Button") && CBI.IsSelected)
                             {
-                                
+
                                 buttonCount++;
                             }
                             if (CBI.Name.Contains("Input") && CBI.IsSelected)
@@ -487,6 +525,39 @@ namespace TCPDevice
                         {
                             throw new System.Exception($"Нет кнопок для отправки команд в свойстве {LastTBIndex} - {NextTBIndex}");
                         }
+                    }
+                }
+                if (Child.GetType() == typeof(ComboBox) && ((ComboBox)Child).Name.Contains("Serial"))
+                {
+                    try
+                    {
+                        ComboBox? CB = Child as ComboBox;
+                        if(CB.SelectedIndex != -1)
+                        {
+                            if(!((MainWindow)this.Owner).PortTracker.FixedPorts.Select(x => x.PortName).ToArray().Contains(CB.SelectedItem.ToString()))
+                            {
+                                SerialPort SP = new SerialPort(CB.SelectedItem.ToString(), 115200);
+                                if (!SP.IsOpen)
+                                {
+                                    SP.Open();
+                                }
+                                SP.Close();
+                            }
+                        }
+                        else
+                        {
+                            Border BD = new Border();
+                            BD.BorderBrush = Brushes.Red;
+                            BD.BorderThickness = new Thickness(2);
+                            Grid.SetColumn(BD, Grid.GetColumn(CB));
+                            Grid.SetRow(BD, Grid.GetRow(CB));
+                            Check.Add(BD);
+                            FilledOut = false;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        FilledOut = false;
                     }
                 }
                 if (Child.GetType() == typeof(Border))
@@ -516,7 +587,12 @@ namespace TCPDevice
                 }
                 else
                 {
-                    string XamlString = XamlWriter.Save(ProjectGrid)+'\t';
+                    foreach(SerialPort Item in ((MainWindow)this.Owner).PortTracker.FixedPorts)
+                    {
+                        Item.Close();
+                    }
+                    ((MainWindow)this.Owner).PortTracker.FixedPorts.Clear();
+                    string XamlString = XamlWriter.Save(ProjectGrid) + '\t';
                     List<UIElement> Deletion = new List<UIElement>();
                     List<UIElement> Addition = new List<UIElement>();
                     for (int i = 0; i < ProjectGrid.Children.Count; i++)
@@ -540,7 +616,7 @@ namespace TCPDevice
                             Grid.SetRow(Replace, Grid.GetRow(TB));
                             Addition.Add(Replace);
                         }
-                        if (Child.GetType() == typeof(ComboBox))
+                        if (Child.GetType() == typeof(ComboBox) && !((ComboBox)Child).Name.Contains("Serial"))
                         {
                             ComboBox? CB = Child as ComboBox;
                             ComboBoxItem? CBI = CB.SelectedItem as ComboBoxItem;
@@ -610,6 +686,17 @@ namespace TCPDevice
                                 Addition.Add(L);
                             }
                         }
+                        if (Child.GetType() == typeof(ComboBox) && ((ComboBox)Child).Name.Contains("Serial"))
+                        {
+                            Deletion.Add(Child);
+                            ComboBox? CB = Child as ComboBox;
+                            SerialPort SP = new SerialPort(CB.SelectedItem.ToString(), 115200);
+                            if (!SP.IsOpen)
+                            {
+                                SP.Open();
+                            }
+                            ((MainWindow)this.Owner).PortTracker.FixedPorts.Add(SP);
+                        }
                     }
                     foreach (UIElement Elem in Deletion)
                     {
@@ -620,11 +707,13 @@ namespace TCPDevice
                         ProjectGrid.Children.Add(Elem);
                     }
                     XamlString += XamlWriter.Save(ProjectGrid);
-                    ((MainWindow)Owner).CreateDevice(XamlString, 1);
+                    XamlString += $"\t{string.Join("/", ((MainWindow)this.Owner).PortTracker.FixedPorts.Select(x => x.PortName).ToArray())}";
+                    ((MainWindow)Owner).CreateDevice(XamlString, 2);
+                    this.Close();
                 }
-                this.Close();
+                
             }
-            catch(System.Exception ex)
+            catch (System.Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
@@ -644,7 +733,7 @@ namespace TCPDevice
                     string XAMLString = XamlWriter.Save(ProjectGrid);
                     SaveFileDialog SFD = new SaveFileDialog();
                     SFD.DefaultExt = ".proj";
-                    SFD.Filter = "Устройство (*.proj)|*.proj";
+                    SFD.Filter = "Устройство (*.comproj)|*.comproj";
                     SFD.ShowDialog(this);
                     if (SFD.FileName != null)
                     {
@@ -669,76 +758,83 @@ namespace TCPDevice
 
         private void Import_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog OFD = new OpenFileDialog();
-            OFD.Filter = "Устройство (*.proj)|*.proj";
-            OFD.ShowDialog();
-            if (OFD.FileName != null)
+            try
             {
-                FileStream FS = File.OpenRead(OFD.FileName);
-                StreamReader SR = new StreamReader(FS);
-                string XamlImport = SR.ReadLine().Split('\t')[0];
-                //string XamlImport = XamlString.Split('\n')[1];
-                Grid? Import = XamlReader.Parse(XamlImport) as Grid;
-
-                ProjectGrid.Children.RemoveRange(0, ProjectGrid.Children.Count);
-
-                ProjectGrid.Height = Import.Height;
-                ProjectGrid.Width = Import.Width;
-
-                ProjectGrid.ColumnDefinitions.RemoveRange(0, ProjectGrid.ColumnDefinitions.Count);
-                foreach (ColumnDefinition CD in Import.ColumnDefinitions)
+                OpenFileDialog OFD = new OpenFileDialog();
+                OFD.Filter = "Устройство (*.proj)|*.proj";
+                OFD.ShowDialog();
+                if (OFD.FileName != null)
                 {
-                    ProjectGrid.ColumnDefinitions.Add(new ColumnDefinition());
-                }
-                ProjectGrid.RowDefinitions.RemoveRange(0, ProjectGrid.RowDefinitions.Count);
-                foreach (RowDefinition RD in Import.RowDefinitions)
-                {
-                    ProjectGrid.RowDefinitions.Add(new RowDefinition());
-                }
+                    FileStream FS = File.OpenRead(OFD.FileName);
+                    StreamReader SR = new StreamReader(FS);
+                    string XamlImport = SR.ReadLine().Split('\t')[0];
+                    //string XamlImport = XamlString.Split('\n')[1];
+                    Grid? Import = XamlReader.Parse(XamlImport) as Grid;
 
-                PropAmount = 0;
-                int ChCount = Import.Children.Count;
-                for (int i = 0; i < ChCount; i++)
-                {
-                    UIElement Child = Import.Children[0];
-                    Import.Children.Remove(Child);
-                    ProjectGrid.Children.Add(Child);
-                    if (Child.GetType() == typeof(TextBox))
+                    ProjectGrid.Children.RemoveRange(0, ProjectGrid.Children.Count);
+
+                    ProjectGrid.Height = Import.Height;
+                    ProjectGrid.Width = Import.Width;
+
+                    ProjectGrid.ColumnDefinitions.RemoveRange(0, ProjectGrid.ColumnDefinitions.Count);
+                    foreach (ColumnDefinition CD in Import.ColumnDefinitions)
                     {
-                        TextBox? TB = Child as TextBox;
-                        if (TB.Name.Contains("Prop"))
+                        ProjectGrid.ColumnDefinitions.Add(new ColumnDefinition());
+                    }
+                    ProjectGrid.RowDefinitions.RemoveRange(0, ProjectGrid.RowDefinitions.Count);
+                    foreach (RowDefinition RD in Import.RowDefinitions)
+                    {
+                        ProjectGrid.RowDefinitions.Add(new RowDefinition());
+                    }
+
+                    PropAmount = 0;
+                    int ChCount = Import.Children.Count;
+                    for (int i = 0; i < ChCount; i++)
+                    {
+                        UIElement Child = Import.Children[0];
+                        Import.Children.Remove(Child);
+                        ProjectGrid.Children.Add(Child);
+                        if (Child.GetType() == typeof(TextBox))
                         {
-                            PropAmount++;
+                            TextBox? TB = Child as TextBox;
+                            if (TB.Name.Contains("Prop"))
+                            {
+                                PropAmount++;
+                            }
+                        }
+                        if (Child.GetType() == typeof(Button))
+                        {
+                            Button? BT = Child as Button;
+                            if (BT.Name.Contains("Incr"))
+                            {
+                                BT.Click += Incr_Click;
+                            }
+                            if (BT.Name.Contains("Decr"))
+                            {
+                                BT.Click += Decr_Click;
+                            }
+                            if (BT.Name.Contains("RemoveProp"))
+                            {
+                                BT.Click += RemoveProp_Click;
+                            }
+                            if (BT.Name.Contains("RemoveAxis"))
+                            {
+                                BT.Click += RemoveAxis_Click;
+                            }
+                        }
+                        if (Child.GetType() == typeof(ComboBox) && !((ComboBox)Child).Name.Contains("Serial"))
+                        {
+                            ComboBox? CB = Child as ComboBox;
+                            CB.SelectionChanged += Choice_SelectionChanged;
                         }
                     }
-                    if (Child.GetType() == typeof(Button))
-                    {
-                        Button? BT = Child as Button;
-                        if (BT.Name.Contains("Incr"))
-                        {
-                            BT.Click += Incr_Click;
-                        }
-                        if (BT.Name.Contains("Decr"))
-                        {
-                            BT.Click += Decr_Click;
-                        }
-                        if (BT.Name.Contains("RemoveProp"))
-                        {
-                            BT.Click += RemoveProp_Click;
-                        }
-                        if (BT.Name.Contains("RemoveAxis"))
-                        {
-                            BT.Click += RemoveAxis_Click;
-                        }
-                    }
-                    if (Child.GetType() == typeof(ComboBox))
-                    {
-                        ComboBox? CB = Child as ComboBox;
-                        CB.SelectionChanged += Choice_SelectionChanged;
-                    }
-                }
 
-                AxisAmount = Import.ColumnDefinitions.Count - 1;
+                    AxisAmount = Import.ColumnDefinitions.Count - 1;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
             }
         }
 
@@ -801,7 +897,7 @@ namespace TCPDevice
                         BT.Click += RemoveAxis_Click;
                     }
                 }
-                if (Child.GetType() == typeof(ComboBox))
+                if (Child.GetType() == typeof(ComboBox) && !((ComboBox)Child).Name.Contains("Serial"))
                 {
                     ComboBox? CB = Child as ComboBox;
                     CB.SelectionChanged += Choice_SelectionChanged;

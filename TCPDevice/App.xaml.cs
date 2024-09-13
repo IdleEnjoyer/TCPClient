@@ -20,6 +20,7 @@ namespace TCPDevice
         {
             // Initialize application-scope property
             Properties["LastOpenedProject"] = "NULL";
+            Properties["LastOpenedSerial"] = "NULL";
         }
 
         private void Application_Startup(object sender, StartupEventArgs e)
@@ -39,8 +40,9 @@ namespace TCPDevice
                         // Restore each application-scope property individually
                         while (!reader.EndOfStream)
                         {
-                            string[] keyValue = reader.ReadToEnd().Split(new char[] { '|' });
+                            string[] keyValue = reader.ReadLine().Split(new char[] { '|' });
                             Properties[keyValue[0]] = keyValue[1];
+                            
                         }
                     }
                 }
@@ -71,6 +73,7 @@ namespace TCPDevice
                 {
                     //MessageBox.Show(Properties[key].ToString());
                     writer.WriteLine("{0}|{1}", key, Properties[key]);
+                    //MessageBox.Show($"{key} {Properties[key]}");
                 }
                     
             }

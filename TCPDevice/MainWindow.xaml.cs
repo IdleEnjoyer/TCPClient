@@ -43,8 +43,9 @@ namespace TCPDevice
         private int CurrentTimerInterval = 0;
         private List<int> TimerIntervals = new List<int>();
         private string CurrentDevice = "";
+        private string CurrentSerial = "";
         private bool Saved = true;
-        private SerialPortTracker PortTracker;
+        public SerialPortTracker PortTracker;
 
         public MainWindow()
         {
@@ -52,22 +53,24 @@ namespace TCPDevice
             PortTracker = new SerialPortTracker(this);
             DataContext = PortTracker;
             DispTimer.Interval = TimeSpan.FromMilliseconds(100);
+            PortCheckTimer.Interval = TimeSpan.FromMilliseconds(100);
             PortCheckTimer.Tick += PortCheckTimer_Tick;
             PortCheckTimer.Start();
             DemoCommandList.ItemsSource = Commands;
             if (!App.Current.Properties["LastOpenedProject"].ToString().Contains("NULL"))
             {
                 //MessageBox.Show(App.Current.Properties["LastOpenedProject"].ToString());
-                CreateDevice(App.Current.Properties["LastOpenedProject"].ToString());
-                Saved = true;
+                CreateDevice(App.Current.Properties["LastOpenedProject"].ToString(), 1);
+            }
+            if (!App.Current.Properties["LastOpenedSerial"].ToString().Contains("NULL"))
+            {
+                CreateDevice(App.Current.Properties["LastOpenedSerial"].ToString(), 2);
             }
         }
-
         private void PortCheckTimer_Tick(object? sender, EventArgs e)
         {
             PortTracker.CheckSerialPorts();
         }
-
         public class Command
         {
             public string CMD { get; set; }
@@ -89,7 +92,6 @@ namespace TCPDevice
                 return;
             }
         }
-
         public void ChangeConnection(bool State)
         {
             try
@@ -110,7 +112,6 @@ namespace TCPDevice
                 MessageBox.Show(ex.Message, "Status change error");
             }
         }
-
         private async Task StartReadingDataAsync()
         {
             try
@@ -146,8 +147,6 @@ namespace TCPDevice
                 MessageBox.Show(ex.Message);
             }
         }
-
-        
         public void SendData(string Data)
         {
             try
@@ -169,7 +168,19 @@ namespace TCPDevice
                 MessageBox.Show("Не удалось отправить команду!\nПроверьте подключение!");
             }
         }
-
+        public void SendDataCom(string Data, SerialPort Port)
+        {
+            try
+            {
+                Port.Write(Data);
+                ComData.Text += $"Клиент {System.DateTime.Now}: " + Data + "\n";
+                ComData.ScrollToEnd();
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
         private void SendCmd_Click(object sender, RoutedEventArgs e)
         {
             Button? BTN = sender as Button;
@@ -183,13 +194,6 @@ namespace TCPDevice
                 }
             }
         }
-
-        private void OnSelect(object sender, SelectionChangedEventArgs e)
-        {
-            ComboBox? Element = sender as ComboBox;
-            Element.SelectedItem = 0;
-        }
-
         private void OnPress(object sender, KeyEventArgs e)
         {
             if(e.Key == Key.Enter)
@@ -198,13 +202,11 @@ namespace TCPDevice
                 SendData(TB.Text);
             }
         }
-
         private void AddCommand_Click(object sender, RoutedEventArgs e)
         {
             Command Input = new Command { CMD = DemoCommandInput.Text, TMR = DemoTimerInput.Text };
             Commands.Add(Input);
         }
-
         private void AddTab_Click(object sender, RoutedEventArgs e)
         {
             Saved = false;
@@ -212,7 +214,6 @@ namespace TCPDevice
             NewTab.Owner = this;
             NewTab.Show();
         }
-
         private void TimerStart_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -237,13 +238,11 @@ namespace TCPDevice
                 MessageBox.Show("Очередь таймера пуста");
             }
         }
-
         private void DispTimer_Tick(object? sender, EventArgs e)
         {
             int TimeElapsed = TimerIntervals[CurrentTimerInterval] - (int)TimersElapsed.Elapsed.TotalMilliseconds;
             TimerLabel.Content = $"{TimeSpan.FromMilliseconds(TimeElapsed).TotalSeconds:F3}";
         }
-
         private void PauseTime_Elapsed(object? sender, ElapsedEventArgs e)
         {
             try
@@ -271,7 +270,6 @@ namespace TCPDevice
                 MessageBox.Show(ex.Message);
             }
         }
-
         private void DeleteItem_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -285,13 +283,11 @@ namespace TCPDevice
                 MessageBox.Show(ex.Message + "\n" + Commands.Count.ToString() + "\n" + Buttons.Count.ToString());
             }
         }
-
         private void DeleteItem_Initialized(object sender, EventArgs e)
         {
             Button? button = sender as Button;
             Buttons.Add(button);
         } 
-
         private void TimerStop_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -309,7 +305,6 @@ namespace TCPDevice
                 MessageBox.Show(ex.Message);
             }
         }
-
         private void TMR_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
             if(!IsNumber(e.Text))
@@ -317,13 +312,11 @@ namespace TCPDevice
                 e.Handled = true;
             }
         }
-
         private bool IsNumber(string text)
         {
             Regex NumRegex = new Regex("[+-]?(\\d*\\.\\d+|\\d+\\.\\d*|\\d+)");
             return NumRegex.IsMatch(text);
         }
-
         private void Import_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -350,7 +343,6 @@ namespace TCPDevice
                 MessageBox.Show("Что-то пошло не так: " + ex.Message);
             }
         }
-
         private void StopConnection_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -363,7 +355,6 @@ namespace TCPDevice
                 MessageBox.Show(ex.Message, "Connection stop error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-
         private void StartConnection_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -384,7 +375,6 @@ namespace TCPDevice
                 return;
             }
         }
-
         private void Export_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -405,7 +395,6 @@ namespace TCPDevice
                     {
                         SW.WriteLine(Com.CMD + "\t" + Com.TMR);
                     }
-                    
                 }
                 SW.Close();
                 FS.Close();
@@ -416,12 +405,21 @@ namespace TCPDevice
                 MessageBox.Show(ex.Message);
             }
         }
-
-        public void CreateDevice(string XamlString)
+        public void CreateDevice(string XamlString, int Type)
         {
-            CurrentDevice = XamlString;
-            string[] Lines = CurrentDevice.Split('\t');
-            DeviceTab.Content = null;
+            string[] Lines = new string[0];
+            if (Type == 1)
+            {
+                CurrentDevice = XamlString;
+                Lines = CurrentDevice.Split('\t');
+                DeviceTab.Content = null;
+            }
+            if(Type == 2)
+            {
+                CurrentSerial = XamlString;
+                Lines = CurrentSerial.Split("\t");
+                DeviceTabCom.Content = null;
+            }
             ScrollViewer SV = new ScrollViewer();
             //<ScrollViewer x:Name="Viewer" Grid.Row="1" Grid.ColumnSpan="4" HorizontalScrollBarVisibility="Visible">
             SV.Name = "Viewer";
@@ -472,7 +470,14 @@ namespace TCPDevice
                             {
                                 Command += TB.Text.Replace(",",".") + " ";
                             }
-                            SendData(BT.Resources["Command"].ToString() + " " + Command);
+                            if (Type == 1)
+                            {
+                                SendData(BT.Resources["Command"].ToString() + " " + Command);
+                            }
+                            if(Type == 2)
+                            {
+                                SendDataCom(BT.Resources["Command"].ToString() + " " + Command, PortTracker.FixedPorts[Grid.GetColumn(BT) - 1]);
+                            }
                         }
                         if (Inputs.Count == 1)
                         {
@@ -483,7 +488,14 @@ namespace TCPDevice
                             if (Inputs[0].Resources["First"].ToString() == BT.Name)
                             {
                                 string Command = BT.Resources["Command"].ToString() + " " + Inputs[0].Text.Replace(",",".");
-                                SendData(Command);
+                                if (Type == 1)
+                                {
+                                    SendData(Command);
+                                }
+                                if(Type == 2)
+                                {
+                                    SendDataCom(Command, PortTracker.FixedPorts[Grid.GetColumn(BT) - 1]);
+                                }
                             }
                             else
                             {
@@ -494,13 +506,27 @@ namespace TCPDevice
                                 if (Inputs[0].Resources["Second"].ToString() == BT.Name)
                                 {
                                     string Command = BT.Resources["Command"].ToString() + " -" + Inputs[0].Text.Replace(",",".");
-                                    SendData(Command);
+                                    if (Type == 1)
+                                    {
+                                        SendData(Command);
+                                    }
+                                    if (Type == 2)
+                                    {
+                                        SendDataCom(Command, PortTracker.FixedPorts[Grid.GetColumn(BT) - 1]);
+                                    }
                                 }
                             }
                         }
                         if (Inputs.Count == 0)
-                        {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
-                            SendData(BT.Resources["Command"].ToString());
+                        {
+                            if (Type == 1)
+                            {
+                                SendData(BT.Resources["Command"].ToString());
+                            }
+                            if(Type == 2)
+                            {
+                                SendDataCom(BT.Resources["Command"].ToString(), PortTracker.FixedPorts[Grid.GetColumn(BT) - 1]);
+                            }
                         }
                     };
                 }
@@ -517,67 +543,151 @@ namespace TCPDevice
                 }
             }
             SV.Content = GR;
-            DeviceTab.Content = SV;
-            DeviceTab.Header = "Устройство";
+            if (Type == 1)
+            {
+                DeviceTab.Content = SV;
+                DeviceTab.Header = "Устройство";
+            }
+            else
+            {
+                DeviceTabCom.Content = SV;
+                DeviceTabCom.Header = "Устройство";
+                string[] LoadedPorts = Lines[2].Split("/");
+                foreach (string Item in LoadedPorts)
+                {
+                    SerialPort SP = new SerialPort(Item, 115200);
+                    try
+                    {
+                        PortTracker.FixedPorts.Add(SP);
+                        PortTracker.FixedPorts.Last().Open();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message);
+                    }
+                }
+                foreach (SerialPort Item in PortTracker.FixedPorts)
+                {
+                    Item.DataReceived += (sender, e) =>
+                    {
+                        SerialPort? SP = sender as SerialPort;
+                        ComDataRecieve(SP, SP.ReadExisting());
+                    };
+                }
+            }
         }
-
-
         private void Open_Click(object sender, RoutedEventArgs e)
         {
             try
             {
                 OpenFileDialog OFD = new OpenFileDialog();
-                OFD.Filter = "Устройство (*.tesart)|*.tesart";
-                OFD.InitialDirectory = System.IO.Directory.GetCurrentDirectory();
-                OFD.ShowDialog();
-                if(OFD.FileName != string.Empty)
+                MenuItem? MI = sender as MenuItem;
+                if (!MI.Name.Contains("Com"))
                 {
-                    StreamReader SR = new StreamReader(OFD.FileName);
-                    string XamlString = SR.ReadLine() + '\t' + SR.ReadLine();
-                    App.Current.Properties["LastOpenedProject"] = XamlString;
-                    CreateDevice(XamlString);
-                    SR.Dispose();
+                    OFD.Filter = "Устройство (*.tesart)|*.tesart";
+                    OFD.InitialDirectory = System.IO.Directory.GetCurrentDirectory();
+                    OFD.ShowDialog();
+                    if (OFD.FileName != string.Empty)
+                    {
+                        StreamReader SR = new StreamReader(OFD.FileName);
+                        string XamlString = SR.ReadLine() + '\t' + SR.ReadLine();
+                        App.Current.Properties["LastOpenedProject"] = XamlString;
+                        CreateDevice(XamlString, 1);
+                        SR.Dispose();
+                    }
+                }
+                else
+                {
+                    OFD.Filter = "Устройство (*.comtesart)|*.comtesart";
+                    OFD.InitialDirectory = System.IO.Directory.GetCurrentDirectory();
+                    OFD.ShowDialog();
+                    if (OFD.FileName != string.Empty)
+                    {
+                        StreamReader SR = new StreamReader(OFD.FileName);
+                        string XamlString = SR.ReadLine() + '\t' + SR.ReadLine() + "\t" + SR.ReadLine();
+                        App.Current.Properties["LastOpenedProject"] = XamlString;
+                        CreateDevice(XamlString, 2);
+                        SR.Dispose();
+                    }
                 }
                 OFD.Reset();
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.ToString());
+                MessageBox.Show(ex.Message);
             }
         }
-
         private void Redact_Click(object sender, RoutedEventArgs e)
         {
             Saved = false;
-            AddProjectWindow APW = new AddProjectWindow();
-            APW.Owner = this;
-            APW.Show();
-            APW.ImportProject(App.Current.Properties["LastOpenedProject"].ToString());
+            MenuItem? MI = sender as MenuItem;
+            if (!MI.Name.Contains("Com"))
+            {
+                AddProjectWindow APW = new AddProjectWindow();
+                APW.Owner = this;
+                APW.Show();
+                APW.ImportProject(App.Current.Properties["LastOpenedProject"].ToString());
+            }
+            else
+            {
+                AddSerial AS = new AddSerial();
+                AS.Owner = this;
+                AS.Show();
+                AS.ImportProject(App.Current.Properties["LastOpenedSerial"].ToString());
+            }
         }
-
         private void Save_Click(object sender, RoutedEventArgs e)
         {
-            SaveProject(CurrentDevice);
+            MenuItem? MI = sender as MenuItem;
+            if (!MI.Name.Contains("Com"))
+            {
+                SaveProject(CurrentDevice, 1);
+            }
+            else
+            {
+                SaveProject(CurrentSerial, 2);
+            }
             Saved = true;
         }
-
-        void SaveProject(string XamlString)
+        private void SaveProject(string XamlString, int Type)
         {
             try
             {
                 SaveFileDialog SFD = new SaveFileDialog();
-                SFD.Filter = "Устройство (*.tesart)|*.tesart";
-                SFD.ShowDialog();
-                if(SFD.FileName != null)
+                if (Type == 1)
                 {
-                    //string XAMLString = XamlWriter.Save(ProjectGrid);
-                    //string FileName = $"Устройство_{DateTime.Today.Day}_{DateTime.Today.Month}_{DateTime.Today.Year}_{DateTime.Now.Hour}_{DateTime.Now.Minute}_{DateTime.Now.Second}.tesart";
-                    FileStream FS = File.Create(SFD.FileName);
-                    StreamWriter SW = new StreamWriter(FS);
-                    SW.Write(XamlString, 0, XamlString.Length);
-                    App.Current.Properties["LastOpenedProject"] = XamlString;
-                    SW.Close();
-                    FS.Close();
+                    SFD.Filter = "Устройство (*.tesart)|*.tesart";
+                    SFD.InitialDirectory = System.IO.Directory.GetCurrentDirectory();
+                    SFD.ShowDialog();
+                    if (SFD.FileName != null)
+                    {
+                        //string XAMLString = XamlWriter.Save(ProjectGrid);
+                        //string FileName = $"Устройство_{DateTime.Today.Day}_{DateTime.Today.Month}_{DateTime.Today.Year}_{DateTime.Now.Hour}_{DateTime.Now.Minute}_{DateTime.Now.Second}.tesart";
+                        FileStream FS = File.Create(SFD.FileName);
+                        StreamWriter SW = new StreamWriter(FS);
+                        SW.Write(XamlString, 0, XamlString.Length);
+                        App.Current.Properties["LastOpenedProject"] = XamlString;
+                        SW.Close();
+                        FS.Close();
+                    }
+                }
+                if(Type == 2)
+                {
+                    SFD.Filter = "Устройство (*.comtesart)|*.comtesart";
+                    SFD.InitialDirectory = System.IO.Directory.GetCurrentDirectory();
+                    SFD.ShowDialog();
+                    if (SFD.FileName != null)
+                    {
+                        //string XAMLString = XamlWriter.Save(ProjectGrid);
+                        //string FileName = $"Устройство_{DateTime.Today.Day}_{DateTime.Today.Month}_{DateTime.Today.Year}_{DateTime.Now.Hour}_{DateTime.Now.Minute}_{DateTime.Now.Second}.tesart";
+                        FileStream FS = File.Create(SFD.FileName);
+                        StreamWriter SW = new StreamWriter(FS);
+                        XamlString += $"\t{string.Join("/", PortTracker.FixedPorts.Select(x => x.PortName).ToArray())}";
+                        SW.Write(XamlString, 0, XamlString.Length);
+                        App.Current.Properties["LastOpenedSerial"] = XamlString;
+                        SW.Close();
+                        FS.Close();
+                    }
                 }
                 SFD.Reset();
             }
@@ -585,7 +695,6 @@ namespace TCPDevice
             {
             }
         }
-
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             if (!Saved)
@@ -596,7 +705,6 @@ namespace TCPDevice
                 }
             }
         }
-
         private void PortNumber_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             try
@@ -618,7 +726,6 @@ namespace TCPDevice
                 PortOpened.Header = $"Opened: False";
             }
         }
-
         private void ComInput_KeyDown(object sender, KeyEventArgs e)
         {
             try
@@ -627,13 +734,9 @@ namespace TCPDevice
                 {
                     if (PortNumber.SelectedIndex != -1)
                     {
-                        PortTracker.GetPort(PortNumber.SelectedItem.ToString()).Write(ComInput.Text);
+                        TextBox? TB = sender as TextBox;
+                        SendDataCom(TB.Text, PortTracker.GetPort(PortNumber.SelectedItem.ToString()));
                     }
-                }
-                if (e.Key == Key.F1)
-                {
-                    
-                    MessageBox.Show((PortTracker.AvailablePorts.ToArray().SequenceEqual(SerialPort.GetPortNames()).ToString()));
                 }
             }
             catch(Exception ex)
@@ -641,28 +744,48 @@ namespace TCPDevice
                 MessageBox.Show(ex.Message);
             }
         }
-
         private void ComSend_Click(object sender, RoutedEventArgs e)
         {
             try
             {
                 if(PortNumber.SelectedIndex != -1)
                 {
-                    PortTracker.GetPort(PortNumber.SelectedItem.ToString()).Write(ComInput.Text);
+                    Button? BT = sender as Button;
+                    foreach(UIElement Child in ChatGridCom.Children)
+                    {
+                        if(Child.GetType() == typeof(TextBox) && ((TextBox)Child).Name.Last() == BT.Name.Last())
+                        {
+                            SendDataCom(((TextBox)Child).Text, PortTracker.GetPort(PortNumber.SelectedItem.ToString()));
+                            break;
+                        }
+                    }
                 }
             }
             catch(Exception ex)
             {
-                
+                MessageBox.Show(ex.Message);
             }
         }
-
         public void ComDataRecieve(string Data)
         {
             this.Dispatcher.Invoke(() =>
             {
-                ComData.Text += Data;
+                ComData.Text += $"{PortNumber.SelectedItem} " + System.DateTime.Now.ToLongTimeString() + ": " + Data;
             });
+        }
+        public void ComDataRecieve(SerialPort SP, string Data)
+        {
+            this.Dispatcher.Invoke(() =>
+            {
+                ComData.Text += $"{SP.PortName} " + System.DateTime.Now.ToLongTimeString() + ": " + Data;
+            });
+        }
+        private void AddCom_Click(object sender, RoutedEventArgs e)
+        {
+            Saved = false;
+            AddSerial NewTab = new AddSerial();
+            NewTab.Owner = this;
+            NewTab.Show();
         }
     }
 }

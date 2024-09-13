@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO.Ports;
 using System.Linq;
 using System.Management;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -11,16 +13,18 @@ using System.Windows.Threading;
 
 namespace TCPDevice
 {
-    internal class SerialPortTracker
+    public class SerialPortTracker
     {
         private ObservableCollection<string> ComPortsNames;
         private List<SerialPort> SerialPorts;
+        public List<SerialPort> FixedPorts;
         private string Data;
         private MainWindow owner;
         public SerialPortTracker(MainWindow MW)
         {
             ComPortsNames = new ObservableCollection<string>();
             SerialPorts = new List<SerialPort>();
+            FixedPorts = new List<SerialPort>();
             owner = MW;
         }
 
@@ -83,6 +87,10 @@ namespace TCPDevice
 
         public SerialPort GetPort(string name)
         {
+            if(FixedPorts.Exists(x => x.PortName == name))
+            {
+                return FixedPorts.Find(x => x.PortName == name);
+            }
             if(SerialPorts.Exists(x => x.PortName == name))
             {
                 return SerialPorts.Find(x => x.PortName == name);
