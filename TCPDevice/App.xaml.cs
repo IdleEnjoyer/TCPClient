@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
+﻿using System.IO;
 using System.IO.IsolatedStorage;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace TCPDevice
@@ -31,7 +25,7 @@ namespace TCPDevice
             {
                 if (storage.FileExists(StorageFile))
                 {
-                    
+
                     using (IsolatedStorageFileStream stream = storage.OpenFile(StorageFile, FileMode.Open, FileAccess.Read))
                     using (StreamReader reader = new StreamReader(stream))
                     {
@@ -42,7 +36,7 @@ namespace TCPDevice
                         {
                             string[] keyValue = reader.ReadLine().Split(new char[] { '|' });
                             Properties[keyValue[0]] = keyValue[1];
-                            
+
                         }
                     }
                 }
@@ -67,7 +61,7 @@ namespace TCPDevice
             using (IsolatedStorageFileStream stream = storage.OpenFile(StorageFile, FileMode.Create, FileAccess.Write))
             using (StreamWriter writer = new StreamWriter(stream))
             {
-                
+
                 // Persist each application-scope property individually
                 foreach (string key in Properties.Keys)
                 {
@@ -75,7 +69,7 @@ namespace TCPDevice
                     writer.WriteLine("{0}|{1}", key, Properties[key]);
                     //MessageBox.Show($"{key} {Properties[key]}");
                 }
-                    
+
             }
         }
     }

@@ -3,19 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.IO.Ports;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Media;
-using System.IO.Ports;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 
 namespace TCPDevice
@@ -532,9 +525,9 @@ namespace TCPDevice
                     try
                     {
                         ComboBox? CB = Child as ComboBox;
-                        if(CB.SelectedIndex != -1)
+                        if (CB.SelectedIndex != -1)
                         {
-                            if(!((MainWindow)this.Owner).PortTracker.FixedPorts.Select(x => x.PortName).ToArray().Contains(CB.SelectedItem.ToString()))
+                            if (!((MainWindow)this.Owner).PortTracker.FixedPorts.Select(x => x.PortName).ToArray().Contains(CB.SelectedItem.ToString()))
                             {
                                 SerialPort SP = new SerialPort(CB.SelectedItem.ToString(), 115200);
                                 if (!SP.IsOpen)
@@ -587,7 +580,7 @@ namespace TCPDevice
                 }
                 else
                 {
-                    foreach(SerialPort Item in ((MainWindow)this.Owner).PortTracker.FixedPorts)
+                    foreach (SerialPort Item in ((MainWindow)this.Owner).PortTracker.FixedPorts)
                     {
                         Item.Close();
                     }
@@ -711,7 +704,7 @@ namespace TCPDevice
                     ((MainWindow)Owner).CreateDevice(XamlString, 2);
                     this.Close();
                 }
-                
+
             }
             catch (System.Exception ex)
             {

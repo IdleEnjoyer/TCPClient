@@ -1,28 +1,23 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.IO;
+using System.IO.Ports;
+using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Net.Sockets;
-using System.Net;
-using System.Management;
-using System.IO;
-using System.IO.Ports;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Windows.Media.Animation;
-using System.Timers;
-using System.Windows.Threading;
-using System.Diagnostics;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using Microsoft.Win32;
 using System.Windows.Markup;
-using static System.Net.Mime.MediaTypeNames;
-using System.Security.Cryptography;
+using System.Windows.Media;
+using System.Windows.Threading;
 
 #pragma warning disable CS8618
 #pragma warning disable CS8602
@@ -33,7 +28,7 @@ namespace TCPDevice
     {
         private ObservableCollection<Command> Commands = new();
         private List<Button> Buttons = new List<Button>();
-        public TcpClient Client {get; set;}
+        public TcpClient Client { get; set; }
         private NetworkStream Stream;
         private byte[] ByteData;
         private System.Timers.Timer PauseTime;
@@ -107,7 +102,7 @@ namespace TCPDevice
                     ConnectionStatus.Foreground = Brushes.Red;
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "Status change error");
             }
@@ -163,7 +158,7 @@ namespace TCPDevice
                     ServerData.ScrollToEnd();
                 });
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 MessageBox.Show("Не удалось отправить команду!\nПроверьте подключение!");
             }
@@ -176,7 +171,7 @@ namespace TCPDevice
                 ComData.Text += $"Клиент {System.DateTime.Now}: " + Data + "\n";
                 ComData.ScrollToEnd();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
@@ -185,9 +180,9 @@ namespace TCPDevice
         {
             Button? BTN = sender as Button;
             Grid? GRD = BTN.Parent as Grid;
-            foreach(UIElement Child in GRD.Children)
+            foreach (UIElement Child in GRD.Children)
             {
-                if(Grid.GetColumn(Child) == 0 && Grid.GetRow(Child) == Grid.GetRow(BTN))
+                if (Grid.GetColumn(Child) == 0 && Grid.GetRow(Child) == Grid.GetRow(BTN))
                 {
                     TextBox? TB = Child as TextBox;
                     SendData(TB.Text);
@@ -196,7 +191,7 @@ namespace TCPDevice
         }
         private void OnPress(object sender, KeyEventArgs e)
         {
-            if(e.Key == Key.Enter)
+            if (e.Key == Key.Enter)
             {
                 TextBox? TB = sender as TextBox;
                 SendData(TB.Text);
@@ -219,7 +214,7 @@ namespace TCPDevice
             try
             {
                 TimerIntervals.Clear();
-                for(int ItemId = 0;  ItemId < Commands.Count; ItemId++)
+                for (int ItemId = 0; ItemId < Commands.Count; ItemId++)
                 {
                     TimerIntervals.Add(int.Parse(Commands[ItemId].TMR));
                 }
@@ -233,7 +228,7 @@ namespace TCPDevice
                 DispTimer.Tick += DispTimer_Tick;
                 DispTimer.Start();
             }
-            catch (Exception )
+            catch (Exception)
             {
                 MessageBox.Show("Очередь таймера пуста");
             }
@@ -249,7 +244,7 @@ namespace TCPDevice
             {
                 System.Windows.Application.Current.Dispatcher.Invoke(() =>
                 {
-                    
+
                     if (CurrentTimerInterval >= TimerIntervals.Count - 1)
                     {
                         CurrentTimerInterval = 0;
@@ -287,7 +282,7 @@ namespace TCPDevice
         {
             Button? button = sender as Button;
             Buttons.Add(button);
-        } 
+        }
         private void TimerStop_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -307,7 +302,7 @@ namespace TCPDevice
         }
         private void TMR_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
-            if(!IsNumber(e.Text))
+            if (!IsNumber(e.Text))
             {
                 e.Handled = true;
             }
@@ -327,7 +322,7 @@ namespace TCPDevice
                 StreamReader ImportFileStream = new StreamReader(Dial.FileName);
                 int i = 0;
                 Commands.Clear();
-                while(!ImportFileStream.EndOfStream)
+                while (!ImportFileStream.EndOfStream)
                 {
                     Words.Add(ImportFileStream.ReadLine().Split('\t'));
                     Command C = new Command();
@@ -361,7 +356,7 @@ namespace TCPDevice
             {
                 IPAddress Address = IPAddress.Parse(IPInput.Text);
                 int Port = int.Parse(PortInput.Text);
-                
+
 
                 Client = new TcpClient(Address.ToString(), Port);
 
@@ -414,7 +409,7 @@ namespace TCPDevice
                 Lines = CurrentDevice.Split('\t');
                 DeviceTab.Content = null;
             }
-            if(Type == 2)
+            if (Type == 2)
             {
                 CurrentSerial = XamlString;
                 Lines = CurrentSerial.Split("\t");
@@ -424,11 +419,18 @@ namespace TCPDevice
             //<ScrollViewer x:Name="Viewer" Grid.Row="1" Grid.ColumnSpan="4" HorizontalScrollBarVisibility="Visible">
             SV.Name = "Viewer";
             SV.HorizontalScrollBarVisibility = ScrollBarVisibility.Visible;
-            SV.Background = new SolidColorBrush(Color.FromRgb(0xC9,0xC9,0xC9));
-            Grid? GR = XamlReader.Parse(Lines[1]) as Grid;
-            foreach(UIElement Child in GR.Children)
+            if (Type == 1)
             {
-                if(Child.GetType() == typeof(Button))
+                SV.Background = new SolidColorBrush(Color.FromRgb(0xC9, 0xC9, 0xC9));
+            }
+            if (Type == 2)
+            {
+                SV.Background = new SolidColorBrush(Color.FromRgb(0xB9, 0xB9, 0xB9));
+            }
+            Grid? GR = XamlReader.Parse(Lines[1]) as Grid;
+            foreach (UIElement Child in GR.Children)
+            {
+                if (Child.GetType() == typeof(Button))
                 {
                     Button? BT = Child as Button;
                     BT.Click += (sender, e) =>
@@ -468,13 +470,13 @@ namespace TCPDevice
                             string Command = "";
                             foreach (TextBox TB in Inputs)
                             {
-                                Command += TB.Text.Replace(",",".") + " ";
+                                Command += TB.Text.Replace(",", ".") + " ";
                             }
                             if (Type == 1)
                             {
                                 SendData(BT.Resources["Command"].ToString() + " " + Command);
                             }
-                            if(Type == 2)
+                            if (Type == 2)
                             {
                                 SendDataCom(BT.Resources["Command"].ToString() + " " + Command, PortTracker.FixedPorts[Grid.GetColumn(BT) - 1]);
                             }
@@ -487,12 +489,12 @@ namespace TCPDevice
                             }
                             if (Inputs[0].Resources["First"].ToString() == BT.Name)
                             {
-                                string Command = BT.Resources["Command"].ToString() + " " + Inputs[0].Text.Replace(",",".");
+                                string Command = BT.Resources["Command"].ToString() + " " + Inputs[0].Text.Replace(",", ".");
                                 if (Type == 1)
                                 {
                                     SendData(Command);
                                 }
-                                if(Type == 2)
+                                if (Type == 2)
                                 {
                                     SendDataCom(Command, PortTracker.FixedPorts[Grid.GetColumn(BT) - 1]);
                                 }
@@ -505,7 +507,7 @@ namespace TCPDevice
                                 }
                                 if (Inputs[0].Resources["Second"].ToString() == BT.Name)
                                 {
-                                    string Command = BT.Resources["Command"].ToString() + " -" + Inputs[0].Text.Replace(",",".");
+                                    string Command = BT.Resources["Command"].ToString() + " -" + Inputs[0].Text.Replace(",", ".");
                                     if (Type == 1)
                                     {
                                         SendData(Command);
@@ -523,14 +525,14 @@ namespace TCPDevice
                             {
                                 SendData(BT.Resources["Command"].ToString());
                             }
-                            if(Type == 2)
+                            if (Type == 2)
                             {
                                 SendDataCom(BT.Resources["Command"].ToString(), PortTracker.FixedPorts[Grid.GetColumn(BT) - 1]);
                             }
                         }
                     };
                 }
-                if(Child.GetType() == typeof(TextBox))
+                if (Child.GetType() == typeof(TextBox))
                 {
                     TextBox? TB = Child as TextBox;
                     TB.LostFocus += (sender, e) =>
@@ -671,7 +673,7 @@ namespace TCPDevice
                         FS.Close();
                     }
                 }
-                if(Type == 2)
+                if (Type == 2)
                 {
                     SFD.Filter = "Устройство (*.comtesart)|*.comtesart";
                     SFD.InitialDirectory = System.IO.Directory.GetCurrentDirectory();
@@ -699,7 +701,7 @@ namespace TCPDevice
         {
             if (!Saved)
             {
-                if(MessageBox.Show("Последний проект не был сохранён, всё равно выйти?", "Выход" , MessageBoxButton.YesNo) == MessageBoxResult.No)
+                if (MessageBox.Show("Последний проект не был сохранён, всё равно выйти?", "Выход", MessageBoxButton.YesNo) == MessageBoxResult.No)
                 {
                     e.Cancel = true;
                 }
@@ -739,7 +741,7 @@ namespace TCPDevice
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
@@ -748,12 +750,12 @@ namespace TCPDevice
         {
             try
             {
-                if(PortNumber.SelectedIndex != -1)
+                if (PortNumber.SelectedIndex != -1)
                 {
                     Button? BT = sender as Button;
-                    foreach(UIElement Child in ChatGridCom.Children)
+                    foreach (UIElement Child in ChatGridCom.Children)
                     {
-                        if(Child.GetType() == typeof(TextBox) && ((TextBox)Child).Name.Last() == BT.Name.Last())
+                        if (Child.GetType() == typeof(TextBox) && ((TextBox)Child).Name.Last() == BT.Name.Last())
                         {
                             SendDataCom(((TextBox)Child).Text, PortTracker.GetPort(PortNumber.SelectedItem.ToString()));
                             break;
@@ -761,7 +763,7 @@ namespace TCPDevice
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }

@@ -1,15 +1,9 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO.Ports;
 using System.Linq;
-using System.Management;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Threading;
 
 namespace TCPDevice
 {
@@ -43,7 +37,7 @@ namespace TCPDevice
                 }
             });
             List<SerialPort> Deletion = new List<SerialPort>();
-            foreach(SerialPort Port in SerialPorts)
+            foreach (SerialPort Port in SerialPorts)
             {
                 if (!ComPortsNames.Contains(Port.PortName))
                 {
@@ -52,13 +46,13 @@ namespace TCPDevice
                 }
             }
             List<SerialPort> Addition = new List<SerialPort>();
-            
+
             foreach (string Name in ComPortsNames)
             {
-                
+
                 if (!SerialPorts.Exists(x => x.PortName == Name))
                 {
-                    
+
                     SerialPort Port = new SerialPort(Name, 115200);
                     Port.DataReceived += Port_DataReceived;
                     Addition.Add(Port);
@@ -68,7 +62,7 @@ namespace TCPDevice
             {
                 SerialPorts.Remove(Port);
             }
-            foreach(SerialPort Port in Addition)
+            foreach (SerialPort Port in Addition)
             {
                 SerialPorts.Add(Port);
             }
@@ -87,11 +81,11 @@ namespace TCPDevice
 
         public SerialPort GetPort(string name)
         {
-            if(FixedPorts.Exists(x => x.PortName == name))
+            if (FixedPorts.Exists(x => x.PortName == name))
             {
                 return FixedPorts.Find(x => x.PortName == name);
             }
-            if(SerialPorts.Exists(x => x.PortName == name))
+            if (SerialPorts.Exists(x => x.PortName == name))
             {
                 return SerialPorts.Find(x => x.PortName == name);
             }

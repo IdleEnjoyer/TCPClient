@@ -3,11 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Media;
 
@@ -358,7 +355,7 @@ namespace TCPDevice
                 {
                     ProjectGrid.Children.Remove(Deletion[i]);
                 }
-                for(int i =0; i < Move.Count; i++)
+                for (int i = 0; i < Move.Count; i++)
                 {
                     Grid.SetRow(Move[i], Grid.GetRow(Move[i]) - 1);
                 }
@@ -467,7 +464,7 @@ namespace TCPDevice
                             ComboBoxItem? CBI = comboBox.SelectedItem as ComboBoxItem;
                             if (CBI.Name.Contains("Button") && CBI.IsSelected)
                             {
-                                
+
                                 buttonCount++;
                             }
                             if (CBI.Name.Contains("Input") && CBI.IsSelected)
@@ -516,7 +513,7 @@ namespace TCPDevice
                 }
                 else
                 {
-                    string XamlString = XamlWriter.Save(ProjectGrid)+'\t';
+                    string XamlString = XamlWriter.Save(ProjectGrid) + '\t';
                     List<UIElement> Deletion = new List<UIElement>();
                     List<UIElement> Addition = new List<UIElement>();
                     for (int i = 0; i < ProjectGrid.Children.Count; i++)
@@ -624,7 +621,7 @@ namespace TCPDevice
                 }
                 this.Close();
             }
-            catch(System.Exception ex)
+            catch (System.Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
