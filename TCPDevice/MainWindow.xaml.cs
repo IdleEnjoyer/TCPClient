@@ -607,7 +607,7 @@ namespace TCPDevice
                     {
                         StreamReader SR = new StreamReader(OFD.FileName);
                         string XamlString = SR.ReadLine() + '\t' + SR.ReadLine() + "\t" + SR.ReadLine();
-                        App.Current.Properties["LastOpenedProject"] = XamlString;
+                        App.Current.Properties["LastOpenedSerial"] = XamlString;
                         CreateDevice(XamlString, 2);
                         SR.Dispose();
                     }
