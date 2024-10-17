@@ -17,10 +17,10 @@ namespace TCPDevice
     /// </summary>
     public partial class AddProjectWindow : Window
     {
-        Random rng = new Random();
+        Random rng = new();
         int AxisAmount = 1;
         int PropAmount = 1;
-        List<int> Amounts = new List<int>();
+        List<int> Amounts = new();
         public AddProjectWindow()
         {
             InitializeComponent();
@@ -30,7 +30,7 @@ namespace TCPDevice
 
         private void AddChoice(int Column, int Row)
         {
-            ComboBox Choice = new ComboBox();
+            ComboBox Choice = new();
             Choice.Height = 25;
             Choice.Width = 100;
             Choice.Name = $"Choice_{Column}_{Row}_{rng.Next()}";

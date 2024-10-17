@@ -52,7 +52,6 @@ namespace TCPDevice
 
                 if (!SerialPorts.Exists(x => x.PortName == Name))
                 {
-
                     SerialPort Port = new SerialPort(Name, 115200);
                     Port.DataReceived += Port_DataReceived;
                     Addition.Add(Port);

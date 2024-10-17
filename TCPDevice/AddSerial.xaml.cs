@@ -548,7 +548,7 @@ namespace TCPDevice
                             FilledOut = false;
                         }
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         FilledOut = false;
                     }

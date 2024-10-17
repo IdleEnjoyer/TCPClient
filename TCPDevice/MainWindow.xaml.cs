@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Ports;
@@ -18,6 +19,7 @@ using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Threading;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 #pragma warning disable CS8618
 #pragma warning disable CS8602
@@ -27,7 +29,9 @@ namespace TCPDevice
     public partial class MainWindow : Window
     {
         private ObservableCollection<Command> Commands = new();
-        private List<Button> Buttons = new List<Button>();
+        private ObservableCollection<Command> CommandsSerial = new();
+        private List<Button> Buttons = new();
+        private List<Button> ButtonsSerial = new();
         public TcpClient Client { get; set; }
         private NetworkStream Stream;
         private byte[] ByteData;
@@ -52,6 +56,7 @@ namespace TCPDevice
             PortCheckTimer.Tick += PortCheckTimer_Tick;
             PortCheckTimer.Start();
             DemoCommandList.ItemsSource = Commands;
+            DemoCommandListCom.ItemsSource = CommandsSerial;
             if (!App.Current.Properties["LastOpenedProject"].ToString().Contains("NULL"))
             {
                 //MessageBox.Show(App.Current.Properties["LastOpenedProject"].ToString());
@@ -158,7 +163,7 @@ namespace TCPDevice
                     ServerData.ScrollToEnd();
                 });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 MessageBox.Show("Не удалось отправить команду!\nПроверьте подключение!");
             }
@@ -167,8 +172,8 @@ namespace TCPDevice
         {
             try
             {
-                Port.Write(Data);
-                ComData.Text += $"Клиент {System.DateTime.Now}: " + Data + "\n";
+                Port.Write(Data+"\r\n");
+                ComData.Text += $"Клиент {System.DateTime.Now.ToLongTimeString()}: " + Data + "\n";
                 ComData.ScrollToEnd();
             }
             catch (Exception ex)
@@ -202,6 +207,11 @@ namespace TCPDevice
             Command Input = new Command { CMD = DemoCommandInput.Text, TMR = DemoTimerInput.Text };
             Commands.Add(Input);
         }
+        private void AddCommandCom_Click(object sender, RoutedEventArgs e)
+        {
+            Command Input = new Command { CMD = DemoCommandInputCom.Text, TMR = DemoTimerInputCom.Text };
+            CommandsSerial.Add(Input);
+        }
         private void AddTab_Click(object sender, RoutedEventArgs e)
         {
             Saved = false;
@@ -214,19 +224,38 @@ namespace TCPDevice
             try
             {
                 TimerIntervals.Clear();
-                for (int ItemId = 0; ItemId < Commands.Count; ItemId++)
-                {
-                    TimerIntervals.Add(int.Parse(Commands[ItemId].TMR));
+                Button BT = sender as Button;
+                if (!BT.Name.Contains("Com")){
+                    for (int ItemId = 0; ItemId < Commands.Count; ItemId++)
+                    {
+                        TimerIntervals.Add(int.Parse(Commands[ItemId].TMR));
+                    }
+                    PauseTime = new System.Timers.Timer();
+                    PauseTime.Elapsed += PauseTime_Elapsed;
+                    SendData(Commands[CurrentTimerInterval].CMD);
+                    PauseTime.Interval = TimerIntervals[0];
+                    DemoCommandList.SelectedItem = DemoCommandList.Items[0];
+                    PauseTime.Start();
+                    TimersElapsed.Start();
+                    DispTimer.Tick += DispTimer_Tick;
+                    DispTimer.Start();
                 }
-                PauseTime = new System.Timers.Timer();
-                PauseTime.Elapsed += PauseTime_Elapsed;
-                SendData(Commands[CurrentTimerInterval].CMD);
-                PauseTime.Interval = TimerIntervals[0];
-                DemoCommandList.SelectedItem = DemoCommandList.Items[0];
-                PauseTime.Start();
-                TimersElapsed.Start();
-                DispTimer.Tick += DispTimer_Tick;
-                DispTimer.Start();
+                else
+                {
+                    for (int ItemId = 0; ItemId < Commands.Count; ItemId++)
+                    {
+                        TimerIntervals.Add(int.Parse(CommandsSerial[ItemId].TMR));
+                    }
+                    PauseTime = new System.Timers.Timer();
+                    PauseTime.Elapsed += PauseTimeCom_Elapsed;
+                    SendDataCom(Commands[CurrentTimerInterval].CMD, PortTracker.GetPort(PortNumber.SelectedItem.ToString()));
+                    PauseTime.Interval = TimerIntervals[0];
+                    DemoCommandList.SelectedItem = DemoCommandList.Items[0];
+                    PauseTime.Start();
+                    TimersElapsed.Start();
+                    DispTimer.Tick += DispTimer_Tick;
+                    DispTimer.Start();
+                }
             }
             catch (Exception)
             {
@@ -244,7 +273,6 @@ namespace TCPDevice
             {
                 System.Windows.Application.Current.Dispatcher.Invoke(() =>
                 {
-
                     if (CurrentTimerInterval >= TimerIntervals.Count - 1)
                     {
                         CurrentTimerInterval = 0;
@@ -254,6 +282,33 @@ namespace TCPDevice
                         CurrentTimerInterval++;
                     }
                     SendData(Commands[CurrentTimerInterval].CMD);
+                    PauseTime.Interval = TimerIntervals[CurrentTimerInterval];
+                    DemoCommandList.SelectedItem = DemoCommandList.Items[CurrentTimerInterval];
+                    TimersElapsed.Restart();
+                });
+            }
+            catch (Exception ex)
+            {
+                PauseTime.Stop();
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void PauseTimeCom_Elapsed(object? sender, ElapsedEventArgs e)
+        {
+            try
+            {
+                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                {
+                    if (CurrentTimerInterval >= TimerIntervals.Count - 1)
+                    {
+                        CurrentTimerInterval = 0;
+                    }
+                    else
+                    {
+                        CurrentTimerInterval++;
+                    }
+                    SendDataCom(Commands[CurrentTimerInterval].CMD, PortTracker.GetPort(PortNumber.SelectedItem.ToString()));
                     PauseTime.Interval = TimerIntervals[CurrentTimerInterval];
                     DemoCommandList.SelectedItem = DemoCommandList.Items[CurrentTimerInterval];
                     TimersElapsed.Restart();
@@ -278,22 +333,52 @@ namespace TCPDevice
                 MessageBox.Show(ex.Message + "\n" + Commands.Count.ToString() + "\n" + Buttons.Count.ToString());
             }
         }
+        private void DeleteItemCom_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Button? Self = sender as Button;
+                CommandsSerial.RemoveAt(ButtonsSerial.IndexOf(Self));
+                ButtonsSerial.RemoveAt(ButtonsSerial.IndexOf(Self));
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + "\n" + CommandsSerial.Count.ToString() + "\n" + ButtonsSerial.Count.ToString());
+            }
+        }
         private void DeleteItem_Initialized(object sender, EventArgs e)
         {
             Button? button = sender as Button;
             Buttons.Add(button);
         }
+        private void DeleteItemCom_Initialized(object sender, EventArgs e)
+        {
+            Button? button = sender as Button;
+            ButtonsSerial.Add(button);
+        }
         private void TimerStop_Click(object sender, RoutedEventArgs e)
         {
             try
             {
+                Button? BT = sender as Button;
                 PauseTime.Stop();
-                PauseTime.Elapsed -= PauseTime_Elapsed;
+                if (!BT.Name.Contains("Com"))
+                {
+                    PauseTime.Elapsed -= PauseTime_Elapsed;
+                    CommandGrid.IsEnabled = true;
+                    CommandGridCom.IsEnabled = true;
+                }
+                else
+                {
+                    PauseTime.Elapsed -= PauseTimeCom_Elapsed;
+                    CommandGridCom.IsEnabled = true;
+                    CommandGrid.IsEnabled = true;
+                }
                 CurrentTimerInterval = 0;
                 TimersElapsed.Reset();
                 DispTimer.Stop();
                 DispTimer.Tick -= DispTimer_Tick;
-                CommandGrid.IsEnabled = true;
+                
             }
             catch (Exception ex)
             {
@@ -321,14 +406,29 @@ namespace TCPDevice
                 List<string[]> Words = new List<string[]>();
                 StreamReader ImportFileStream = new StreamReader(Dial.FileName);
                 int i = 0;
-                Commands.Clear();
+                Button? BT = sender as Button;
+                if (!BT.Name.Contains("Com"))
+                {
+                    Commands.Clear();
+                }
+                else
+                {
+                    CommandsSerial.Clear();
+                }
                 while (!ImportFileStream.EndOfStream)
                 {
                     Words.Add(ImportFileStream.ReadLine().Split('\t'));
                     Command C = new Command();
                     C.CMD = $"{Words[i][0]}";
                     C.TMR = $"{Words[i][1]}";
-                    Commands.Add(C);
+                    if (!BT.Name.Contains("Com"))
+                    {
+                        Commands.Add(C);
+                    }
+                    else
+                    {
+                        CommandsSerial.Add(C);
+                    }
                     i++;
                 }
                 MessageBox.Show("Импорт выполнен успешно");
@@ -419,20 +519,13 @@ namespace TCPDevice
             //<ScrollViewer x:Name="Viewer" Grid.Row="1" Grid.ColumnSpan="4" HorizontalScrollBarVisibility="Visible">
             SV.Name = "Viewer";
             SV.HorizontalScrollBarVisibility = ScrollBarVisibility.Visible;
-            if (Type == 1)
-            {
-                SV.Background = new SolidColorBrush(Color.FromRgb(0xC9, 0xC9, 0xC9));
-            }
-            if (Type == 2)
-            {
-                SV.Background = new SolidColorBrush(Color.FromRgb(0xB9, 0xB9, 0xB9));
-            }
             Grid? GR = XamlReader.Parse(Lines[1]) as Grid;
             foreach (UIElement Child in GR.Children)
             {
                 if (Child.GetType() == typeof(Button))
                 {
                     Button? BT = Child as Button;
+
                     BT.Click += (sender, e) =>
                     {
                         int Index = Grid.GetRow(BT);
@@ -547,11 +640,13 @@ namespace TCPDevice
             SV.Content = GR;
             if (Type == 1)
             {
+                SV.Background = new SolidColorBrush(Color.FromRgb(0xC9, 0xC9, 0xC9));
                 DeviceTab.Content = SV;
                 DeviceTab.Header = "Устройство";
             }
             else
             {
+                SV.Background = new SolidColorBrush(Color.FromRgb(0xB9, 0xB9, 0xB9));
                 DeviceTabCom.Content = SV;
                 DeviceTabCom.Header = "Устройство";
                 string[] LoadedPorts = Lines[2].Split("/");
@@ -572,8 +667,16 @@ namespace TCPDevice
                 {
                     Item.DataReceived += (sender, e) =>
                     {
-                        SerialPort? SP = sender as SerialPort;
-                        ComDataRecieve(SP, SP.ReadExisting());
+                        try
+                        {
+                            SerialPort? SP = sender as SerialPort;
+                            //SP.ReadTo("-->");
+                            ComDataRecieve(SP, SP.ReadTo("-->"));
+                        }
+                        catch (Exception ex)
+                        {
+                            ComData.Text += "Сервер" + System.DateTime.Now.ToLongTimeString() + $": {ex.Message}\n";
+                        }
                     };
                 }
             }
@@ -693,7 +796,7 @@ namespace TCPDevice
                 }
                 SFD.Reset();
             }
-            catch (System.Exception ex)
+            catch (System.Exception)
             {
             }
         }
@@ -772,14 +875,18 @@ namespace TCPDevice
         {
             this.Dispatcher.Invoke(() =>
             {
-                ComData.Text += $"{PortNumber.SelectedItem} " + System.DateTime.Now.ToLongTimeString() + ": " + Data;
+                Data = Data.Replace("\r", " ").Replace("\n", "");
+                ComData.Text += $"{PortNumber.SelectedItem} " + System.DateTime.Now.ToLongTimeString() + ": " + Data + "\n";
+                ComData.ScrollToEnd();
             });
         }
         public void ComDataRecieve(SerialPort SP, string Data)
         {
             this.Dispatcher.Invoke(() =>
             {
-                ComData.Text += $"{SP.PortName} " + System.DateTime.Now.ToLongTimeString() + ": " + Data;
+                Data = Data.Replace("\r", " ").Replace("\n", "");
+                ComData.Text += $"{SP.PortName} " + System.DateTime.Now.ToLongTimeString() + ": " + Data + "\n";
+                ComData.ScrollToEnd();
             });
         }
         private void AddCom_Click(object sender, RoutedEventArgs e)

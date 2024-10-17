@@ -17,8 +17,8 @@
                 <MenuItem x:Name="Export" Header="Экспорт" Click="Export_Click"/>
                 <MenuItem x:Name="Import" Header="Импорт" Click="Import_Click"/>
             </MenuItem>
-            <MenuItem x:Name="AddAxisBttn" Header="Добавить Ось" Click="AddAxisBttn_Click"/>
-            <MenuItem x:Name="AddPropBttn" Header="Добавить Свойство" Click="AddPropBttn_Click"/>
+            <MenuItem x:Name="AddAxisBttn" Header="Добавить ось" Click="AddAxisBttn_Click"/>
+            <MenuItem x:Name="AddPropBttn" Header="Добавить свойство" Click="AddPropBttn_Click"/>
             <MenuItem x:Name="Completion" Header="Закончить" Click="Completion_Click"/>
         </Menu>
         <ScrollViewer x:Name="Viewer" Grid.Row="1" HorizontalScrollBarVisibility="Visible">
