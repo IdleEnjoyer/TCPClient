@@ -226,6 +226,21 @@ namespace TCPDevice
                 TimerIntervals.Clear();
                 Button BT = sender as Button;
                 if (!BT.Name.Contains("Com")){
+                    int Index = 0;
+                    foreach (UIElement Child in DemoCommandList.Children)
+                    {
+                        if (Child.GetType() == typeof(TextBox) && ((TextBox)Child).Name.Contains("CMD"))
+                        {
+                            TextBox? TB = Child as TextBox;
+                            Commands[Index].CMD = TB.ToString();
+                        }
+                        if (Child.GetType() == typeof(TextBox) && ((TextBox)Child).Name.Contains("CMD"))
+                        {
+                            TextBox? TB = Child as TextBox;
+                            Commands[Index].TMR = TB.ToString();
+                            Index++;
+                        }
+                    }
                     for (int ItemId = 0; ItemId < Commands.Count; ItemId++)
                     {
                         TimerIntervals.Add(int.Parse(Commands[ItemId].TMR));
@@ -242,18 +257,33 @@ namespace TCPDevice
                 }
                 else
                 {
-                    for (int ItemId = 0; ItemId < Commands.Count; ItemId++)
+                    int Index = 0;
+                    foreach (UIElement Child in DemoCommandListCom.Children)
+                    {
+                        if (Child.GetType() == typeof(TextBox) && ((TextBox)Child).Name.Contains("CMD"))
+                        {
+                            TextBox? TB = Child as TextBox;
+                            CommandsSerial[Index].CMD = TB.ToString();
+                        }
+                        if (Child.GetType() == typeof(TextBox) && ((TextBox)Child).Name.Contains("CMD"))
+                        {
+                            TextBox? TB = Child as TextBox;
+                            CommandsSerial[Index].TMR = TB.ToString();
+                            Index++;
+                        }
+                    }
+                    for (int ItemId = 0; ItemId < CommandsSerial.Count; ItemId++)
                     {
                         TimerIntervals.Add(int.Parse(CommandsSerial[ItemId].TMR));
                     }
                     PauseTime = new System.Timers.Timer();
                     PauseTime.Elapsed += PauseTimeCom_Elapsed;
-                    SendDataCom(Commands[CurrentTimerInterval].CMD, PortTracker.GetPort(PortNumber.SelectedItem.ToString()));
+                    SendDataCom(CommandsSerial[CurrentTimerInterval].CMD, PortTracker.GetPort(PortNumber.SelectedItem.ToString()));
                     PauseTime.Interval = TimerIntervals[0];
-                    DemoCommandList.SelectedItem = DemoCommandList.Items[0];
+                    DemoCommandListCom.SelectedItem = DemoCommandListCom.Items[0];
                     PauseTime.Start();
                     TimersElapsed.Start();
-                    DispTimer.Tick += DispTimer_Tick;
+                    DispTimer.Tick += DispTimerCom_Tick;
                     DispTimer.Start();
                 }
             }
@@ -266,6 +296,12 @@ namespace TCPDevice
         {
             int TimeElapsed = TimerIntervals[CurrentTimerInterval] - (int)TimersElapsed.Elapsed.TotalMilliseconds;
             TimerLabel.Content = $"{TimeSpan.FromMilliseconds(TimeElapsed).TotalSeconds:F3}";
+        }
+
+        private void DispTimerCom_Tick(object? sender, EventArgs e)
+        {
+            int TimeElapsed = TimerIntervals[CurrentTimerInterval] - (int)TimersElapsed.Elapsed.TotalMilliseconds;
+            TimerLabelCom.Content = $"{TimeSpan.FromMilliseconds(TimeElapsed).TotalSeconds:F3}";
         }
         private void PauseTime_Elapsed(object? sender, ElapsedEventArgs e)
         {
@@ -308,9 +344,9 @@ namespace TCPDevice
                     {
                         CurrentTimerInterval++;
                     }
-                    SendDataCom(Commands[CurrentTimerInterval].CMD, PortTracker.GetPort(PortNumber.SelectedItem.ToString()));
+                    SendDataCom(CommandsSerial[CurrentTimerInterval].CMD, PortTracker.GetPort(PortNumber.SelectedItem.ToString()));
                     PauseTime.Interval = TimerIntervals[CurrentTimerInterval];
-                    DemoCommandList.SelectedItem = DemoCommandList.Items[CurrentTimerInterval];
+                    DemoCommandListCom.SelectedItem = DemoCommandListCom.Items[CurrentTimerInterval];
                     TimersElapsed.Restart();
                 });
             }
@@ -660,7 +696,7 @@ namespace TCPDevice
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show(ex.Message);
+
                     }
                 }
                 foreach (SerialPort Item in PortTracker.FixedPorts)
@@ -895,6 +931,18 @@ namespace TCPDevice
             AddSerial NewTab = new AddSerial();
             NewTab.Owner = this;
             NewTab.Show();
+        }
+
+        private void Reconnect_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                PortTracker.GetPort(PortNumber.SelectedItem.ToString()).Open();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
     }
 }

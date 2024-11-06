@@ -233,6 +233,7 @@
                     <MenuItem Header="Порт:"/>
                     <ComboBox Name="PortNumber" SelectionChanged="PortNumber_SelectionChanged" ItemsSource="{Binding AvailablePorts}"/>
                     <MenuItem Name="PortOpened" Header="Открыт: "/>
+                    <MenuItem Name="Reconnect" Header="Подключиться" Click="Reconnect_Click"/>
                 </Menu>
             </Grid>
             <!--<Grid>
