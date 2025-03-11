@@ -68,11 +68,10 @@
                                 <ColumnDefinition Width="2*"/>
                             </Grid.ColumnDefinitions>
                             <Menu Height="25" VerticalAlignment="Top" Grid.ColumnSpan="4">
-                                <Button x:Name="TimerStart" Content="Старт" Click="TimerStart_Click" FontSize="14"/>
-                                <Button x:Name="TimerStop" Content="Стоп" Click="TimerStop_Click" FontSize="14"/>
-                                <Button x:Name="Import" Content="Импорт" Click="Import_Click" FontSize="14"/>
-                                <Button x:Name="Export" Content="Экспорт" Click="Export_Click" FontSize="14"/>
-
+                                <MenuItem x:Name="TimerStart" Header="Старт" Click="TimerStart_Click" FontSize="14"/>
+                                <MenuItem x:Name="TimerStop" Header="Стоп" Click="TimerStop_Click" FontSize="14"/>
+                                <MenuItem x:Name="Import" Header="Импорт" Click="Import_Click" FontSize="14"/>
+                                <MenuItem x:Name="Export" Header="Экспорт" Click="Export_Click" FontSize="14"/>
                             </Menu>
                             <Label x:Name="TimerLabel" Content="Время" FontSize="20" Grid.Row="1" Grid.ColumnSpan="4" HorizontalAlignment="Center" VerticalAlignment="Top"/>
                             <Grid x:Name="CommandGrid" Margin="20,40,20,10" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="4">
@@ -88,12 +87,12 @@
                                 <TextBox x:Name="DemoCommandInput" Height="20" Grid.Row="0" Grid.Column="0" />
                                 <TextBox x:Name="DemoTimerInput" Height="20" Grid.Row="0" Grid.Column="1" PreviewTextInput="TMR_PreviewTextInput"/>
                                 <Button x:Name="AddCommand" Height="20" Grid.Row="0" Grid.Column="2" Content="Добавить" Click="AddCommand_Click"/>
-                                <ListView x:Name="DemoCommandList" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" ItemsSource="{Binding Commands}">
+                                <ListView x:Name="DemoCommandList" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" ItemsSource="{Binding Commands}" d:ItemsSource="{d:SampleData ItemCount=5}">
                                     <ListView.ItemTemplate>
                                         <DataTemplate>
                                             <StackPanel x:Name="CMDList" Orientation="Horizontal">
-                                                <TextBox x:Name="CMD" Text="{Binding CMD}"/>
-                                                <TextBox x:Name="TMR" Text="{Binding TMR}" PreviewTextInput="TMR_PreviewTextInput"/>
+                                                <TextBox x:Name="CMD" Text="{Binding CMD, Mode=TwoWay}"/>
+                                                <TextBox x:Name="TMR" Text="{Binding TMR, Mode=TwoWay}" PreviewTextInput="TMR_PreviewTextInput"/>
                                                 <Button x:Name="DeleteItem" Content="✖" Click="DeleteItem_Click" Initialized="DeleteItem_Initialized"/>
                                             </StackPanel>
                                         </DataTemplate>
@@ -164,10 +163,10 @@
                                 <ColumnDefinition Width="2*"/>
                             </Grid.ColumnDefinitions>
                             <Menu Height="25" VerticalAlignment="Top" Grid.ColumnSpan="4">
-                                <Button x:Name="TimerStartCom" Content="Старт" Click="TimerStart_Click" FontSize="14"/>
-                                <Button x:Name="TimerStopCom" Content="Стоп" Click="TimerStop_Click" FontSize="14"/>
-                                <Button x:Name="ImportCom" Content="Импорт" Click="Import_Click" FontSize="14"/>
-                                <Button x:Name="ExportCom" Content="Экспорт" Click="Export_Click" FontSize="14"/>
+                                <MenuItem x:Name="TimerStartCom" Header="Старт" Click="TimerStart_Click" FontSize="14"/>
+                                <MenuItem x:Name="TimerStopCom" Header="Стоп" Click="TimerStop_Click" FontSize="14"/>
+                                <MenuItem x:Name="ImportCom" Header="Импорт" Click="Import_Click" FontSize="14"/>
+                                <MenuItem x:Name="ExportCom" Header="Экспорт" Click="Export_Click" FontSize="14"/>
                             </Menu>
                             <Label x:Name="TimerLabelCom" Content="Время" FontSize="20" Grid.Row="1" Grid.ColumnSpan="4" HorizontalAlignment="Center" VerticalAlignment="Top"/>
                             <Grid x:Name="CommandGridCom" Margin="20,40,20,10" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="4">
@@ -183,12 +182,12 @@
                                 <TextBox x:Name="DemoCommandInputCom" Height="20" Grid.Row="0" Grid.Column="0" />
                                 <TextBox x:Name="DemoTimerInputCom" Height="20" Grid.Row="0" Grid.Column="1" PreviewTextInput="TMR_PreviewTextInput"/>
                                 <Button x:Name="AddCommandCom" Height="20" Grid.Row="0" Grid.Column="2" Content="Добавить" Click="AddCommandCom_Click"/>
-                                <ListView x:Name="DemoCommandListCom" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" ItemsSource="{Binding CommandsSerial}">
+                                <ListView x:Name="DemoCommandListCom" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" ItemsSource="{Binding CommandsSerial}" d:ItemsSource="{d:SampleData ItemCount=5}">
                                     <ListView.ItemTemplate>
                                         <DataTemplate>
                                             <StackPanel x:Name="CMDListCom" Orientation="Horizontal">
-                                                <TextBox x:Name="CMDSerial" Text="{Binding CMD}"/>
-                                                <TextBox x:Name="TMRSerial" Text="{Binding TMR}" PreviewTextInput="TMR_PreviewTextInput"/>
+                                                <TextBox x:Name="CMDSerial" Text="{Binding CMD, Mode=TwoWay}"/>
+                                                <TextBox x:Name="TMRSerial" Text="{Binding TMR, Mode=TwoWay}" PreviewTextInput="TMR_PreviewTextInput"/>
                                                 <Button x:Name="DeleteItemCom" Content="✖" Click="DeleteItemCom_Click" Initialized="DeleteItemCom_Initialized"/>
                                             </StackPanel>
                                         </DataTemplate>

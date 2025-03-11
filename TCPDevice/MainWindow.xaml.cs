@@ -134,7 +134,8 @@ namespace TCPDevice
                             break;
                         }
                         string Data = Encoding.ASCII.GetString(Buffer, 0, BytesRead);
-                        ServerData.Text += "Сервер " + System.DateTime.Now.ToLongTimeString() + ": " + Data;
+                        Data = Data.Replace("\r", "").Replace("\n","");
+                        ServerData.Text += "Сервер " + System.DateTime.Now.ToLongTimeString() + ": " + Data + "\n";
                         ServerData.ScrollToEnd();
                     }
                     catch (IOException)
@@ -229,8 +230,9 @@ namespace TCPDevice
             try
             {
                 TimerIntervals.Clear();
-                Button? BT = sender as Button;
+                MenuItem? BT = sender as MenuItem;
                 if (!BT.Name.Contains("Com")){
+                    
                     foreach (Command Item in DemoCommandList.Items)
                     {
                         Commands[DemoCommandList.Items.IndexOf(Item)].CMD = Item.CMD;
@@ -380,7 +382,7 @@ namespace TCPDevice
         {
             try
             {
-                Button? BT = sender as Button;
+                MenuItem? BT = sender as MenuItem;
                 PauseTime.Stop();
                 if (!BT.Name.Contains("Com"))
                 {
@@ -426,7 +428,7 @@ namespace TCPDevice
                 List<string[]> Words = new();
                 StreamReader ImportFileStream = new(Dial.FileName);
                 int i = 0;
-                Button? BT = sender as Button;
+                MenuItem? BT = sender as MenuItem;
                 if (!BT.Name.Contains("Com"))
                 {
                     Commands.Clear();
