@@ -8,42 +8,6 @@
 		Title="MainWindow" Height="490" Width="800" Background="#FFC9C9C9"
         Closing="Window_Closing">
     <TabControl>
-        <TabItem Header="Подключение">
-            <Grid Background="#FFBDBDBD">
-                <Viewbox x:Name="ConnectionView" Grid.Row="1">
-                    <Grid x:Name="ConnectionGrid" HorizontalAlignment="Center" Height="325">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="3*"/>
-                            <RowDefinition Height="3*"/>
-                            <RowDefinition Height="3*"/>
-                            <RowDefinition Height="3*"/>
-                            <RowDefinition Height="1*"/>
-                            <RowDefinition Height="3*"/>
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="3*"/>
-                            <ColumnDefinition Width="4*"/>
-                        </Grid.ColumnDefinitions>
-
-                        <Label x:Name="ConnectionStatusLabel" Content="Соединение: " Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="24"/>
-                        <Label x:Name="ConnectionStatus" Content="Отключено" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" Foreground="Red"/>
-
-                        <Button x:Name="StartConnection" Content="Подключиться"  Grid.Row="5" Margin="10,10,10,10" FontSize="16" Click="StartConnection_Click"/>
-                        <Button x:Name="StopConnection" Content="Отключиться"  Grid.Column="1" Grid.Row="5" Width="164" Margin="10,10,10,10" FontSize="16" Click="StopConnection_Click"/>
-
-                        <Label x:Name="IPLabel" Content="IP:" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="24" Grid.Row="2" Height="40" Width="35"/>
-                        <TextBox x:Name="IPInput" TextWrapping="Wrap" Text="192.168.0.101" FontSize="24" TextAlignment="Justify" Grid.Row="2" Grid.Column="1" VerticalContentAlignment="Center" Margin="0,10,0,10"/>
-
-                        <TextBox x:Name="PortInput" TextWrapping="Wrap" Text="23" FontSize="24" TextAlignment="Justify" Grid.Column="1" Grid.Row="3" VerticalContentAlignment="Center" Margin="0,10,0,10"/>
-                        <Label x:Name="PortLabel" Content="Port:" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="24" Grid.Row="3" Height="42" Width="58"/>
-
-
-                        <Label x:Name="ConnectionLabel" Content="TCP Клиент: Демонстрации" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="22" Height="42" Grid.ColumnSpan="2" Width="282" HorizontalContentAlignment="Center"/>
-
-                    </Grid>
-                </Viewbox>
-            </Grid>
-        </TabItem>
         <TabItem Header="Ethernet">
             <Grid Background="#FFBDBDBD">
                 <Grid.RowDefinitions>
@@ -56,6 +20,38 @@
                 </Grid.ColumnDefinitions>
 
                 <TabControl x:Name="TabProgram" Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Background="Gray" Margin="0,25,0,0">
+                    <TabItem x:Name="ConnectionTCP" Header="Подключение">
+                        <Grid Background="#FFBDBDBD">
+                            <Viewbox x:Name="ConnectionView" Grid.Row="1">
+                                <Grid x:Name="ConnectionGrid" HorizontalAlignment="Center" Height="325">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="3*"/>
+                                        <RowDefinition Height="3*"/>
+                                        <RowDefinition Height="3*"/>
+                                        <RowDefinition Height="1*"/>
+                                        <RowDefinition Height="3*"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="3*"/>
+                                        <ColumnDefinition Width="4*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Label x:Name="ConnectionStatusLabel" Content="Соединение: " Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="24"/>
+                                    <Label x:Name="ConnectionStatus" Content="Отключено" Grid.Column="1" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" Foreground="Red"/>
+
+                                    <Button x:Name="StartConnection" Content="Подключиться"  Grid.Row="5" Margin="10,10,10,10" FontSize="16" Click="StartConnection_Click"/>
+                                    <Button x:Name="StopConnection" Content="Отключиться"  Grid.Column="1" Grid.Row="5" Width="164" Margin="10,10,10,10" FontSize="16" Click="StopConnection_Click"/>
+
+                                    <Label x:Name="IPLabel" Content="IP:" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="24" Grid.Row="1" Height="40" Width="35"/>
+                                    <TextBox x:Name="IPInput" TextWrapping="Wrap" Text="192.168.0.101" FontSize="24" TextAlignment="Justify" Grid.Row="1" Grid.Column="1" VerticalContentAlignment="Center" Margin="0,10,0,10"/>
+
+                                    <TextBox x:Name="PortInput" TextWrapping="Wrap" Text="23" FontSize="24" TextAlignment="Justify" Grid.Column="1" Grid.Row="2" VerticalContentAlignment="Center" Margin="0,10,0,10"/>
+                                    <Label x:Name="PortLabel" Content="Port:" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="24" Grid.Row="2" Height="42" Width="58"/>
+
+                                </Grid>
+                            </Viewbox>
+                        </Grid>
+                    </TabItem>
                     <TabItem x:Name="DeviceTab" Header="Добавить Устр-во">
                         <Button x:Name="AddTab" Width="200" Height="50" Content="Добавить проект" FontSize="20" Click="AddTab_Click" />
                     </TabItem>

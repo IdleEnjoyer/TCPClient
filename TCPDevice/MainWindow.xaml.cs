@@ -23,6 +23,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 #pragma warning disable CS8618
 #pragma warning disable CS8602
+#pragma warning disable CS8604
 
 namespace TCPDevice
 {
@@ -36,15 +37,17 @@ namespace TCPDevice
         private NetworkStream Stream;
         private byte[] ByteData;
         private System.Timers.Timer PauseTime;
-        private DispatcherTimer DispTimer = new DispatcherTimer();
-        private DispatcherTimer PortCheckTimer = new DispatcherTimer();
-        private Stopwatch TimersElapsed = new Stopwatch();
+        private DispatcherTimer DispTimer = new();
+        private DispatcherTimer PortCheckTimer = new();
+        private Stopwatch TimersElapsed = new();
         private int CurrentTimerInterval = 0;
-        private List<int> TimerIntervals = new List<int>();
+        private List<int> TimerIntervals = new();
         private string CurrentDevice = "";
         private string CurrentSerial = "";
         private bool Saved = true;
         public SerialPortTracker PortTracker;
+        [GeneratedRegex("[+-]?(\\d*\\.\\d+|\\d+\\.\\d*|\\d+)")]
+        private static partial Regex MyRegex();
 
         public MainWindow()
         {
@@ -204,19 +207,21 @@ namespace TCPDevice
         }
         private void AddCommand_Click(object sender, RoutedEventArgs e)
         {
-            Command Input = new Command { CMD = DemoCommandInput.Text, TMR = DemoTimerInput.Text };
+            Command Input = new() { CMD = DemoCommandInput.Text, TMR = DemoTimerInput.Text };
             Commands.Add(Input);
         }
         private void AddCommandCom_Click(object sender, RoutedEventArgs e)
         {
-            Command Input = new Command { CMD = DemoCommandInputCom.Text, TMR = DemoTimerInputCom.Text };
+            Command Input = new() { CMD = DemoCommandInputCom.Text, TMR = DemoTimerInputCom.Text };
             CommandsSerial.Add(Input);
         }
         private void AddTab_Click(object sender, RoutedEventArgs e)
         {
             Saved = false;
-            AddProjectWindow NewTab = new AddProjectWindow();
-            NewTab.Owner = this;
+            AddProjectWindow NewTab = new()
+            {
+                Owner = this
+            };
             NewTab.Show();
         }
         private void TimerStart_Click(object sender, RoutedEventArgs e)
@@ -224,22 +229,12 @@ namespace TCPDevice
             try
             {
                 TimerIntervals.Clear();
-                Button BT = sender as Button;
+                Button? BT = sender as Button;
                 if (!BT.Name.Contains("Com")){
-                    int Index = 0;
-                    foreach (UIElement Child in DemoCommandList.Children)
+                    foreach (Command Item in DemoCommandList.Items)
                     {
-                        if (Child.GetType() == typeof(TextBox) && ((TextBox)Child).Name.Contains("CMD"))
-                        {
-                            TextBox? TB = Child as TextBox;
-                            Commands[Index].CMD = TB.ToString();
-                        }
-                        if (Child.GetType() == typeof(TextBox) && ((TextBox)Child).Name.Contains("CMD"))
-                        {
-                            TextBox? TB = Child as TextBox;
-                            Commands[Index].TMR = TB.ToString();
-                            Index++;
-                        }
+                        Commands[DemoCommandList.Items.IndexOf(Item)].CMD = Item.CMD;
+                        Commands[DemoCommandList.Items.IndexOf(Item)].TMR = Item.TMR;
                     }
                     for (int ItemId = 0; ItemId < Commands.Count; ItemId++)
                     {
@@ -257,20 +252,10 @@ namespace TCPDevice
                 }
                 else
                 {
-                    int Index = 0;
-                    foreach (UIElement Child in DemoCommandListCom.Children)
+                    foreach (Command Item in DemoCommandListCom.Items)
                     {
-                        if (Child.GetType() == typeof(TextBox) && ((TextBox)Child).Name.Contains("CMD"))
-                        {
-                            TextBox? TB = Child as TextBox;
-                            CommandsSerial[Index].CMD = TB.ToString();
-                        }
-                        if (Child.GetType() == typeof(TextBox) && ((TextBox)Child).Name.Contains("CMD"))
-                        {
-                            TextBox? TB = Child as TextBox;
-                            CommandsSerial[Index].TMR = TB.ToString();
-                            Index++;
-                        }
+                        CommandsSerial[DemoCommandListCom.Items.IndexOf(Item)].CMD = Item.CMD;
+                        CommandsSerial[DemoCommandListCom.Items.IndexOf(Item)].TMR = Item.TMR;
                     }
                     for (int ItemId = 0; ItemId < CommandsSerial.Count; ItemId++)
                     {
@@ -297,7 +282,6 @@ namespace TCPDevice
             int TimeElapsed = TimerIntervals[CurrentTimerInterval] - (int)TimersElapsed.Elapsed.TotalMilliseconds;
             TimerLabel.Content = $"{TimeSpan.FromMilliseconds(TimeElapsed).TotalSeconds:F3}";
         }
-
         private void DispTimerCom_Tick(object? sender, EventArgs e)
         {
             int TimeElapsed = TimerIntervals[CurrentTimerInterval] - (int)TimersElapsed.Elapsed.TotalMilliseconds;
@@ -309,7 +293,7 @@ namespace TCPDevice
             {
                 System.Windows.Application.Current.Dispatcher.Invoke(() =>
                 {
-                    if (CurrentTimerInterval >= TimerIntervals.Count - 1)
+                    if(CurrentTimerInterval >= TimerIntervals.Count - 1)
                     {
                         CurrentTimerInterval = 0;
                     }
@@ -428,19 +412,19 @@ namespace TCPDevice
                 e.Handled = true;
             }
         }
-        private bool IsNumber(string text)
+        static private bool IsNumber(string text)
         {
-            Regex NumRegex = new Regex("[+-]?(\\d*\\.\\d+|\\d+\\.\\d*|\\d+)");
+            Regex NumRegex = MyRegex();
             return NumRegex.IsMatch(text);
         }
         private void Import_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                OpenFileDialog Dial = new OpenFileDialog();
+                OpenFileDialog Dial = new();
                 Dial.ShowDialog(this);
-                List<string[]> Words = new List<string[]>();
-                StreamReader ImportFileStream = new StreamReader(Dial.FileName);
+                List<string[]> Words = new();
+                StreamReader ImportFileStream = new(Dial.FileName);
                 int i = 0;
                 Button? BT = sender as Button;
                 if (!BT.Name.Contains("Com"))
@@ -454,9 +438,11 @@ namespace TCPDevice
                 while (!ImportFileStream.EndOfStream)
                 {
                     Words.Add(ImportFileStream.ReadLine().Split('\t'));
-                    Command C = new Command();
-                    C.CMD = $"{Words[i][0]}";
-                    C.TMR = $"{Words[i][1]}";
+                    Command C = new()
+                    {
+                        CMD = $"{Words[i][0]}",
+                        TMR = $"{Words[i][1]}"
+                    };
                     if (!BT.Name.Contains("Com"))
                     {
                         Commands.Add(C);
@@ -510,11 +496,13 @@ namespace TCPDevice
         {
             try
             {
-                SaveFileDialog SFD = new SaveFileDialog();
-                SFD.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory;
+                SaveFileDialog SFD = new()
+                {
+                    InitialDirectory = AppDomain.CurrentDomain.BaseDirectory
+                };
                 SFD.ShowDialog();
                 FileStream FS = File.Create(SFD.FileName);
-                StreamWriter SW = new StreamWriter(FS);
+                StreamWriter SW = new(FS);
 
                 foreach (Command Com in Commands)
                 {
@@ -551,10 +539,11 @@ namespace TCPDevice
                 Lines = CurrentSerial.Split("\t");
                 DeviceTabCom.Content = null;
             }
-            ScrollViewer SV = new ScrollViewer();
-            //<ScrollViewer x:Name="Viewer" Grid.Row="1" Grid.ColumnSpan="4" HorizontalScrollBarVisibility="Visible">
-            SV.Name = "Viewer";
-            SV.HorizontalScrollBarVisibility = ScrollBarVisibility.Visible;
+            ScrollViewer SV = new()
+            {
+                Name = "Viewer",
+                HorizontalScrollBarVisibility = ScrollBarVisibility.Visible
+            };
             Grid? GR = XamlReader.Parse(Lines[1]) as Grid;
             foreach (UIElement Child in GR.Children)
             {
@@ -585,7 +574,7 @@ namespace TCPDevice
                         {
                             NextTBIndex = GR.RowDefinitions.Count;
                         }
-                        List<TextBox> Inputs = new List<TextBox>();
+                        List<TextBox> Inputs = new();
                         foreach (UIElement TEMP in GR.Children)
                         {
                             if (Grid.GetRow(TEMP) >= LastTBIndex && Grid.GetRow(TEMP) < NextTBIndex && TEMP.GetType() == typeof(TextBox) && Grid.GetColumn(TEMP) == Grid.GetColumn(BT))
@@ -688,13 +677,13 @@ namespace TCPDevice
                 string[] LoadedPorts = Lines[2].Split("/");
                 foreach (string Item in LoadedPorts)
                 {
-                    SerialPort SP = new SerialPort(Item, 115200);
+                    SerialPort SP = new(Item, 115200);
                     try
                     {
                         PortTracker.FixedPorts.Add(SP);
                         PortTracker.FixedPorts.Last().Open();
                     }
-                    catch (Exception ex)
+                    catch
                     {
 
                     }
@@ -706,7 +695,6 @@ namespace TCPDevice
                         try
                         {
                             SerialPort? SP = sender as SerialPort;
-                            //SP.ReadTo("-->");
                             ComDataRecieve(SP, SP.ReadTo("-->"));
                         }
                         catch (Exception ex)
@@ -721,7 +709,7 @@ namespace TCPDevice
         {
             try
             {
-                OpenFileDialog OFD = new OpenFileDialog();
+                OpenFileDialog OFD = new();
                 MenuItem? MI = sender as MenuItem;
                 if (!MI.Name.Contains("Com"))
                 {
@@ -730,7 +718,7 @@ namespace TCPDevice
                     OFD.ShowDialog();
                     if (OFD.FileName != string.Empty)
                     {
-                        StreamReader SR = new StreamReader(OFD.FileName);
+                        StreamReader SR = new(OFD.FileName);
                         string XamlString = SR.ReadLine() + '\t' + SR.ReadLine();
                         App.Current.Properties["LastOpenedProject"] = XamlString;
                         CreateDevice(XamlString, 1);
@@ -744,7 +732,7 @@ namespace TCPDevice
                     OFD.ShowDialog();
                     if (OFD.FileName != string.Empty)
                     {
-                        StreamReader SR = new StreamReader(OFD.FileName);
+                        StreamReader SR = new(OFD.FileName);
                         string XamlString = SR.ReadLine() + '\t' + SR.ReadLine() + "\t" + SR.ReadLine();
                         App.Current.Properties["LastOpenedSerial"] = XamlString;
                         CreateDevice(XamlString, 2);
@@ -764,15 +752,19 @@ namespace TCPDevice
             MenuItem? MI = sender as MenuItem;
             if (!MI.Name.Contains("Com"))
             {
-                AddProjectWindow APW = new AddProjectWindow();
-                APW.Owner = this;
+                AddProjectWindow APW = new()
+                {
+                    Owner = this
+                };
                 APW.Show();
                 APW.ImportProject(App.Current.Properties["LastOpenedProject"].ToString());
             }
             else
             {
-                AddSerial AS = new AddSerial();
-                AS.Owner = this;
+                AddSerial AS = new()
+                {
+                    Owner = this
+                };
                 AS.Show();
                 AS.ImportProject(App.Current.Properties["LastOpenedSerial"].ToString());
             }
@@ -794,7 +786,7 @@ namespace TCPDevice
         {
             try
             {
-                SaveFileDialog SFD = new SaveFileDialog();
+                SaveFileDialog SFD = new();
                 if (Type == 1)
                 {
                     SFD.Filter = "Устройство (*.tesart)|*.tesart";
@@ -805,7 +797,7 @@ namespace TCPDevice
                         //string XAMLString = XamlWriter.Save(ProjectGrid);
                         //string FileName = $"Устройство_{DateTime.Today.Day}_{DateTime.Today.Month}_{DateTime.Today.Year}_{DateTime.Now.Hour}_{DateTime.Now.Minute}_{DateTime.Now.Second}.tesart";
                         FileStream FS = File.Create(SFD.FileName);
-                        StreamWriter SW = new StreamWriter(FS);
+                        StreamWriter SW = new(FS);
                         SW.Write(XamlString, 0, XamlString.Length);
                         App.Current.Properties["LastOpenedProject"] = XamlString;
                         SW.Close();
@@ -822,7 +814,7 @@ namespace TCPDevice
                         //string XAMLString = XamlWriter.Save(ProjectGrid);
                         //string FileName = $"Устройство_{DateTime.Today.Day}_{DateTime.Today.Month}_{DateTime.Today.Year}_{DateTime.Now.Hour}_{DateTime.Now.Minute}_{DateTime.Now.Second}.tesart";
                         FileStream FS = File.Create(SFD.FileName);
-                        StreamWriter SW = new StreamWriter(FS);
+                        StreamWriter SW = new(FS);
                         XamlString += $"\t{string.Join("/", PortTracker.FixedPorts.Select(x => x.PortName).ToArray())}";
                         SW.Write(XamlString, 0, XamlString.Length);
                         App.Current.Properties["LastOpenedSerial"] = XamlString;
@@ -928,8 +920,10 @@ namespace TCPDevice
         private void AddCom_Click(object sender, RoutedEventArgs e)
         {
             Saved = false;
-            AddSerial NewTab = new AddSerial();
-            NewTab.Owner = this;
+            AddSerial NewTab = new()
+            {
+                Owner = this
+            };
             NewTab.Show();
         }
 

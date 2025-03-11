@@ -12,13 +12,12 @@ namespace TCPDevice
         private ObservableCollection<string> ComPortsNames;
         private List<SerialPort> SerialPorts;
         public List<SerialPort> FixedPorts;
-        private string Data;
         private MainWindow owner;
         public SerialPortTracker(MainWindow MW)
         {
-            ComPortsNames = new ObservableCollection<string>();
-            SerialPorts = new List<SerialPort>();
-            FixedPorts = new List<SerialPort>();
+            ComPortsNames = new();
+            SerialPorts = new();
+            FixedPorts = new();
             owner = MW;
         }
 
@@ -36,7 +35,7 @@ namespace TCPDevice
                     }
                 }
             });
-            List<SerialPort> Deletion = new List<SerialPort>();
+            List<SerialPort> Deletion = new();
             foreach (SerialPort Port in SerialPorts)
             {
                 if (!ComPortsNames.Contains(Port.PortName))
@@ -45,14 +44,14 @@ namespace TCPDevice
                     Deletion.Add(Port);
                 }
             }
-            List<SerialPort> Addition = new List<SerialPort>();
+            List<SerialPort> Addition = new();
 
             foreach (string Name in ComPortsNames)
             {
 
                 if (!SerialPorts.Exists(x => x.PortName == Name))
                 {
-                    SerialPort Port = new SerialPort(Name, 115200);
+                    SerialPort Port = new(Name, 115200);
                     Port.DataReceived += Port_DataReceived;
                     Addition.Add(Port);
                 }

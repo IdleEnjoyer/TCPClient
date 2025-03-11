@@ -27,7 +27,7 @@ namespace TCPDevice
                 {
 
                     using (IsolatedStorageFileStream stream = storage.OpenFile(StorageFile, FileMode.Open, FileAccess.Read))
-                    using (StreamReader reader = new StreamReader(stream))
+                    using (StreamReader reader = new(stream))
                     {
                         //storage.Remove();
                         //this.Shutdown();
@@ -43,10 +43,12 @@ namespace TCPDevice
             }
             catch (DirectoryNotFoundException ex)
             {
+                MessageBox.Show(ex.Message);
                 // Path the file didn't exist
             }
             catch (IsolatedStorageException ex)
             {
+                MessageBox.Show(ex.Message);
                 // Storage was removed or doesn't exist
                 // -or-
                 // If using .NET 6+ the inner exception contains the real cause
@@ -59,7 +61,7 @@ namespace TCPDevice
             // Persist application-scope property to isolated storage
             IsolatedStorageFile storage = IsolatedStorageFile.GetUserStoreForDomain();
             using (IsolatedStorageFileStream stream = storage.OpenFile(StorageFile, FileMode.Create, FileAccess.Write))
-            using (StreamWriter writer = new StreamWriter(stream))
+            using (StreamWriter writer = new(stream))
             {
 
                 // Persist each application-scope property individually

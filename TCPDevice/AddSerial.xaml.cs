@@ -18,12 +18,11 @@ namespace TCPDevice
     /// </summary>
     public partial class AddSerial : Window
     {
-        Random rng = new Random();
+        Random rng = new();
         int AxisAmount = 1;
         int PropAmount = 1;
-        List<int> Amounts = new List<int>();
-        ObservableCollection<string> Ports = new ObservableCollection<string>();
-        DispatcherTimer PortCheck = new DispatcherTimer();
+        ObservableCollection<string> Ports = new();
+        DispatcherTimer PortCheck = new();
         public AddSerial()
         {
             InitializeComponent();
@@ -52,34 +51,44 @@ namespace TCPDevice
 
         private void AddChoice(int Column, int Row)
         {
-            ComboBox Choice = new ComboBox();
-            Choice.Height = 25;
-            Choice.Width = 100;
-            Choice.Name = $"Choice_{Column}_{Row}_{rng.Next()}";
-            Choice.VerticalAlignment = VerticalAlignment.Top;
+            ComboBox Choice = new()
+            {
+                Height = 25,
+                Width = 100,
+                Name = $"Choice_{Column}_{Row}_{rng.Next()}",
+                VerticalAlignment = VerticalAlignment.Top
+            };
             Choice.SelectionChanged += Choice_SelectionChanged;
             Grid.SetColumn(Choice, Column);
             Grid.SetRow(Choice, Row);
             ProjectGrid.Children.Add(Choice);
 
-            ComboBoxItem None = new ComboBoxItem();
-            None.Content = "Ничего";
-            None.Name = $"None_{Column}_{Row}_{rng.Next()}";
+            ComboBoxItem None = new()
+            {
+                Content = "Ничего",
+                Name = $"None_{Column}_{Row}_{rng.Next()}"
+            };
             Choice.Items.Add(None);
 
-            ComboBoxItem LabelItem = new ComboBoxItem();
-            LabelItem.Content = "Надпись";
-            LabelItem.Name = $"Label_{Column}_{Row}_{rng.Next()}";
+            ComboBoxItem LabelItem = new()
+            {
+                Content = "Надпись",
+                Name = $"Label_{Column}_{Row}_{rng.Next()}"
+            };
             Choice.Items.Add(LabelItem);
 
-            ComboBoxItem Button = new ComboBoxItem();
-            Button.Content = "Кнопка";
-            Button.Name = $"Button_{Column}_{Row}_{rng.Next()}";
+            ComboBoxItem Button = new()
+            {
+                Content = "Кнопка",
+                Name = $"Button_{Column}_{Row}_{rng.Next()}"
+            };
             Choice.Items.Add(Button);
 
-            ComboBoxItem Input = new ComboBoxItem();
-            Input.Content = "Поле ввода";
-            Input.Name = $"Input_{Column}_{Row}_{rng.Next()}";
+            ComboBoxItem Input = new()
+            {
+                Content = "Поле ввода",
+                Name = $"Input_{Column}_{Row}_{rng.Next()}"
+            };
             Choice.Items.Add(Input);
         }
 
@@ -90,39 +99,45 @@ namespace TCPDevice
             ProjectGrid.ColumnDefinitions.Add(new ColumnDefinition());
 
             //<TextBox x:Name="Axis" Text="ОСЬ 1" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Grid.Column="1" Grid.Row="0" FontSize="16" Margin="0,20,0,0" VerticalAlignment="Bottom" Height="25"/>
-            TextBox NewAxis = new TextBox();
-            NewAxis.Text = $"ОСЬ {AxisAmount}";
-            NewAxis.Height = 25;
-            NewAxis.VerticalAlignment = VerticalAlignment.Bottom;
-            NewAxis.FontSize = 16;
-            NewAxis.HorizontalContentAlignment = HorizontalAlignment.Center;
-            NewAxis.VerticalContentAlignment = VerticalAlignment.Center;
-            NewAxis.Name = $"AxisC{AxisAmount}";
+            TextBox NewAxis = new()
+            {
+                Text = $"ОСЬ {AxisAmount}",
+                Height = 25,
+                VerticalAlignment = VerticalAlignment.Bottom,
+                FontSize = 16,
+                HorizontalContentAlignment = HorizontalAlignment.Center,
+                VerticalContentAlignment = VerticalAlignment.Center,
+                Name = $"AxisC{AxisAmount}"
+            };
             Grid.SetColumn(NewAxis, AxisAmount);
             Grid.SetRow(NewAxis, 0);
             ProjectGrid.Children.Add(NewAxis);
 
             //<Button x:Name="RemoveAxis" Content="X" Grid.Column="1" Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Right" Height="25" Width="25" Click="RemoveAxis_Click"/>
-            Button Remove = new Button();
-            Remove.Name = $"RemoveAxis{AxisAmount}";
-            Remove.Content = "X";
-            Remove.VerticalAlignment = VerticalAlignment.Top;
-            Remove.HorizontalAlignment = HorizontalAlignment.Right;
-            Remove.Height = 25;
-            Remove.Width = 25;
+            Button Remove = new()
+            {
+                Name = $"RemoveAxis{AxisAmount}",
+                Content = "X",
+                VerticalAlignment = VerticalAlignment.Top,
+                HorizontalAlignment = HorizontalAlignment.Right,
+                Height = 25,
+                Width = 25
+            };
             Remove.Click += RemoveAxis_Click;
             Grid.SetColumn(Remove, AxisAmount);
             Grid.SetRow(Remove, 0);
             ProjectGrid.Children.Add(Remove);
 
             //< ComboBox x: Name = "SerialPort1" Grid.Column = "1" Grid.Row = "0" Height = "25" VerticalAlignment = "Top" Width = "60" HorizontalAlignment = "Left" />
-            ComboBox PortChoice = new ComboBox();
-            PortChoice.Name = $"SerialPort{AxisAmount}";
-            PortChoice.Height = 25;
-            PortChoice.Width = 60;
-            PortChoice.VerticalAlignment = VerticalAlignment.Top;
-            PortChoice.HorizontalAlignment = HorizontalAlignment.Left;
-            PortChoice.ItemsSource = Ports;
+            ComboBox PortChoice = new()
+            {
+                Name = $"SerialPort{AxisAmount}",
+                Height = 25,
+                Width = 60,
+                VerticalAlignment = VerticalAlignment.Top,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                ItemsSource = Ports
+            };
             Grid.SetColumn(PortChoice, AxisAmount);
             Grid.SetRow(PortChoice, 0);
             ProjectGrid.Children.Add(PortChoice);
@@ -141,56 +156,64 @@ namespace TCPDevice
             ProjectGrid.RowDefinitions.Add(new RowDefinition());
 
             //<TextBox x:Name="Prop" Text="СВОЙСТВО 1" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Grid.Column="0" Grid.Row="1" FontSize="14" HorizontalAlignment="Left" Margin="0,20,0,0" Width="95" VerticalAlignment="Bottom" Height="25"/>
-            TextBox NewProp = new TextBox();
-            NewProp.HorizontalAlignment = HorizontalAlignment.Left;
-            NewProp.VerticalAlignment = VerticalAlignment.Bottom;
-            NewProp.Width = 95;
-            NewProp.Height = 25;
-            NewProp.Text = $"СВОЙСТВО {PropAmount}";
-            NewProp.FontSize = 14;
-            NewProp.HorizontalContentAlignment = HorizontalAlignment.Center;
-            NewProp.VerticalContentAlignment = VerticalAlignment.Center;
-            NewProp.Name = $"Prop{PropAmount}";
+            TextBox NewProp = new()
+            {
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Bottom,
+                Width = 95,
+                Height = 25,
+                Text = $"СВОЙСТВО {PropAmount}",
+                FontSize = 14,
+                HorizontalContentAlignment = HorizontalAlignment.Center,
+                VerticalContentAlignment = VerticalAlignment.Center,
+                Name = $"Prop{PropAmount}"
+            };
             Grid.SetColumn(NewProp, 0);
             Grid.SetRow(NewProp, ProjectGrid.RowDefinitions.Count - 1);
             ProjectGrid.Children.Add(NewProp);
 
             //<Button x:Name="RemoveProp" Content="X" Grid.Column="0" Grid.Row="1" VerticalAlignment="Top" HorizontalAlignment="Right" Height="25" Width="25" Click="RemoveProp_Click"/>
-            Button Remove = new Button();
-            Remove.Height = 25;
-            Remove.Width = 25;
-            Remove.Name = $"RemoveProp{PropAmount}";
-            Remove.Content = "X";
-            Remove.VerticalAlignment = VerticalAlignment.Top;
-            Remove.HorizontalAlignment = HorizontalAlignment.Left;
+            Button Remove = new()
+            {
+                Height = 25,
+                Width = 25,
+                Name = $"RemoveProp{PropAmount}",
+                Content = "X",
+                VerticalAlignment = VerticalAlignment.Top,
+                HorizontalAlignment = HorizontalAlignment.Left
+            };
             Remove.Click += RemoveProp_Click;
             Grid.SetColumn(Remove, 0);
             Grid.SetRow(Remove, ProjectGrid.RowDefinitions.Count - 1);
             ProjectGrid.Children.Add(Remove);
 
             //<Button x:Name="Incr" Content ="+" Grid.Column="0" Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="25" Height="25" Margin="0,0,0,25" FontSize="16" Click="Incr_Click"/>
-            Button Increment = new Button();
-            Increment.Height = 25;
-            Increment.Width = 25;
-            Increment.Name = $"Incr{PropAmount}";
-            Increment.Content = "+";
-            Increment.VerticalAlignment = VerticalAlignment.Top;
-            Increment.HorizontalAlignment = HorizontalAlignment.Right;
-            Increment.FontSize = 16;
+            Button Increment = new()
+            {
+                Height = 25,
+                Width = 25,
+                Name = $"Incr{PropAmount}",
+                Content = "+",
+                VerticalAlignment = VerticalAlignment.Top,
+                HorizontalAlignment = HorizontalAlignment.Right,
+                FontSize = 16
+            };
             Increment.Click += Incr_Click;
             Grid.SetColumn(Increment, 0);
             Grid.SetRow(Increment, ProjectGrid.RowDefinitions.Count - 1);
             ProjectGrid.Children.Add(Increment);
 
             //<Button x:Name="Decr" Content ="-" Grid.Column="0" Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Bottom"  Width="25" Height="25"  FontSize="16" Click="Decr_Click"/>
-            Button Decrement = new Button();
-            Decrement.Height = 25;
-            Decrement.Width = 25;
-            Decrement.Name = $"Decr{PropAmount}";
-            Decrement.Content = "-";
-            Decrement.VerticalAlignment = VerticalAlignment.Bottom;
-            Decrement.HorizontalAlignment = HorizontalAlignment.Right;
-            Decrement.FontSize = 16;
+            Button Decrement = new()
+            {
+                Height = 25,
+                Width = 25,
+                Name = $"Decr{PropAmount}",
+                Content = "-",
+                VerticalAlignment = VerticalAlignment.Bottom,
+                HorizontalAlignment = HorizontalAlignment.Right,
+                FontSize = 16
+            };
             Decrement.Click += Decr_Click;
             Grid.SetColumn(Decrement, 0);
             Grid.SetRow(Decrement, ProjectGrid.RowDefinitions.Count - 1);
@@ -213,11 +236,13 @@ namespace TCPDevice
                     ComboBoxItem? Prev = e.RemovedItems[0] as ComboBoxItem;
                     if (!Prev.Name.Contains("Button") && !Prev.Name.Contains("Label"))
                     {
-                        TextBox TB = new TextBox();
-                        TB.Name = $"Command_{Grid.GetColumn(Choice)}_{Grid.GetRow(Choice)}";
-                        TB.Width = 100;
-                        TB.Height = 25;
-                        TB.VerticalAlignment = VerticalAlignment.Bottom;
+                        TextBox TB = new()
+                        {
+                            Name = $"Command_{Grid.GetColumn(Choice)}_{Grid.GetRow(Choice)}",
+                            Width = 100,
+                            Height = 25,
+                            VerticalAlignment = VerticalAlignment.Bottom
+                        };
                         Grid.SetColumn(TB, Grid.GetColumn(Choice));
                         Grid.SetRow(TB, Grid.GetRow(Choice));
                         ProjectGrid.Children.Add(TB);
@@ -225,11 +250,13 @@ namespace TCPDevice
                 }
                 else
                 {
-                    TextBox TB = new TextBox();
-                    TB.Name = $"Command_{Grid.GetColumn(Choice)}_{Grid.GetRow(Choice)}";
-                    TB.Width = 100;
-                    TB.Height = 25;
-                    TB.VerticalAlignment = VerticalAlignment.Bottom;
+                    TextBox TB = new()
+                    {
+                        Name = $"Command_{Grid.GetColumn(Choice)}_{Grid.GetRow(Choice)}",
+                        Width = 100,
+                        Height = 25,
+                        VerticalAlignment = VerticalAlignment.Bottom
+                    };
                     Grid.SetColumn(TB, Grid.GetColumn(Choice));
                     Grid.SetRow(TB, Grid.GetRow(Choice));
                     ProjectGrid.Children.Add(TB);
@@ -281,7 +308,7 @@ namespace TCPDevice
             {
                 Amount = ProjectGrid.RowDefinitions.Count - Index;
             }
-            List<UIElement> Chlist = new List<UIElement>();
+            List<UIElement> Chlist = new();
             for (int i = 0; i < ProjectGrid.Children.Count; i++)
             {
                 if (Grid.GetRow(ProjectGrid.Children[i]) >= Index && Grid.GetRow(ProjectGrid.Children[i]) < Index + Amount)
@@ -369,8 +396,8 @@ namespace TCPDevice
             }
             if ((NextIndex != Index + 1 || Last) && Index != ProjectGrid.RowDefinitions.Count - 1)
             {
-                List<UIElement> Deletion = new List<UIElement>();
-                List<UIElement> Move = new List<UIElement>();
+                List<UIElement> Deletion = new();
+                List<UIElement> Move = new();
                 foreach (UIElement Child in ProjectGrid.Children)
                 {
                     if (Grid.GetRow(Child) == NextIndex - 1 && NextIndex != Index)
@@ -398,7 +425,7 @@ namespace TCPDevice
 
         private void RemoveAxis_Click(object sender, RoutedEventArgs e)
         {
-            List<UIElement> Elems = new List<UIElement>();
+            List<UIElement> Elems = new();
             Button? BT = sender as Button;
             int Index = Grid.GetColumn(BT);
             foreach (UIElement Child in ProjectGrid.Children)
@@ -427,8 +454,8 @@ namespace TCPDevice
         bool FillCheck()
         {
             bool FilledOut = true;
-            List<UIElement> Check = new List<UIElement>();
-            List<UIElement> Delete = new List<UIElement>();
+            List<UIElement> Check = new();
+            List<UIElement> Delete = new();
             foreach (UIElement Child in ProjectGrid.Children)
             {
                 if (Child.GetType() == typeof(TextBox))
@@ -450,9 +477,11 @@ namespace TCPDevice
 
                     if (CB.SelectedIndex == -1)
                     {
-                        Border BD = new Border();
-                        BD.BorderBrush = Brushes.Red;
-                        BD.BorderThickness = new Thickness(2);
+                        Border BD = new()
+                        {
+                            BorderBrush = Brushes.Red,
+                            BorderThickness = new Thickness(2)
+                        };
                         Grid.SetColumn(BD, Grid.GetColumn(CB));
                         Grid.SetRow(BD, Grid.GetRow(CB));
                         Check.Add(BD);
@@ -482,7 +511,7 @@ namespace TCPDevice
                         {
                             NextTBIndex = ProjectGrid.RowDefinitions.Count;
                         }
-                        List<UIElement> ComboBoxes = new List<UIElement>();
+                        List<UIElement> ComboBoxes = new();
                         foreach (UIElement TEMP in ProjectGrid.Children)
                         {
                             if (Grid.GetRow(TEMP) >= LastTBIndex && Grid.GetRow(TEMP) < NextTBIndex && TEMP.GetType() == typeof(ComboBox) && Grid.GetColumn(TEMP) == Grid.GetColumn(CB))
@@ -529,7 +558,7 @@ namespace TCPDevice
                         {
                             if (!((MainWindow)this.Owner).PortTracker.FixedPorts.Select(x => x.PortName).ToArray().Contains(CB.SelectedItem.ToString()))
                             {
-                                SerialPort SP = new SerialPort(CB.SelectedItem.ToString(), 115200);
+                                SerialPort SP = new(CB.SelectedItem.ToString(), 115200);
                                 if (!SP.IsOpen)
                                 {
                                     SP.Open();
@@ -539,9 +568,11 @@ namespace TCPDevice
                         }
                         else
                         {
-                            Border BD = new Border();
-                            BD.BorderBrush = Brushes.Red;
-                            BD.BorderThickness = new Thickness(2);
+                            Border BD = new()
+                            {
+                                BorderBrush = Brushes.Red,
+                                BorderThickness = new Thickness(2)
+                            };
                             Grid.SetColumn(BD, Grid.GetColumn(CB));
                             Grid.SetRow(BD, Grid.GetRow(CB));
                             Check.Add(BD);
@@ -586,8 +617,8 @@ namespace TCPDevice
                     }
                     ((MainWindow)this.Owner).PortTracker.FixedPorts.Clear();
                     string XamlString = XamlWriter.Save(ProjectGrid) + '\t';
-                    List<UIElement> Deletion = new List<UIElement>();
-                    List<UIElement> Addition = new List<UIElement>();
+                    List<UIElement> Deletion = new();
+                    List<UIElement> Addition = new();
                     for (int i = 0; i < ProjectGrid.Children.Count; i++)
                     {
                         UIElement Child = ProjectGrid.Children[i];
@@ -599,12 +630,14 @@ namespace TCPDevice
                         {
                             Deletion.Add(Child);
                             TextBox? TB = Child as TextBox;
-                            Label Replace = new Label();
-                            Replace.Name = TB.Name;
-                            Replace.Content = TB.Text;
-                            Replace.FontSize = 16;
-                            Replace.HorizontalAlignment = HorizontalAlignment.Center;
-                            Replace.VerticalAlignment = VerticalAlignment.Center;
+                            Label Replace = new()
+                            {
+                                Name = TB.Name,
+                                Content = TB.Text,
+                                FontSize = 16,
+                                HorizontalAlignment = HorizontalAlignment.Center,
+                                VerticalAlignment = VerticalAlignment.Center
+                            };
                             Grid.SetColumn(Replace, Grid.GetColumn(TB));
                             Grid.SetRow(Replace, Grid.GetRow(TB));
                             Addition.Add(Replace);
@@ -620,11 +653,13 @@ namespace TCPDevice
                             if (CBI.Name.Contains("Input"))
                             {
                                 Deletion.Add(Child);
-                                TextBox Input = new TextBox();
-                                Input.Name = CBI.Name;
-                                Input.VerticalAlignment = VerticalAlignment.Center;
-                                Input.FontSize = 16;
-                                Input.Text = "1.0";
+                                TextBox Input = new()
+                                {
+                                    Name = CBI.Name,
+                                    VerticalAlignment = VerticalAlignment.Center,
+                                    FontSize = 16,
+                                    Text = "1.0"
+                                };
                                 Input.Resources.Add("First", " ");
                                 Input.Resources.Add("Second", " ");
                                 Grid.SetColumn(Input, Grid.GetColumn(CB));
@@ -634,12 +669,14 @@ namespace TCPDevice
                             if (CBI.Name.Contains("Button"))
                             {
                                 Deletion.Add(CB);
-                                Button Command = new Button();
-                                Command.Name = CBI.Name;
-                                Command.Width = 100;
-                                Command.VerticalAlignment = VerticalAlignment.Center;
-                                Command.HorizontalAlignment = HorizontalAlignment.Center;
-                                Command.FontSize = 16;
+                                Button Command = new()
+                                {
+                                    Name = CBI.Name,
+                                    Width = 100,
+                                    VerticalAlignment = VerticalAlignment.Center,
+                                    HorizontalAlignment = HorizontalAlignment.Center,
+                                    FontSize = 16
+                                };
                                 foreach (UIElement TEMP in ProjectGrid.Children)
                                 {
                                     if (TEMP.GetType() == typeof(TextBox) && Grid.GetRow(TEMP) == Grid.GetRow(CB) && Grid.GetColumn(TEMP) == Grid.GetColumn(CB))
@@ -659,8 +696,10 @@ namespace TCPDevice
                             {
 
                                 Deletion.Add(CB);
-                                Label L = new Label();
-                                L.Name = CBI.Name;
+                                Label L = new()
+                                {
+                                    Name = CBI.Name
+                                };
                                 foreach (UIElement TEMP in ProjectGrid.Children)
                                 {
                                     if (TEMP.GetType() == typeof(TextBox) && Grid.GetRow(TEMP) == Grid.GetRow(CB) && Grid.GetColumn(TEMP) == Grid.GetColumn(CB))
@@ -683,7 +722,7 @@ namespace TCPDevice
                         {
                             Deletion.Add(Child);
                             ComboBox? CB = Child as ComboBox;
-                            SerialPort SP = new SerialPort(CB.SelectedItem.ToString(), 115200);
+                            SerialPort SP = new(CB.SelectedItem.ToString(), 115200);
                             if (!SP.IsOpen)
                             {
                                 SP.Open();
@@ -724,14 +763,17 @@ namespace TCPDevice
                 if (FillCheck())
                 {
                     string XAMLString = XamlWriter.Save(ProjectGrid);
-                    SaveFileDialog SFD = new SaveFileDialog();
-                    SFD.DefaultExt = ".proj";
-                    SFD.Filter = "Устройство (*.comproj)|*.comproj";
+                    SaveFileDialog SFD = new()
+                    {
+                        DefaultExt = ".proj",
+                        Filter = "Устройство (*.comproj)|*.comproj"
+                    };
                     SFD.ShowDialog(this);
                     if (SFD.FileName != null)
                     {
                         FileStream FS = File.Create(SFD.FileName);
-                        StreamWriter SW = new StreamWriter(FS);
+                        StreamWriter streamWriter = new(FS);
+                        StreamWriter SW = streamWriter;
                         SW.Write(XAMLString, 0, XAMLString.Length);
                         SW.Close();
                         FS.Close();
@@ -753,13 +795,15 @@ namespace TCPDevice
         {
             try
             {
-                OpenFileDialog OFD = new OpenFileDialog();
-                OFD.Filter = "Устройство (*.proj)|*.proj";
+                OpenFileDialog OFD = new()
+                {
+                    Filter = "Устройство (*.proj)|*.proj"
+                };
                 OFD.ShowDialog();
                 if (OFD.FileName != null)
                 {
                     FileStream FS = File.OpenRead(OFD.FileName);
-                    StreamReader SR = new StreamReader(FS);
+                    StreamReader SR = new(FS);
                     string XamlImport = SR.ReadLine().Split('\t')[0];
                     //string XamlImport = XamlString.Split('\n')[1];
                     Grid? Import = XamlReader.Parse(XamlImport) as Grid;
