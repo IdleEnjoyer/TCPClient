@@ -17,6 +17,8 @@ using System.Configuration;
 using System.Net;
 using System.Windows.Markup;
 using System.IO;
+using static System.Net.Mime.MediaTypeNames;
+using System.Windows.Threading;
 
 namespace TCPDevice
 {
@@ -25,115 +27,72 @@ namespace TCPDevice
     /// </summary>
     public partial class MainWindow : Window
     {
-        private TcpClient Client;
-        private NetworkStream Stream;
-        private byte[] ByteData;
-        private string DataString;
+        private TcpClient Client_OPU1;
+		private TcpClient Client_OPU2;
+		private NetworkStream Stream_OPU1;
+		private NetworkStream Stream_OPU2;
+		private float[] OPU1_LowerLimits;
+		private float[] OPU1_UpperLimits;
+		private float[] OPU1_SpeedLimits = { 10.0f, 10.0f, 10.0f, 10.0f };
+		private float[] OPU2_LowerLimits;
+		private float[] OPU2_UpperLimits;
+		private float[] OPU2_SpeedLimits = { 10.0f, 10.0f, 10.0f, 10.0f };
+		private DispatcherTimer OPU1_StatusTimer;
+		private byte[] WriteByteData;
+		public string Axis = "";
         public MainWindow()
         {
             InitializeComponent();
-        }
+		}
 
-        private async void StartConnection_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                IPAddress Address = IPAddress.Parse(IPInput.Text);
-                int Port = int.Parse(PortInput.Text);
+		public void SendCommand(string Com)
+		{
+			if (Client_OPU1.Connected)
+			{
+				WriteByteData = Encoding.UTF8.GetBytes("^" + Com + "\r\r");
+				Stream_OPU1.Write(WriteByteData, 0, WriteByteData.Length);
+			}
+		}
+		
+		
 
-                Client = new TcpClient(Address.ToString(), Port);
-                Stream = Client.GetStream();
+		private void OPU1_Connect_Click(object sender, RoutedEventArgs e)
+		{
+			//IPAddress Address = IPAddress.Parse("192.168.0.101");
+			//int Port = 2000;
+			//Client_OPU1 = new TcpClient(Address.ToString(), Port);
+			//Stream_OPU1 = Client_OPU1.GetStream();
+			if (Client_OPU1.Connected)
+			{
+				OPU1_ConnectStatus.Fill = Brushes.Green;
+			}
+			else
+			{
+				OPU1_ConnectStatus.Fill = Brushes.Red;
+			}
+		}
 
-                ConnectionStatus.Content = "Connected!";
-                ConnectionStatus.Foreground = Brushes.Green;
+		private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+		{
 
-                await StartReadingDataAsync();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            }
-        }
+		}
 
-        private void StopConnection_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                Client.Close();
-                ConnectionStatus.Content = "Disconnected";
-                ConnectionStatus.Foreground = Brushes.Red;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
+		private void OPU1_Power_Click(object sender, RoutedEventArgs e)
+		{
+			SendCommand("EN");
+		}
 
-        private void SendData_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                if (!DataField.Text.Contains(EndSymbol.Text))
-                {
-                    DataString += DataField.Text;
-                    MessageBox.Show("Text added");
-                }
-                else
-                {
-                    if (Client.Connected)
-                    {
-                        DataString += DataField.Text.Split(EndSymbol.Text)[0];
-                        ByteData = System.Text.Encoding.ASCII.GetBytes(DataString);
-                        Stream.Write(ByteData, 0, ByteData.Length);
-                        DataString = string.Empty;
-                        MessageBox.Show("Data sent");
-                    }
-                    else
-                    {
-                        MessageBox.Show("Couldn't send data. Retry connection and try again.");
-                    }
+		private void OPU1_Home_Click(object sender, RoutedEventArgs e)
+		{
+			SendCommand("FH");
+		}
 
-                }
-                DataField.Text = string.Empty;
-
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-        private void ShowData_Click(object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show(DataString, "Current data");
-        }
-
-        private async Task StartReadingDataAsync()
-        {
-            byte[] Buffer = new byte[1024];
-            while (Client.Connected)
-            {
-                try
-                {
-                    int BytesRead = await Stream.ReadAsync(Buffer, 0, Buffer.Length);
-                    if (BytesRead == 0)
-                    {
-                        Client.Close();
-                        ConnectionStatus.Content = "Disconnected";
-                        ConnectionStatus.Foreground = Brushes.Red;
-                        MessageBox.Show("Server closed!", "Attention", MessageBoxButton.OK, MessageBoxImage.Exclamation);
-                        break;
-                    }
-                    string Data = Encoding.ASCII.GetString(Buffer, 0, BytesRead);
-                    ServerData.Text += "Server at " + System.DateTime.Now.ToString() + ": " + Data + "\n";
-                }
-                catch (IOException ex)
-                {
-                    MessageBox.Show(ex.Message, "huh");
-                    break;
-                }
-            }
-        }
-    }
+		private void OPU1_AzSetLim_Click(object sender, RoutedEventArgs e)
+		{
+			Axis = "A";
+			Window LimPopup = new PopupLimits();
+			LimPopup.Owner = this;
+			LimPopup.ShowDialog();
+		}
+	}
 }
