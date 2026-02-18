@@ -5,6 +5,23 @@
     <TargetFramework>net7.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
+    <Authors></Authors>
+    <ApplicationIcon>TESART.ico</ApplicationIcon>
+    <AssemblyName>SerPO</AssemblyName>
+    <Description>TESART Service PO</Description>
+    <Company>TESART</Company>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="TESART.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="TESART.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="TESART.png" />
+  </ItemGroup>
 
 </Project>

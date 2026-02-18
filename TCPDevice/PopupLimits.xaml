@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TCPDevice"
         mc:Ignorable="d"
-        Title="PopupLimits" Height="180" Width="320">
+        Title="Смена Лимитов" Height="180" Width="320" ResizeMode="NoResize" WindowStyle="ToolWindow" Background="#FFAAB4C8">
     <Grid>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="1*"/>
@@ -17,9 +17,27 @@
 			<ColumnDefinition Width="4*"/>
 		</Grid.ColumnDefinitions>
 		<Label Content="⤒" Grid.Row="0" Grid.Column="0" FontSize="35" HorizontalContentAlignment="Center"/>
-		<TextBox x:Name="UpperLim" Grid.Row="0" Grid.Column="1" Margin="0,5,10,5" FontSize="20" VerticalContentAlignment="Center"/>
+		<TextBox x:Name="UpperLim" Grid.Row="0" Grid.Column="1" Margin="0,5,10,0" FontSize="20" VerticalContentAlignment="Center">
+			<TextBox.Resources>
+				<Style TargetType="Border">
+					<Setter Property="CornerRadius" Value="10, 10, 0, 0"/>
+				</Style>
+			</TextBox.Resources>
+		</TextBox>
 		<Label Content="⤓" Grid.Row="1" Grid.Column="0" FontSize="35" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
-		<TextBox x:Name="LowerLim" Grid.Row="1" Grid.Column="1" Margin="0,5,10,5" FontSize="20" VerticalContentAlignment="Center"/>
-		<Button x:Name="Confirm" Content="ОК" Grid.Row="2" Grid.ColumnSpan="2" FontSize="20" Margin="20,10,20,10" Click="Confirm_Click"/>
+		<TextBox x:Name="LowerLim" Grid.Row="1" Grid.Column="1" Margin="0,0,10,5" FontSize="20" VerticalContentAlignment="Center">
+			<TextBox.Resources>
+				<Style TargetType="Border">
+					<Setter Property="CornerRadius" Value="0, 0, 10, 10"/>
+				</Style>
+			</TextBox.Resources>
+		</TextBox>
+		<Button x:Name="Confirm" Content="ОК" Grid.Row="2" Grid.ColumnSpan="2" FontSize="20" Margin="20,5,20,5" Foreground="#FFCFCFCF" Click="Confirm_Click" Style="{DynamicResource DefBtn}">
+			<Button.Resources>
+				<Style TargetType="Border">
+					<Setter Property="CornerRadius" Value="10"/>
+				</Style>
+			</Button.Resources>
+		</Button>
 	</Grid>
 </Window>

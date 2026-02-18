@@ -36,9 +36,8 @@ namespace TCPDevice
 					if (Down < Up)
 					{
 						MainWindow MW = this.Owner as MainWindow;
-						string Com = "SETLIM " + MW.Axis + " " + Down + " " + Up;
-						MW.SendCommand(Com);
-						//MessageBox.Show(Com);
+						string Com = "SETLIM " + MW.Axis_OPU1 + MW.Axis_OPU2 + " " + Down + " " + Up;
+						MW.SendCommand_OPU1(Com);
 						this.Close();
 					}
 				}
