@@ -6,153 +6,9 @@
         xmlns:local="clr-namespace:TCPDevice"
         mc:Ignorable="d"
 		Closing="Window_Closing"
-        Title="ТЕСАРТ Сервисное ПО" Height="720" Width="1280" Background="White" MinWidth="1074" MinHeight="624">
+        Title="ТЕСАРТ Сервисное ПО" Height="720" Width="1280" Background="White" MinWidth="1074" MinHeight="624" MouseMove="Window_MouseMove" MouseUp="Window_MouseUp" TouchMove="Window_TouchMove">
 	<Window.Resources>
-		<Style x:Key="FocusVisual">
-			<Setter Property="Control.Template">
-				<Setter.Value>
-					<ControlTemplate>
-						<Rectangle Margin="2" StrokeDashArray="1 2" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" SnapsToDevicePixels="true" StrokeThickness="1"/>
-					</ControlTemplate>
-				</Setter.Value>
-			</Setter>
-		</Style>
-		<Style x:Key="OptionMarkFocusVisual">
-			<Setter Property="Control.Template">
-				<Setter.Value>
-					<ControlTemplate>
-						<Rectangle Margin="14,0,0,0" StrokeDashArray="1 2" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" SnapsToDevicePixels="true" StrokeThickness="1"/>
-					</ControlTemplate>
-				</Setter.Value>
-			</Setter>
-		</Style>
-		<SolidColorBrush x:Key="RadioButton.Static.Background" Color="#FFFFFFFF"/>
-		<SolidColorBrush x:Key="RadioButton.Static.Border" Color="#FF707070"/>
-		<SolidColorBrush x:Key="RadioButton.Static.Glyph" Color="#FF212121"/>
-		<SolidColorBrush x:Key="RadioButton.MouseOver.Background" Color="#FFF3F9FF"/>
-		<SolidColorBrush x:Key="RadioButton.MouseOver.Border" Color="#FF5593FF"/>
-		<SolidColorBrush x:Key="RadioButton.MouseOver.Glyph" Color="#FF212121"/>
-		<SolidColorBrush x:Key="RadioButton.Pressed.Background" Color="#FFD9ECFF"/>
-		<SolidColorBrush x:Key="RadioButton.Pressed.Border" Color="#FF3C77DD"/>
-		<SolidColorBrush x:Key="RadioButton.Pressed.Glyph" Color="#FF212121"/>
-		<SolidColorBrush x:Key="RadioButton.Disabled.Background" Color="#FFE6E6E6"/>
-		<SolidColorBrush x:Key="RadioButton.Disabled.Border" Color="#FFBCBCBC"/>
-		<SolidColorBrush x:Key="RadioButton.Disabled.Glyph" Color="#FF707070"/>
-		<Style x:Key="DemoRadioButton" TargetType="{x:Type RadioButton}">
-			<Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
-			<Setter Property="Background" Value="{StaticResource RadioButton.Static.Background}"/>
-			<Setter Property="BorderBrush" Value="{StaticResource RadioButton.Static.Border}"/>
-			<Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
-			<Setter Property="BorderThickness" Value="1"/>
-			<Setter Property="Template">
-				<Setter.Value>
-					<ControlTemplate TargetType="{x:Type RadioButton}">
-						<Grid x:Name="templateRoot" Background="Transparent" SnapsToDevicePixels="True">
-							<Grid.ColumnDefinitions>
-								<ColumnDefinition Width="Auto"/>
-								<ColumnDefinition Width="*"/>
-							</Grid.ColumnDefinitions>
-							<Border x:Name="radioButtonBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="100" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="1,1,2,1" VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
-								<Grid x:Name="markGrid" Margin="2">
-									<Ellipse x:Name="optionMark" Fill="{StaticResource RadioButton.Static.Glyph}" Width="35" MinWidth="6" Height="35" MinHeight="6" Opacity="0"/>
-								</Grid>
-							</Border>
-							<ContentPresenter x:Name="contentPresenter" Grid.Column="1" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
-						</Grid>
-						<ControlTemplate.Triggers>
-							<Trigger Property="HasContent" Value="true">
-								<Setter Property="FocusVisualStyle" Value="{StaticResource OptionMarkFocusVisual}"/>
-								<Setter Property="Padding" Value="4,-1,0,0"/>
-							</Trigger>
-							<Trigger Property="IsMouseOver" Value="true">
-								<Setter Property="Background" TargetName="radioButtonBorder" Value="{StaticResource RadioButton.MouseOver.Background}"/>
-								<Setter Property="BorderBrush" TargetName="radioButtonBorder" Value="{StaticResource RadioButton.MouseOver.Border}"/>
-								<Setter Property="Fill" TargetName="optionMark" Value="{StaticResource RadioButton.MouseOver.Glyph}"/>
-							</Trigger>
-							<Trigger Property="IsEnabled" Value="false">
-								<Setter Property="Background" TargetName="radioButtonBorder" Value="{StaticResource RadioButton.Disabled.Background}"/>
-								<Setter Property="BorderBrush" TargetName="radioButtonBorder" Value="{StaticResource RadioButton.Disabled.Border}"/>
-								<Setter Property="Fill" TargetName="optionMark" Value="{StaticResource RadioButton.Disabled.Glyph}"/>
-							</Trigger>
-							<Trigger Property="IsPressed" Value="true">
-								<Setter Property="Background" TargetName="radioButtonBorder" Value="{StaticResource RadioButton.Pressed.Background}"/>
-								<Setter Property="BorderBrush" TargetName="radioButtonBorder" Value="{StaticResource RadioButton.Pressed.Border}"/>
-								<Setter Property="Fill" TargetName="optionMark" Value="{StaticResource RadioButton.Pressed.Glyph}"/>
-							</Trigger>
-							<Trigger Property="IsChecked" Value="true">
-								<Setter Property="Opacity" TargetName="optionMark" Value="1"/>
-							</Trigger>
-							<Trigger Property="IsChecked" Value="{x:Null}">
-								<Setter Property="Opacity" TargetName="optionMark" Value="0.56"/>
-							</Trigger>
-						</ControlTemplate.Triggers>
-					</ControlTemplate>
-				</Setter.Value>
-			</Setter>
-		</Style>
-		<SolidColorBrush x:Key="ProgressBar.Progress" Color="#FF06B025"/>
-		<SolidColorBrush x:Key="ProgressBar.Background" Color="#FFE6E6E6"/>
-		<SolidColorBrush x:Key="ProgressBar.Border" Color="#FFBCBCBC"/>
-		<Style x:Key="DemoProgressBar" TargetType="{x:Type ProgressBar}">
-			<Setter Property="Foreground" Value="{StaticResource ProgressBar.Progress}"/>
-			<Setter Property="Background" Value="{StaticResource ProgressBar.Background}"/>
-			<Setter Property="BorderBrush" Value="{StaticResource ProgressBar.Border}"/>
-			<Setter Property="BorderThickness" Value="1"/>
-			<Setter Property="Template">
-				<Setter.Value>
-					<ControlTemplate TargetType="{x:Type ProgressBar}">
-						<Grid x:Name="TemplateRoot">
-							<VisualStateManager.VisualStateGroups>
-								<VisualStateGroup x:Name="CommonStates">
-									<VisualState x:Name="Determinate"/>
-									<VisualState x:Name="Indeterminate">
-										<Storyboard RepeatBehavior="Forever">
-											<DoubleAnimationUsingKeyFrames Storyboard.TargetName="Animation" Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[0].(ScaleTransform.ScaleX)">
-												<EasingDoubleKeyFrame KeyTime="0" Value="0.25"/>
-												<EasingDoubleKeyFrame KeyTime="0:0:1" Value="0.25"/>
-												<EasingDoubleKeyFrame KeyTime="0:0:2" Value="0.25"/>
-											</DoubleAnimationUsingKeyFrames>
-											<PointAnimationUsingKeyFrames Storyboard.TargetName="Animation" Storyboard.TargetProperty="(UIElement.RenderTransformOrigin)">
-												<EasingPointKeyFrame KeyTime="0" Value="-0.5,0.5"/>
-												<EasingPointKeyFrame KeyTime="0:0:1" Value="0.5,0.5"/>
-												<EasingPointKeyFrame KeyTime="0:0:2" Value="1.5,0.5"/>
-											</PointAnimationUsingKeyFrames>
-										</Storyboard>
-									</VisualState>
-								</VisualStateGroup>
-							</VisualStateManager.VisualStateGroups>
-							<Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="30"/>
-							<Rectangle x:Name="PART_Track"/>
-							<Grid x:Name="PART_Indicator" ClipToBounds="true" HorizontalAlignment="Left">
-								<Rectangle x:Name="Indicator" Fill="{TemplateBinding Foreground}" RadiusX="30" RadiusY="30"/>
-								<Rectangle x:Name="Animation" Fill="{TemplateBinding Foreground}" RenderTransformOrigin="0.5,0.5" RadiusX="30" RadiusY="30">
-									<Rectangle.RenderTransform>
-										<TransformGroup>
-											<ScaleTransform/>
-											<SkewTransform/>
-											<RotateTransform/>
-											<TranslateTransform/>
-										</TransformGroup>
-									</Rectangle.RenderTransform>
-								</Rectangle>
-							</Grid>
-						</Grid>
-						<ControlTemplate.Triggers>
-							<Trigger Property="Orientation" Value="Vertical">
-								<Setter Property="LayoutTransform" TargetName="TemplateRoot">
-									<Setter.Value>
-										<RotateTransform Angle="-90"/>
-									</Setter.Value>
-								</Setter>
-							</Trigger>
-							<Trigger Property="IsIndeterminate" Value="true">
-								<Setter Property="Visibility" TargetName="Indicator" Value="Collapsed"/>
-							</Trigger>
-						</ControlTemplate.Triggers>
-					</ControlTemplate>
-				</Setter.Value>
-			</Setter>
-		</Style>
+		
 	</Window.Resources>
 	<TabControl x:Name="Control" Background="#FFAAB4C8">
 		<TabItem x:Name="Demo_Tab" Header="Демонастрация">
@@ -168,26 +24,28 @@
 					<ColumnDefinition Width="2*"/>
 				</Grid.ColumnDefinitions>
 				<GroupBox Grid.Row="1" Grid.Column="1">
-					<Grid >
-						<Canvas x:Name="Demo_Canvas" Background="#FF798CBB" Width="540" Height="450">
+					<Viewbox Margin="0,10,0,10" >
+						<Canvas x:Name="Demo_Canvas" Background="#FF798CBB" Width="540" Height="450" >
 							
 							
-							<Grid x:Name="Slider_X_Rect" Width="260" Height="210" Canvas.Left="130" Canvas.Top="110">
+							<Grid x:Name="Slider_X_Rect" Width="260" Height="210" Canvas.Left="10" Canvas.Top="115">
 								<Rectangle Fill="Black" Stroke="#FF3E3E3E" RadiusX="10" RadiusY="10"/>
 								<Rectangle Fill="Gray" Width="130"/>
 							</Grid>
 							
-							<Grid x:Name="Slider_Y_Rect" Width="260" Height="210" Canvas.Left="130" Canvas.Top="110">
+							<Grid x:Name="Slider_Y_Rect" Width="260" Height="210" Canvas.Left="10" Canvas.Top="10">
 								<Rectangle Fill="Black" RadiusX="10" RadiusY="10" Stroke="White"/>
 								<Rectangle Fill="#FF9A9A9A" Width="100" Height="70" />
 							</Grid>
 							
-							<Ellipse x:Name="Target_Pos_Point" Height="10" Width="10" Fill="White" Canvas.Left="0" Canvas.Top="0"/>
+							<Ellipse x:Name="Target_Pos_Point" Height="40" Width="40" Fill="White" Canvas.Left="120" Canvas.Top="95" Opacity="0.5" PreviewMouseLeftButtonDown="Target_Pos_Point_PreviewMouseLeftButtonDown" PreviewTouchDown="Target_Pos_Point_PreviewTouchDown"/>
+
+							<Rectangle Stroke="White" Opacity="0.8" Canvas.Left="120" Canvas.Top="95" Width="300" Height="260"/>
 						</Canvas>
-					</Grid>
+					</Viewbox>
 				</GroupBox>
-				<Slider x:Name="Vertical_Pos_Slider" Grid.Row="1" Grid.Column="0" Orientation="Vertical" HorizontalAlignment="Right" Cursor="ScrollNS" Maximum="2200" SmallChange="1" LargeChange="20" IsDirectionReversed="True" ValueChanged="Vertical_Pos_Slider_ValueChanged"/>
-				<Slider x:Name="Horizontal_Pos_Slider" Grid.Row="2" Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top" Cursor="ScrollWE" Maximum="2600" LargeChange="20" SmallChange="1" ValueChanged="Horizontal_Pos_Slider_ValueChanged"/>
+				<Slider x:Name="Vertical_Pos_Slider" Grid.Row="1" Grid.Column="0" Orientation="Vertical" HorizontalAlignment="Right" Cursor="ScrollNS" Maximum="2200" SmallChange="1" LargeChange="20" IsDirectionReversed="True" ValueChanged="Vertical_Pos_Slider_ValueChanged" Margin="0,0,15,0" HorizontalContentAlignment="Center"/>
+				<Slider x:Name="Horizontal_Pos_Slider" Grid.Row="2" Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top" Cursor="ScrollWE" Maximum="2600" LargeChange="20" SmallChange="1" ValueChanged="Horizontal_Pos_Slider_ValueChanged" Margin="0,15,0,0"/>
 			</Grid>
 		</TabItem>
 	</TabControl>

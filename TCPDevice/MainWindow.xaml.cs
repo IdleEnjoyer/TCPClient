@@ -58,6 +58,8 @@ namespace TCPDevice
 		private int OPU1_IngoreLimit_Counter = 0;
 		private int OPU2_IngoreLimit_Counter = 0;
 
+		private bool isDragging = false;
+
 		private RadialGradientBrush GreenBrush = new(Color.FromRgb(255, 255, 255), Color.FromRgb(0, 255, 0));
 		private RadialGradientBrush RedBrush = new(Color.FromRgb(255, 255, 255), Color.FromRgb(255, 0, 0));
 		public MainWindow()
@@ -291,15 +293,80 @@ namespace TCPDevice
 
 		private void Vertical_Pos_Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
 		{
-			Canvas.SetTop(Target_Pos_Point, 2 * Vertical_Pos_Slider.Value / 10.0);
+			//Canvas.SetTop(Target_Pos_Point, 95 + Vertical_Pos_Slider.Value / 10.0);
 			Canvas.SetTop(Slider_Y_Rect, 10 + Vertical_Pos_Slider.Value / 10.0);
 		}
 
 		private void Horizontal_Pos_Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
 		{
-			Canvas.SetLeft(Target_Pos_Point, 2 * Horizontal_Pos_Slider.Value / 10.0 );
+			//Canvas.SetLeft(Target_Pos_Point, 120 + Horizontal_Pos_Slider.Value / 10.0 );
 			Canvas.SetLeft(Slider_X_Rect, 10 + Horizontal_Pos_Slider.Value / 10.0 );
 			Canvas.SetLeft(Slider_Y_Rect, 10 + Horizontal_Pos_Slider.Value / 10.0 );
+		}
+
+		private void Target_Pos_Point_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+		{
+			isDragging = true;
+		}
+
+		private void Window_MouseMove(object sender, MouseEventArgs e)
+		{
+			if (isDragging)//120 95 380 315
+			{
+				if (Mouse.GetPosition(relativeTo: Demo_Canvas).Y - 20.0 >= 95.0 && Mouse.GetPosition(relativeTo: Demo_Canvas).Y - 20.0 <= 315.0)
+				{
+					Canvas.SetTop(Target_Pos_Point, Mouse.GetPosition(relativeTo: Demo_Canvas).Y - 20);
+				}
+				else if (Mouse.GetPosition(relativeTo: Demo_Canvas).Y - 20.0 <= 95.0)
+				{
+
+				}
+				if (Mouse.GetPosition(relativeTo: Demo_Canvas).X - 20.0 >= 120.0 && Mouse.GetPosition(relativeTo: Demo_Canvas).X - 20.0 <= 380.0)
+				{
+					Canvas.SetLeft(Target_Pos_Point, Mouse.GetPosition(relativeTo: Demo_Canvas).X - 20);
+				}
+			}
+		}
+
+		private void Window_MouseUp(object sender, MouseButtonEventArgs e)
+		{
+			isDragging = false;
+		}
+
+		private void Target_Pos_Point_PreviewTouchDown(object sender, TouchEventArgs e)
+		{
+			isDragging = true;
+		}
+
+		private void Window_TouchMove(object sender, TouchEventArgs e)
+		{
+			if (isDragging)//120 95 380 315
+			{
+				if (e.GetTouchPoint(relativeTo: Demo_Canvas).Position.Y - 20.0 >= 95.0 && e.GetTouchPoint(relativeTo: Demo_Canvas).Position.Y - 20.0 <= 315.0)
+				{
+					Canvas.SetTop(Target_Pos_Point, e.GetTouchPoint(relativeTo: Demo_Canvas).Position.Y - 20);
+				}
+				else if (e.GetTouchPoint(relativeTo: Demo_Canvas).Position.Y - 20.0 <= 95.0)
+				{
+					Canvas.SetTop(Target_Pos_Point, 95.0);
+				}
+				else if (e.GetTouchPoint(relativeTo: Demo_Canvas).Position.Y - 20.0 >= 315.0)
+				{
+					Canvas.SetTop(Target_Pos_Point, 315.0);
+				}
+				if (e.GetTouchPoint(relativeTo: Demo_Canvas).Position.X - 20.0 >= 120.0 && e.GetTouchPoint(relativeTo: Demo_Canvas).Position.X - 20.0 <= 380.0)
+				{
+					Canvas.SetLeft(Target_Pos_Point, e.GetTouchPoint(relativeTo: Demo_Canvas).Position.X - 20);
+				}
+				else if (e.GetTouchPoint(relativeTo: Demo_Canvas).Position.X - 20.0 <= 120.0)
+				{
+					Canvas.SetLeft(Target_Pos_Point, 120);
+				}
+				else if (e.GetTouchPoint(relativeTo: Demo_Canvas).Position.X - 20.0 >= 380.0)
+				{
+					Canvas.SetLeft(Target_Pos_Point, 380);
+				}
+			}
 		}
 	}
 }
