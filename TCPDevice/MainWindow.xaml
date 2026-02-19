@@ -8,7 +8,7 @@
 		Closing="Window_Closing"
         Title="ТЕСАРТ Сервисное ПО" Height="720" Width="1280" Background="White" MinWidth="1074" MinHeight="624" MouseMove="Window_MouseMove" MouseUp="Window_MouseUp" TouchMove="Window_TouchMove">
 	<Window.Resources>
-		
+
 	</Window.Resources>
 	<TabControl x:Name="Control" Background="#FFAAB4C8">
 		<TabItem x:Name="Demo_Tab" Header="Демонастрация">
@@ -24,28 +24,50 @@
 					<ColumnDefinition Width="2*"/>
 				</Grid.ColumnDefinitions>
 				<GroupBox Grid.Row="1" Grid.Column="1">
-					<Viewbox Margin="0,10,0,10" >
+					<Viewbox x:Name="viewbox" Margin="0,10,0,10" >
 						<Canvas x:Name="Demo_Canvas" Background="#FF798CBB" Width="540" Height="450" >
-							
-							
+							<Grid Width="260" Height="260" Canvas.Left="140" Canvas.Top="115">
+								<Rectangle Fill="Black" Height="200" Margin="0,60,0,0" />
+								<Rectangle Fill="Black" Stroke="DimGray" Margin="0,0,0,50" RadiusX="10" RadiusY="10"/>
+								<Rectangle Fill="Gray" Height="130" Margin="0,0,0,50"/>
+							</Grid>
+
 							<Grid x:Name="Slider_X_Rect" Width="260" Height="210" Canvas.Left="10" Canvas.Top="115">
 								<Rectangle Fill="Black" Stroke="#FF3E3E3E" RadiusX="10" RadiusY="10"/>
 								<Rectangle Fill="Gray" Width="130"/>
 							</Grid>
-							
+
 							<Grid x:Name="Slider_Y_Rect" Width="260" Height="210" Canvas.Left="10" Canvas.Top="10">
 								<Rectangle Fill="Black" RadiusX="10" RadiusY="10" Stroke="White"/>
 								<Rectangle Fill="#FF9A9A9A" Width="100" Height="70" />
 							</Grid>
-							
+
 							<Ellipse x:Name="Target_Pos_Point" Height="40" Width="40" Fill="White" Canvas.Left="120" Canvas.Top="95" Opacity="0.5" PreviewMouseLeftButtonDown="Target_Pos_Point_PreviewMouseLeftButtonDown" PreviewTouchDown="Target_Pos_Point_PreviewTouchDown"/>
 
 							<Rectangle Stroke="White" Opacity="0.8" Canvas.Left="120" Canvas.Top="95" Width="300" Height="260"/>
 						</Canvas>
 					</Viewbox>
 				</GroupBox>
-				<Slider x:Name="Vertical_Pos_Slider" Grid.Row="1" Grid.Column="0" Orientation="Vertical" HorizontalAlignment="Right" Cursor="ScrollNS" Maximum="2200" SmallChange="1" LargeChange="20" IsDirectionReversed="True" ValueChanged="Vertical_Pos_Slider_ValueChanged" Margin="0,0,15,0" HorizontalContentAlignment="Center"/>
-				<Slider x:Name="Horizontal_Pos_Slider" Grid.Row="2" Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top" Cursor="ScrollWE" Maximum="2600" LargeChange="20" SmallChange="1" ValueChanged="Horizontal_Pos_Slider_ValueChanged" Margin="0,15,0,0"/>
+				<Slider x:Name="Vertical_Pos_Slider" Grid.Row="1" Grid.Column="0" Orientation="Vertical" HorizontalAlignment="Left" Cursor="ScrollNS" Maximum="2200" SmallChange="1" LargeChange="20" IsDirectionReversed="True" ValueChanged="Vertical_Pos_Slider_ValueChanged" Margin="83,130,0,129" HorizontalContentAlignment="Center" RenderTransformOrigin="0.5,0.5">
+					<Slider.RenderTransform>
+						<TransformGroup>
+							<ScaleTransform ScaleY="2" ScaleX="2"/>
+							<SkewTransform/>
+							<RotateTransform/>
+							<TranslateTransform/>
+						</TransformGroup>
+					</Slider.RenderTransform>
+				</Slider>
+				<Slider x:Name="Horizontal_Pos_Slider" Grid.Row="2" Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top" Cursor="ScrollWE" Maximum="2600" LargeChange="20" SmallChange="1" ValueChanged="Horizontal_Pos_Slider_ValueChanged" Margin="236,15,236,0" RenderTransformOrigin="0.5,0.5">
+					<Slider.RenderTransform>
+						<TransformGroup>
+							<ScaleTransform ScaleX="2" ScaleY="2"/>
+							<SkewTransform/>
+							<RotateTransform/>
+							<TranslateTransform/>
+						</TransformGroup>
+					</Slider.RenderTransform>
+				</Slider>
 			</Grid>
 		</TabItem>
 	</TabControl>

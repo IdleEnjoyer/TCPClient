@@ -28,158 +28,37 @@ namespace TCPDevice
 	/// </summary>
 	public partial class MainWindow : Window
 	{
-		private TcpClient Client_OPU1;
-		private NetworkStream Stream_OPU1;
-		private float[] OPU1_LowerLimits = new float[4];
-		private float[] OPU1_UpperLimits = new float[4];
+		private TcpClient Client;
+		private NetworkStream Stream;
+		private float[] OPU1_LowerLimits = { -130.0f, 130.0f };
+		private float[] OPU1_UpperLimits = { -105.0f, 105.0f };
 		private bool OPU1_Enabled = false;
 		private double[] OPU1_Position = { 0.0, 0.0, 0.0, 0.0 };
 		private bool OPU1_Stopped = false;
 		private bool OPU1_InError = false;
 
-		private TcpClient Client_OPU2;
-		private NetworkStream Stream_OPU2;
-		private float[] OPU2_LowerLimits = new float[5];
-		private float[] OPU2_UpperLimits = new float[5];
-		private bool OPU2_Enabled = false;
-		private double[] OPU2_Position = { 0.0, 0.0, 0.0, 0.0, 0.0 };
-		private bool OPU2_Stopped = false;
-		private bool OPU2_InError = false;
-
-		private DispatcherTimer OPU1_StatusTimer;
-		private DispatcherTimer OPU2_StatusTimer;
-		private int OPU1_Status = 0;
-		private int OPU2_Status = 0;
 		private byte[] WriteByteData;
 		public string Axis_OPU1 = "";
 		public string Axis_OPU2 = "";
 		public bool AllowNegative = false;
 
-		private int OPU1_IngoreLimit_Counter = 0;
-		private int OPU2_IngoreLimit_Counter = 0;
-
 		private bool isDragging = false;
-
-		private RadialGradientBrush GreenBrush = new(Color.FromRgb(255, 255, 255), Color.FromRgb(0, 255, 0));
-		private RadialGradientBrush RedBrush = new(Color.FromRgb(255, 255, 255), Color.FromRgb(255, 0, 0));
 		public MainWindow()
         {
             InitializeComponent();
-			GreenBrush.Center = new Point(0.25, 0.25);
-			RedBrush.Center = new Point(0.25, 0.25);
 		}
 
-		
 
-		private void OPU1_StatusTimer_Tick(object? sender, EventArgs e)
+		public void SendCommand(string Com)
 		{
-			switch (OPU1_Status)
-			{
-				case 0:
-					SendCommand_OPU1("EN?");
-					OPU1_Status++;
-					break;
-				case 1:
-					SendCommand_OPU1("FH?");
-					OPU1_Status++;
-					break;
-				case 2:
-					SendCommand_OPU1("POS?");
-					OPU1_Status++;
-					break;
-				case 3:
-					SendCommand_OPU1("STOP?");
-					OPU1_Status++;
-					break;
-				case 4:
-					SendCommand_OPU1("FLT?");
-					OPU1_Status++;
-					break;
-				case 5:
-					SendCommand_OPU1("LIM? A");
-					OPU1_Status++;
-					break;
-				case 6:
-					SendCommand_OPU1("LIM? E");
-					OPU1_Status++;
-					break;
-				case 7:
-					SendCommand_OPU1("LIM? P");
-					OPU1_Status++;
-					break;
-				case 8:
-					SendCommand_OPU1("LIM? Y");
-					OPU1_Status = 0;
-					break;
-			}
-			
-		}
-
-		private void OPU2_StatusTimer_Tick(object? sender, EventArgs e)
-		{
-			
-			switch (OPU2_Status)
-			{
-				case 0:
-					SendCommand_OPU2("EN?");
-					OPU2_Status++;
-					break;
-				case 1:
-					SendCommand_OPU2("FH?");
-					OPU2_Status++;
-					break;
-				case 2:
-					SendCommand_OPU2("POS?");
-					OPU2_Status++;
-					break;
-				case 3:
-					SendCommand_OPU2("STOP?");
-					OPU2_Status++;
-					break;
-				case 4:
-					SendCommand_OPU2("FLT?");
-					OPU2_Status++;
-					break;
-				case 5:
-					SendCommand_OPU2("LIM? A");
-					OPU2_Status++;
-					break;
-				case 6:
-					SendCommand_OPU2("LIM? E");
-					OPU2_Status++;
-					break;
-				case 7:
-					SendCommand_OPU2("LIM? P");
-					OPU2_Status++;
-					break;
-				case 8:
-					SendCommand_OPU2("LIM? X");
-					OPU2_Status++;
-					break;
-				case 9:
-					SendCommand_OPU2("LIM? Y");
-					OPU2_Status = 0;
-					break;
-			}
-		}
-
-		public void SendCommand_OPU1(string Com)
-		{
-			if (Client_OPU1.Connected)
+			if (Client.Connected)
 			{
 				WriteByteData = Encoding.UTF8.GetBytes("^" + Com + "~\r\n");
-				Stream_OPU1.Write(WriteByteData, 0, WriteByteData.Length);
+				Stream.Write(WriteByteData, 0, WriteByteData.Length);
 			}
 		}
 
-		public void SendCommand_OPU2(string Com)
-		{
-			if (Client_OPU2.Connected)
-			{
-				WriteByteData = Encoding.UTF8.GetBytes("^" + Com + "~\r\n");
-				Stream_OPU2.Write(WriteByteData, 0, WriteByteData.Length);
-			}
-		}
+
 
 		private async void ConnectOPU1()
 		{
@@ -187,13 +66,12 @@ namespace TCPDevice
 			{
 				IPAddress Address = IPAddress.Parse("192.168.0.101");
 				int Port = 2000;
-				Client_OPU1 = new TcpClient(Address.ToString(), Port);
+				Client = new TcpClient(Address.ToString(), Port);
 
-				if (Client_OPU1.Connected)
+				if (Client.Connected)
 				{
-					Stream_OPU1 = Client_OPU1.GetStream();
-					OPU1_StatusTimer.Start();
-					await StartReadingOPU1DataAsync();
+					Stream = Client.GetStream();
+					await StartReadingDataAsync();
 				}
 				else
 				{
@@ -205,44 +83,19 @@ namespace TCPDevice
 			}
 		}
 
-		private async void ConnectOPU2()
-		{
-			try
-			{
-				IPAddress Address = IPAddress.Parse("192.168.0.102");
-				int Port = 2000;
-				Client_OPU2 = new TcpClient(Address.ToString(), Port);
-
-				if (Client_OPU2.Connected)
-				{
-					Stream_OPU2 = Client_OPU2.GetStream();
-					OPU2_StatusTimer.Start();
-					//await StartReadingOPU2DataAsync();
-				}
-				else
-				{
-					throw new Exception("No connection");
-				}
-			}
-			catch (Exception ex)
-			{
-				MessageBox.Show(ex.Message);
-			}
-		}
-
-		private async Task StartReadingOPU1DataAsync()
+		private async Task StartReadingDataAsync()
 		{
 			try
 			{
 				byte[] Buffer = new byte[1024];
-				while (Client_OPU1.Connected)
+				while (Client.Connected)
 				{
 					try
 					{
-						int BytesRead = await Stream_OPU1.ReadAsync(Buffer);
+						int BytesRead = await Stream.ReadAsync(Buffer);
 						if (BytesRead == 0)
 						{
-							Client_OPU1.Close();
+							Client.Close();
 							break;
 						}
 						string Data = Encoding.UTF8.GetString(Buffer, 0, BytesRead);
@@ -255,7 +108,6 @@ namespace TCPDevice
 					catch (IOException)
 					{
 						MessageBox.Show("Connection error");
-						OPU1_StatusTimer.Stop();
 						break;
 					}
 				}
@@ -263,7 +115,6 @@ namespace TCPDevice
 			catch (Exception ex)
 			{
 				MessageBox.Show($"Connection Error: {ex.Message}");
-				OPU1_StatusTimer.Stop();
 			}
 		}
 
@@ -274,19 +125,11 @@ namespace TCPDevice
 
 		private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
 		{
-			if (Client_OPU1 != null)
+			if (Client != null)
 			{
-				if (Client_OPU1.Connected)
+				if (Client.Connected)
 				{
-					SendCommand_OPU1("DIS");
-				}
-			}
-
-			if (Client_OPU2 != null)
-			{
-				if (Client_OPU2.Connected)
-				{
-					SendCommand_OPU2("DIS");
+					SendCommand("DIS");
 				}
 			}
 		}
@@ -319,11 +162,23 @@ namespace TCPDevice
 				}
 				else if (Mouse.GetPosition(relativeTo: Demo_Canvas).Y - 20.0 <= 95.0)
 				{
-
+					Canvas.SetTop(Target_Pos_Point, 95.0);
+				}
+				else
+				{
+					Canvas.SetTop(Target_Pos_Point, 315.0);
 				}
 				if (Mouse.GetPosition(relativeTo: Demo_Canvas).X - 20.0 >= 120.0 && Mouse.GetPosition(relativeTo: Demo_Canvas).X - 20.0 <= 380.0)
 				{
 					Canvas.SetLeft(Target_Pos_Point, Mouse.GetPosition(relativeTo: Demo_Canvas).X - 20);
+				}
+				else if (Mouse.GetPosition(relativeTo: Demo_Canvas).X - 20.0 <= 120.0)
+				{
+					Canvas.SetLeft(Target_Pos_Point, 120.0);
+				}
+				else
+				{
+					Canvas.SetLeft(Target_Pos_Point, 380.0);
 				}
 			}
 		}
@@ -350,7 +205,7 @@ namespace TCPDevice
 				{
 					Canvas.SetTop(Target_Pos_Point, 95.0);
 				}
-				else if (e.GetTouchPoint(relativeTo: Demo_Canvas).Position.Y - 20.0 >= 315.0)
+				else
 				{
 					Canvas.SetTop(Target_Pos_Point, 315.0);
 				}
@@ -362,7 +217,7 @@ namespace TCPDevice
 				{
 					Canvas.SetLeft(Target_Pos_Point, 120);
 				}
-				else if (e.GetTouchPoint(relativeTo: Demo_Canvas).Position.X - 20.0 >= 380.0)
+				else
 				{
 					Canvas.SetLeft(Target_Pos_Point, 380);
 				}
