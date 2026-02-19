@@ -1141,7 +1141,7 @@ namespace TCPDevice
 				Demo_Ongoing = true;
 				await Demo_OPU1();
 			}
-			if (OPU2_Demo.IsChecked == true)//AZ(-20;0;20) UM(-10;0;10) Y(1500;1600;1700;1800;1900;2000) POL(0;90)
+			if (OPU2_Demo.IsChecked == true)//AZ(-20;0;20) UM(-10;0;10) X(0;100;200;300) Y(1500;1600;1700;1800;1900;2000) POL(0;90)
 			{
 				Demo_OPU2_State = 1;
 				SendCommand_OPU2("FH");
