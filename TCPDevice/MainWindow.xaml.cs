@@ -20,6 +20,7 @@ using System.IO;
 using static System.Net.Mime.MediaTypeNames;
 using System.Windows.Threading;
 using System.Globalization;
+using System.Threading;
 
 namespace TCPDevice
 {
@@ -65,6 +66,7 @@ namespace TCPDevice
 		private int Demo_OPU2_State = 0;
 		private int Demo_OPU2_Az_State = -1;
 		private int Demo_OPU2_UM_State = -1;
+		private int Demo_OPU2_X_State = 1;
 		private int Demo_OPU2_Y_State = 1;
 		private int Demo_OPU2_Pol_State = 0;
 		private double[] Demo_OPU1_TargetPosition = { 0.0, 0.0, 0.0, 0.0 };
@@ -88,7 +90,7 @@ namespace TCPDevice
 			OPU2_StatusTimer.Tick += OPU2_StatusTimer_Tick;
 
 			Wait_Timer = new DispatcherTimer();
-			Wait_Timer.Interval = TimeSpan.FromMilliseconds(500);
+			Wait_Timer.Interval = TimeSpan.FromMilliseconds(3000);
 			Wait_Timer.Tick += Wait_Timer_Tick;
 		}
 
@@ -313,9 +315,16 @@ namespace TCPDevice
 										Index++;
 									}
 									OPU1_AzCurPos.Content = OPU1_Position[0].ToString("0.000°");
+									Demo_AzPos_OPU1.Content = OPU1_Position[0].ToString("0.000°");
+
 									OPU1_UmCurPos.Content = OPU1_Position[1].ToString("0.000°");
+									Demo_UMPos_OPU1.Content = OPU1_Position[1].ToString("0.000°");
+
 									OPU1_PolCurPos.Content = OPU1_Position[2].ToString("0.000°");
+									Demo_PolPos_OPU1.Content = OPU1_Position[2].ToString("0.000°");
+
 									OPU1_YCurPos.Content = OPU1_Position[3].ToString("0.000 мм");
+									Demo_YPos_OPU1.Content = OPU1_Position[3].ToString("0.000 мм");
 								}
 								if (Data.Contains("LIM?"))
 								{
@@ -416,10 +425,19 @@ namespace TCPDevice
 										Index++;
 									}
 									OPU2_AzCurPos.Content = OPU2_Position[0].ToString("0.000°");
+									Demo_AzPos_OPU2.Content = OPU2_Position[0].ToString("0.000°");
+
 									OPU2_UmCurPos.Content = OPU2_Position[1].ToString("0.000°");
+									Demo_UMPos_OPU2.Content = OPU2_Position[1].ToString("0.000°");
+
 									OPU2_PolCurPos.Content = OPU2_Position[2].ToString("0.000°");
+									Demo_PolPos_OPU2.Content = OPU2_Position[2].ToString("0.000°");
+
 									OPU2_XCurPos.Content = OPU2_Position[3].ToString("0.000 мм");
+									Demo_XPos_OPU2.Content = OPU2_Position[3].ToString("0.000 мм");
+
 									OPU2_YCurPos.Content = OPU2_Position[4].ToString("0.000 мм");
+									Demo_YPos_OPU2.Content = OPU2_Position[4].ToString("0.000 мм");
 								}
 								if (Data.Contains("LIM?"))
 								{
@@ -1133,78 +1151,131 @@ namespace TCPDevice
 		{
 			if (OPU1_Demo.IsChecked == true)//AZ(-20;0;20) UM(-10; 0; 10) Y(1500; 1600; 1700; 1800; 1900; 2000) POL(0; 90)
 			{
-				Demo_OPU1_State = 1;
+				Demo_OPU1_State = 0;
 				SendCommand_OPU1("FH");
+				Thread.Sleep(100);
 				SendCommand_OPU1("EN");
 				OPU1_Demo.IsEnabled = false;
 				OPU2_Demo.IsEnabled = false;
 				Demo_Ongoing = true;
-				await Demo_OPU1();
+				await Task.Run(Demo_OPU1);
 			}
 			if (OPU2_Demo.IsChecked == true)//AZ(-20;0;20) UM(-10;0;10) X(0;100;200;300) Y(1500;1600;1700;1800;1900;2000) POL(0;90)
 			{
-				Demo_OPU2_State = 1;
+				Demo_OPU2_State = 0;
 				SendCommand_OPU2("FH");
+				Thread.Sleep(100);
 				SendCommand_OPU2("EN");
+				Thread.Sleep(100);
 				OPU1_Demo.IsEnabled = false;
 				OPU2_Demo.IsEnabled = false;
 				Demo_Ongoing = true;
-				await Demo_OPU2();
+				await Task.Run(Demo_OPU2);
 			}
 		}
 
-		private async Task Demo_OPU1()
+		private void Demo_OPU1()
 		{
+			Thread.Sleep(500);
+			if (!CheckAccess())
+			{
+				Dispatcher.Invoke(() => {
+					DemoProgress.Maximum = 180;
+					DemoProgress.Value = 0;
+				});
+			}
 			while (Demo_Ongoing)//0 - Move Az | 1 - Move UM | 2 - Move Y | 3 - Move Polarisation | def - Wait
 			{
+				
 				switch (Demo_OPU1_State)
 				{
 					case 0:
 						Demo_OPU1_State = -1;
-						if (Demo_OPU1_Az_State == 1)
+						if (Demo_OPU1_Az_State == 2)
 						{
 							Demo_OPU1_Az_State = -1;
 							Demo_OPU1_State = 1;
 						}
 						else
 						{
-							SendCommand_OPU1("MOVE A " + (20 * Demo_OPU1_Az_State).ToString() + " 3");
+							SendCommand_OPU1("MOVE A " + (10 * Demo_OPU1_Az_State).ToString() + " 3");
+							if (!CheckAccess())
+							{
+								Dispatcher.Invoke(() => { 
+									Demo_AzProg_OPU1.IsIndeterminate = true;
+									DemoProgress.Value += 1;
+								});
+							}
+							
 							Demo_OPU1_Az_State += 1;
 						}
 						break;
 					case 1:
 						Demo_OPU1_State = -1;
-						if (Demo_OPU1_UM_State == 1)
+						if (Demo_OPU1_UM_State == 2)
 						{
-							Demo_OPU1_UM_State = -1;
+							Demo_OPU1_UM_State = 0;
 							Demo_OPU1_State = 2;
 						}
 						else
 						{
 							SendCommand_OPU1("MOVE E " + (10 * Demo_OPU1_UM_State).ToString() + " 3");
+							if (!CheckAccess())
+							{
+								Dispatcher.Invoke(() => { 
+									Demo_UmProg_OPU1.IsIndeterminate = true;
+									DemoProgress.Value += 1;
+								});
+							}
 							Demo_OPU1_UM_State += 1;
 						}
 						
 						break;
 					case 2:
 						Demo_OPU1_State = -1;
-						if (Demo_OPU1_Y_State == 10)
+						if (Demo_OPU1_Y_State == 11)
 						{
-							Demo_OPU1_Y_State = 0;
+							Demo_OPU1_Y_State = 1;
 							Demo_OPU1_State = 3;
 						}
 						else
 						{
 							SendCommand_OPU1("MOVE Y " + (1500 + 100 * Demo_OPU1_Y_State).ToString() + " 25");
-							SendCommand_OPU1("MOVE E -20 6");
+							SendCommand_OPU1("MOVE E -10 6");
+							if (!CheckAccess())
+							{
+								Dispatcher.Invoke(() => { 
+									Demo_UmProg_OPU1.IsIndeterminate = true;
+									Demo_YProg_OPU1.IsIndeterminate = true;
+									DemoProgress.Value += 2;
+								});
+							}
 							Demo_OPU1_Y_State += 1;
 						}
 						break;
 					case 3:
 						Demo_OPU1_State = -1;
-						SendCommand_OPU1("MOVE P 90 6");
-						SendCommand_OPU1("MOVE E -20 6");
-						SendCommand_OPU1("MOVE Y 1500 25");
+						if (Demo_OPU1_Pol_State == 1)
+						{
+							Demo_Ongoing = false;
+						}
+						else
+						{
+							SendCommand_OPU1("MOVE P 90 6");
+							SendCommand_OPU1("MOVE E -10 6");
+							SendCommand_OPU1("MOVE Y 1500 25");
+							if (!CheckAccess())
+							{
+								Dispatcher.Invoke(() => { 
+									Demo_UmProg_OPU1.IsIndeterminate = true;
+									Demo_YProg_OPU1.IsIndeterminate = true;
+									Demo_PolProg_OPU1.IsIndeterminate = true;
+									DemoProgress.Value += 3;
+								});
+							}
+							Demo_OPU1_Pol_State += 1;
+						}
+						
 						break;
 					default:
 						if (!Wait_Timer.IsEnabled)
@@ -1214,60 +1285,138 @@ namespace TCPDevice
 						break;
 				}
 			}
+			SendCommand_OPU1("DIS");
+			if (!CheckAccess())
+			{
+				Dispatcher.Invoke(() =>
+				{
+					OPU1_Demo.IsEnabled = true;
+					OPU2_Demo.IsEnabled = true;
+				});
+			}
+
+			return;
 		}
 
-		private async Task Demo_OPU2()
+		private void Demo_OPU2()
 		{
+			Thread.Sleep(500);
+			if (!CheckAccess())
+			{
+				Dispatcher.Invoke(() => {
+					DemoProgress.Maximum = 180;
+					DemoProgress.Value = 0;
+				});
+			}
 			while (Demo_Ongoing)//0 - Move Az | 1 - Move UM | 2 - Move Y | 3 - Move Polarisation | def - Wait
 			{
 				switch (Demo_OPU2_State)
 				{
 					case 0:
 						Demo_OPU2_State = -1;
-						if (Demo_OPU2_Az_State == 1)
+						if (Demo_OPU2_Az_State == 2)
 						{
 							Demo_OPU2_Az_State = -1;
 							Demo_OPU2_State = 1;
 						}
 						else
 						{
-							SendCommand_OPU2("MOVE A " + (20 * Demo_OPU2_Az_State).ToString() + " 3");
+							SendCommand_OPU2("MOVE A " + (10 * Demo_OPU2_Az_State).ToString() + " 3");
+							if (!CheckAccess())
+							{
+								Dispatcher.Invoke(() => { 
+									Demo_AzProg_OPU2.IsIndeterminate = true;
+								});
+							}
 							Demo_OPU2_Az_State += 1;
 						}
 						break;
 					case 1:
 						Demo_OPU1_State = -1;
-						if (Demo_OPU2_UM_State == 1)
+						if (Demo_OPU2_UM_State == 2)
 						{
-							Demo_OPU2_UM_State = -1;
+							Demo_OPU2_UM_State = 0;
 							Demo_OPU2_State = 2;
 						}
 						else
 						{
 							SendCommand_OPU2("MOVE E " + (10 * Demo_OPU2_UM_State).ToString() + " 3");
+							if (!CheckAccess())
+							{
+								Dispatcher.Invoke(() => { Demo_UmProg_OPU2.IsIndeterminate = true; });
+							}
 							Demo_OPU2_UM_State += 1;
 						}
 
 						break;
 					case 2:
 						Demo_OPU1_State = -1;
-						if (Demo_OPU2_Y_State == 10)
+						if (Demo_OPU2_X_State == 4)
 						{
-							Demo_OPU2_Y_State = 0;
+							Demo_OPU2_X_State = 1;
 							Demo_OPU2_State = 3;
 						}
 						else
 						{
-							SendCommand_OPU2("MOVE Y " + (1500 + 100 * Demo_OPU2_Y_State).ToString() + " 25");
-							SendCommand_OPU2("MOVE E -20 6");
+							SendCommand_OPU2("MOVE X " + (100 * Demo_OPU2_X_State).ToString() + " 25");
+							SendCommand_OPU2("MOVE E -10 6");
+							if (!CheckAccess())
+							{
+								Dispatcher.Invoke(() => {
+									Demo_UmProg_OPU2.IsIndeterminate = true;
+									Demo_XProg_OPU2.IsIndeterminate = true;
+								});
+							}
 							Demo_OPU2_Y_State += 1;
 						}
 						break;
 					case 3:
+						Demo_OPU1_State = -1;
+						if (Demo_OPU2_Y_State == 11)
+						{
+							Demo_OPU2_Y_State = 1;
+							Demo_OPU2_State = 4;
+						}
+						else
+						{
+							SendCommand_OPU2("MOVE Y " + (1500 + 100 * Demo_OPU2_Y_State).ToString() + " 25");
+							SendCommand_OPU2("MOVE E -10 6");
+							SendCommand_OPU2("MOVE X 0 25");
+							if (!CheckAccess())
+							{
+								Dispatcher.Invoke(() => {
+									Demo_UmProg_OPU2.IsIndeterminate = true;
+									Demo_XProg_OPU2.IsIndeterminate = true;
+									Demo_YProg_OPU2.IsIndeterminate = true;
+								});
+							}
+							Demo_OPU2_Y_State += 1;
+						}
+						break;
+					case 4:
 						Demo_OPU2_State = -1;
-						SendCommand_OPU2("MOVE P 90 6");
-						SendCommand_OPU2("MOVE E -20 6");
-						SendCommand_OPU2("MOVE Y 1500 25");
+						if (Demo_OPU2_Pol_State == 1)
+						{
+							Demo_Ongoing = false;
+						}
+						else
+						{
+							SendCommand_OPU2("MOVE P 90 6");
+							SendCommand_OPU2("MOVE E -10 6");
+							SendCommand_OPU2("MOVE X 0 25");
+							SendCommand_OPU2("MOVE Y 1500 25");
+							if (!CheckAccess())
+							{
+								Dispatcher.Invoke(() => {
+									Demo_UmProg_OPU2.IsIndeterminate = true;
+									Demo_XProg_OPU2.IsIndeterminate = true;
+									Demo_YProg_OPU2.IsIndeterminate = true;
+									Demo_PolProg_OPU2.IsIndeterminate = true;
+								});
+							}
+							Demo_OPU2_Pol_State += 1;
+						}
+						
 						break;
 					default:
 						if (!Wait_Timer.IsEnabled)
@@ -1277,6 +1426,16 @@ namespace TCPDevice
 						break;
 				}
 			}
+			SendCommand_OPU2("DIS");
+			if (!CheckAccess())
+			{
+				Dispatcher.Invoke(() =>
+				{
+					OPU1_Demo.IsEnabled = true;
+					OPU2_Demo.IsEnabled = true;
+				});
+			}
+			return;
 		}
 
 		private void OPU1_Demo_Checked(object sender, RoutedEventArgs e)
@@ -1294,31 +1453,41 @@ namespace TCPDevice
 			{
 				Demo_Axis_Tab_Control.SelectedIndex = 1;
 			}
-
+			
 		}
 
 		private void Wait_Timer_Tick(object? sender, EventArgs e)
 		{
 			if (OPU1_Demo.IsChecked == true)
 			{
-				foreach (double Pos in Demo_OPU1_TargetPosition) 
+				if (OPU1_Stopped)
 				{
-
+					Demo_OPU1_State = 0;
+					Demo_AzProg_OPU1.IsIndeterminate = false;
+					Demo_UmProg_OPU1.IsIndeterminate = false;
+					Demo_YProg_OPU1.IsIndeterminate = false;
+					Demo_PolProg_OPU1.IsIndeterminate = false;
+					Wait_Timer.Stop();
 				}
 			}
 			if (OPU2_Demo.IsChecked == true)
 			{
-				foreach (double Pos in Demo_OPU2_TargetPosition)
+				if (OPU2_Stopped)
 				{
-
+					Demo_OPU2_State = 0;
+					Demo_AzProg_OPU2.IsIndeterminate = false;
+					Demo_UmProg_OPU2.IsIndeterminate = false;
+					Demo_XProg_OPU2.IsIndeterminate = false;
+					Demo_YProg_OPU2.IsIndeterminate = false;
+					Demo_PolProg_OPU2.IsIndeterminate = false;
+					Wait_Timer.Stop();
 				}
 			}
 		}
 
 		private void DemoStop_Click(object sender, RoutedEventArgs e)
 		{
-			OPU1_Demo.IsEnabled = false;
-			OPU2_Demo.IsEnabled = false;
+			Wait_Timer.Stop();
 			Demo_Ongoing = false;
 		}
 

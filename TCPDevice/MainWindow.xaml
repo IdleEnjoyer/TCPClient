@@ -1127,6 +1127,7 @@
 								<RowDefinition Height="1*"/>
 								<RowDefinition Height="1*"/>
 								<RowDefinition Height="1*"/>
+								<RowDefinition Height="1*"/>
 							</Grid.RowDefinitions>
 							<Grid.ColumnDefinitions>
 								<ColumnDefinition Width="3*"/>
@@ -1137,23 +1138,28 @@
 							<Separator VerticalAlignment="Bottom" Background="#FF6D6D6D" Grid.Row="0" Grid.ColumnSpan="3"/>
 							<Separator VerticalAlignment="Bottom" Background="#FF6D6D6D" Grid.Row="1" Grid.ColumnSpan="3"/>
 							<Separator VerticalAlignment="Bottom" Background="#FF6D6D6D" Grid.Row="2" Grid.ColumnSpan="3"/>
+							<Separator VerticalAlignment="Bottom" Background="#FF6D6D6D" Grid.Row="3" Grid.ColumnSpan="3"/>
 
-							<Label x:Name="Demo_UM_Axis_OPU1" Content="Ось Угла места" Grid.Row="0" FontSize="36" VerticalAlignment="Center" Margin="10,0,0,0"/>
-							<Label x:Name="Demo_Y_Axis_OPU1" Content="Ось Y" Grid.Row="1" FontSize="36" VerticalAlignment="Center" Margin="10,0,0,0"/>
-							<Label x:Name="Demo_Pol_Axis_OPU1" Content="Ось Поляризации" Grid.Row="2" FontSize="36" VerticalAlignment="Center" Margin="10,0,0,0"/>
+							<Label x:Name="Demo_Az_Axis_OPU1" Content="Ось Азимута" Grid.Row="0" FontSize="36" VerticalAlignment="Center" Margin="10,0,0,0"/>
+							<Label x:Name="Demo_UM_Axis_OPU1" Content="Ось Угла места" Grid.Row="1" FontSize="36" VerticalAlignment="Center" Margin="10,0,0,0"/>
+							<Label x:Name="Demo_Y_Axis_OPU1" Content="Ось Y" Grid.Row="2" FontSize="36" VerticalAlignment="Center" Margin="10,0,0,0"/>
+							<Label x:Name="Demo_Pol_Axis_OPU1" Content="Ось Поляризации" Grid.Row="3" FontSize="36" VerticalAlignment="Center" Margin="10,0,0,0"/>
 
-							<Label x:Name="Demo_UMPos_OPU1" Content="0.0°" Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" FontSize="36" HorizontalAlignment="Center"/>
-							<Label x:Name="Demo_YPos_OPU1" Content="0.0 мм" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="36"/>
-							<Label x:Name="Demo_PolPos_OPU1" Content="0.0°" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="36"/>
+							<Label x:Name="Demo_AzPos_OPU1" Content="0.0°" Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" FontSize="36" HorizontalAlignment="Center"/>
+							<Label x:Name="Demo_UMPos_OPU1" Content="0.0°" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" FontSize="36" HorizontalAlignment="Center"/>
+							<Label x:Name="Demo_YPos_OPU1" Content="0.0 мм" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="36"/>
+							<Label x:Name="Demo_PolPos_OPU1" Content="0.0°" Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="36"/>
 
-							<ProgressBar x:Name="Demo_UmProg_OPU1" Style="{DynamicResource DemoProgressBar}" Grid.Column="2" Grid.Row="0" Margin="20,20,20,20"/>
-							<ProgressBar x:Name="Demo_YProg_OPU1" Style="{DynamicResource DemoProgressBar}" Grid.Column="2" Grid.Row="1" Margin="20,20,20,20"/>
-							<ProgressBar x:Name="Demo_PolProg_OPU1" Style="{DynamicResource DemoProgressBar}" Grid.Column="2" Grid.Row="2" Margin="20,20,20,20"/>
+							<ProgressBar x:Name="Demo_AzProg_OPU1" Style="{DynamicResource DemoProgressBar}" Grid.Column="2" Grid.Row="0" Margin="20,20,20,20"/>
+							<ProgressBar x:Name="Demo_UmProg_OPU1" Style="{DynamicResource DemoProgressBar}" Grid.Column="2" Grid.Row="1" Margin="20,20,20,20"/>
+							<ProgressBar x:Name="Demo_YProg_OPU1" Style="{DynamicResource DemoProgressBar}" Grid.Column="2" Grid.Row="2" Margin="20,20,20,20"/>
+							<ProgressBar x:Name="Demo_PolProg_OPU1" Style="{DynamicResource DemoProgressBar}" Grid.Column="2" Grid.Row="3" Margin="20,20,20,20"/>
 						</Grid>
 					</TabItem>
 					<TabItem x:Name="OPU2_Demo_Tab">
 						<Grid x:Name="DemoView_OPU2" Grid.Row="1" Grid.Column="0">
 							<Grid.RowDefinitions>
+								<RowDefinition Height="1*"/>
 								<RowDefinition Height="1*"/>
 								<RowDefinition Height="1*"/>
 								<RowDefinition Height="1*"/>
@@ -1169,21 +1175,28 @@
 							<Separator VerticalAlignment="Bottom" Background="#FF6D6D6D" Grid.Row="1" Grid.ColumnSpan="3"/>
 							<Separator VerticalAlignment="Bottom" Background="#FF6D6D6D" Grid.Row="2" Grid.ColumnSpan="3"/>
 							<Separator VerticalAlignment="Bottom" Background="#FF6D6D6D" Grid.Row="3" Grid.ColumnSpan="3"/>
+							<Separator VerticalAlignment="Bottom" Background="#FF6D6D6D" Grid.Row="4" Grid.ColumnSpan="3"/>
 
+							
 							<Label x:Name="Demo_Az_Axis_OPU2" Content="Ось Азимута" Grid.Row="0" FontSize="36" VerticalAlignment="Center" Margin="10,0,0,0"/>
 							<Label x:Name="Demo_UM_Axis_OPU2" Content="Ось Угла места" Grid.Row="1" FontSize="36" VerticalAlignment="Center" Margin="10,0,0,0"/>
-							<Label x:Name="Demo_Y_Axis_OPU2" Content="Ось Y" Grid.Row="2" FontSize="36" VerticalAlignment="Center" Margin="10,0,0,0"/>
-							<Label x:Name="Demo_Pol_Axis_OPU2" Content="Ось Поляризации" Grid.Row="3" FontSize="36" VerticalAlignment="Center" Margin="10,0,0,0"/>
+							<Label x:Name="Demo_X_Axis_OPU2" Content="Ось X" Grid.Row="2" FontSize="36" VerticalAlignment="Center" Margin="10,0,0,0"/>
+							<Label x:Name="Demo_Y_Axis_OPU2" Content="Ось Y" Grid.Row="3" FontSize="36" VerticalAlignment="Center" Margin="10,0,0,0"/>
+							<Label x:Name="Demo_Pol_Axis_OPU2" Content="Ось Поляризации" Grid.Row="4" FontSize="36" VerticalAlignment="Center" Margin="10,0,0,0"/>
 
+							
 							<Label x:Name="Demo_AzPos_OPU2" Content="0.0°" Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" FontSize="36" HorizontalAlignment="Center"/>
 							<Label x:Name="Demo_UMPos_OPU2" Content="0.0°" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" FontSize="36" HorizontalAlignment="Center"/>
-							<Label x:Name="Demo_YPos_OPU2" Content="0.0 мм" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="36"/>
-							<Label x:Name="Demo_PolPos_OPU2" Content="0.0°" Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="36"/>
+							<Label x:Name="Demo_XPos_OPU2" Content="0.0 мм" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="36"/>
+							<Label x:Name="Demo_YPos_OPU2" Content="0.0 мм" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="36"/>
+							<Label x:Name="Demo_PolPos_OPU2" Content="0.0°" Grid.Row="4" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="36"/>
 
+							
 							<ProgressBar x:Name="Demo_AzProg_OPU2" Style="{DynamicResource DemoProgressBar}" Grid.Column="2" Grid.Row="0" Margin="20,20,20,20"/>
 							<ProgressBar x:Name="Demo_UmProg_OPU2" Style="{DynamicResource DemoProgressBar}" Grid.Column="2" Grid.Row="1" Margin="20,20,20,20"/>
-							<ProgressBar x:Name="Demo_YProg_OPU2" Style="{DynamicResource DemoProgressBar}" Grid.Column="2" Grid.Row="2" Margin="20,20,20,20"/>
-							<ProgressBar x:Name="Demo_PolProg_OPU2" Style="{DynamicResource DemoProgressBar}" Grid.Column="2" Grid.Row="3" Margin="20,20,20,20"/>
+							<ProgressBar x:Name="Demo_XProg_OPU2" Style="{DynamicResource DemoProgressBar}" Grid.Column="2" Grid.Row="2" Margin="20,20,20,20"/>
+							<ProgressBar x:Name="Demo_YProg_OPU2" Style="{DynamicResource DemoProgressBar}" Grid.Column="2" Grid.Row="3" Margin="20,20,20,20"/>
+							<ProgressBar x:Name="Demo_PolProg_OPU2" Style="{DynamicResource DemoProgressBar}" Grid.Column="2" Grid.Row="4" Margin="20,20,20,20"/>
 						</Grid>
 					</TabItem>
 				</TabControl>
