@@ -20,35 +20,19 @@
 				</Grid.RowDefinitions>
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition Width="1*"/>
-					<ColumnDefinition Width="8*"/>
+					<ColumnDefinition Width="5*"/>
 					<ColumnDefinition Width="2*"/>
 				</Grid.ColumnDefinitions>
-				<GroupBox Grid.Row="1" Grid.Column="1">
-					<Viewbox x:Name="viewbox" Margin="0,10,0,10" >
-						<Canvas x:Name="Demo_Canvas" Background="#FF798CBB" Width="540" Height="450" >
-							<Grid Width="260" Height="260" Canvas.Left="140" Canvas.Top="115">
-								<Rectangle Fill="Black" Height="200" Margin="0,60,0,0" />
-								<Rectangle Fill="Black" Stroke="DimGray" Margin="0,0,0,50" RadiusX="10" RadiusY="10"/>
-								<Rectangle Fill="Gray" Height="130" Margin="0,0,0,50"/>
-							</Grid>
-
-							<Grid x:Name="Slider_X_Rect" Width="260" Height="210" Canvas.Left="10" Canvas.Top="115">
-								<Rectangle Fill="Black" Stroke="#FF3E3E3E" RadiusX="10" RadiusY="10"/>
-								<Rectangle Fill="Gray" Width="130"/>
-							</Grid>
-
-							<Grid x:Name="Slider_Y_Rect" Width="260" Height="210" Canvas.Left="10" Canvas.Top="10">
-								<Rectangle Fill="Black" RadiusX="10" RadiusY="10" Stroke="White"/>
-								<Rectangle Fill="#FF9A9A9A" Width="100" Height="70" />
-							</Grid>
-
-							<Ellipse x:Name="Target_Pos_Point" Height="40" Width="40" Fill="White" Canvas.Left="120" Canvas.Top="95" Opacity="0.5" PreviewMouseLeftButtonDown="Target_Pos_Point_PreviewMouseLeftButtonDown" PreviewTouchDown="Target_Pos_Point_PreviewTouchDown"/>
-
-							<Rectangle Stroke="White" Opacity="0.8" Canvas.Left="120" Canvas.Top="95" Width="300" Height="260"/>
-						</Canvas>
-					</Viewbox>
-				</GroupBox>
-				<Slider x:Name="Vertical_Pos_Slider" Grid.Row="1" Grid.Column="0" Orientation="Vertical" HorizontalAlignment="Left" Cursor="ScrollNS" Maximum="2200" SmallChange="1" LargeChange="20" IsDirectionReversed="True" ValueChanged="Vertical_Pos_Slider_ValueChanged" Margin="83,130,0,129" HorizontalContentAlignment="Center" RenderTransformOrigin="0.5,0.5">
+				<Grid Grid.Row="0" Grid.Column="1">
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="1*"/>
+						<ColumnDefinition Width="1*"/>
+					</Grid.ColumnDefinitions>
+					<Label x:Name="XPos_Label" Content="Позиция Х: 130.00 мм" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="34"/>
+					<Label x:Name="YPos_Label" Content="Позиция Y: 105.00 мм" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="34"/>
+				</Grid>
+				<Label x:Name="Slider_Control" Content="Управление" Grid.Column="2" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="28" />
+				<Slider x:Name="Vertical_Pos_Slider" Grid.Row="1" Grid.Column="0" Orientation="Vertical" HorizontalAlignment="Right" Cursor="ScrollNS" Maximum="105" SmallChange="1" LargeChange="5" IsDirectionReversed="True" ValueChanged="Vertical_Pos_Slider_ValueChanged" Margin="83,130,30,129" HorizontalContentAlignment="Center" RenderTransformOrigin="0.5,0.5" TickPlacement="BottomRight" AutoToolTipPlacement="BottomRight" Minimum="-105" AutoToolTipPrecision="2">
 					<Slider.RenderTransform>
 						<TransformGroup>
 							<ScaleTransform ScaleY="2" ScaleX="2"/>
@@ -58,13 +42,149 @@
 						</TransformGroup>
 					</Slider.RenderTransform>
 				</Slider>
-				<Slider x:Name="Horizontal_Pos_Slider" Grid.Row="2" Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top" Cursor="ScrollWE" Maximum="2600" LargeChange="20" SmallChange="1" ValueChanged="Horizontal_Pos_Slider_ValueChanged" Margin="236,15,236,0" RenderTransformOrigin="0.5,0.5">
+				<GroupBox Grid.Row="1" Grid.Column="1">
+					<Viewbox x:Name="viewbox" Margin="0,10,0,10" >
+						<Canvas x:Name="Demo_Canvas" Background="#FF798CBB" Width="540" Height="440">
+							<Grid Width="260" Height="260" Canvas.Left="140" Canvas.Top="115">
+								<Rectangle Fill="Black" Height="200" Margin="0,60,0,0" />
+								<Rectangle Fill="Black" Stroke="DimGray" Margin="0,0,0,50" RadiusX="10" RadiusY="10"/>
+								<Rectangle Fill="Gray" Height="130" Margin="0,0,0,50"/>
+							</Grid>
+
+							<Grid x:Name="Slider_X_Rect" Width="260" Height="210" Canvas.Left="140" Canvas.Top="115">
+								<Rectangle Fill="Black" Stroke="#FF3E3E3E" RadiusX="10" RadiusY="10"/>
+								<Rectangle Fill="Gray" Width="130"/>
+							</Grid>
+
+							<Grid x:Name="Slider_Y_Rect" Width="260" Height="210" Canvas.Left="140" Canvas.Top="115">
+								<Rectangle Fill="Black" RadiusX="10" RadiusY="10" Stroke="White"/>
+								<Rectangle Fill="#FF9A9A9A" Width="100" Height="70" />
+							</Grid>
+
+							<Ellipse x:Name="Target_Pos_Point" Height="40" Width="40" Fill="White" Canvas.Left="250" Canvas.Top="200" Opacity="0.5" PreviewMouseLeftButtonDown="Target_Pos_Point_PreviewMouseLeftButtonDown" PreviewTouchDown="Target_Pos_Point_PreviewTouchDown"/>
+							<Popup x:Name="Target_Pos_Popup" PopupAnimation="Fade" AllowsTransparency="True" PlacementTarget="{Binding ElementName=Target_Pos_Point}" Placement="Center" VerticalOffset="-40">
+								<TextBlock x:Name="PopupText" Text="0.00 ; 0.00" FontSize="16" Background="White"/>
+							</Popup>
+
+							<Rectangle Stroke="White" Opacity="0.8" Canvas.Left="120" Canvas.Top="95" Width="300" Height="250"/>
+						</Canvas>
+					</Viewbox>
+				</GroupBox>
+				
+				<Grid Grid.Row="1" Grid.Column="2">
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="1*"/>
+						<ColumnDefinition Width="1*"/>
+					</Grid.ColumnDefinitions>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="1*"/>
+						<RowDefinition Height="1*"/>
+						<RowDefinition Height="1*"/>
+						<RowDefinition Height="1*"/>
+					</Grid.RowDefinitions>
+					<Button x:Name="PowerSwitch_Btn" Style="{DynamicResource DefBtn}" Grid.Row="0" Grid.Column="0" Margin="20,10,0,10">
+						<Button.Resources>
+							<Style TargetType="Border">
+								<Setter Property="CornerRadius" Value="10, 0, 0, 10"/>
+							</Style>
+						</Button.Resources>
+						<Path Stroke="White" StrokeThickness="5">
+							<Path.Data>
+								<PathGeometry Figures="M 50,20 A 30,30 0 1 1 10,20 M 30,5 L 30,30"/>
+							</Path.Data>
+						</Path>
+					</Button>
+					<Button x:Name="Stop_Btn" Style="{DynamicResource DefBtn}" Grid.Row="0" Grid.Column="1" Margin="0,10,20,10">
+						<Button.Resources>
+							<Style TargetType="Border">
+								<Setter Property="CornerRadius" Value="0, 10, 10, 0"/>
+							</Style>
+						</Button.Resources>
+						<Path x:Name="StopSign" Stroke="White" StrokeThickness="5">
+							<Path.Data>
+								<PathGeometry Figures="M 20,0 L 40,0 60,20 60,40 40,60 20,60 0,40 0,20 20,0"/>
+							</Path.Data>
+							<Path.Fill>
+								<SolidColorBrush x:Name="StopSignBrush" Color="#FFA50000"/>
+							</Path.Fill>
+						</Path>
+						<Button.Triggers>
+							<EventTrigger RoutedEvent="Button.Click">
+								<BeginStoryboard>
+									<Storyboard>
+										<ColorAnimationUsingKeyFrames Storyboard.TargetName="StopSignBrush" Storyboard.TargetProperty="Color" Duration="0:0:0.5">
+											<ColorAnimationUsingKeyFrames.KeyFrames>
+												<LinearColorKeyFrame Value="Red" KeyTime="0:0:0"/>
+												<LinearColorKeyFrame Value="#FFA50000" KeyTime="0:0:0.5"/>
+											</ColorAnimationUsingKeyFrames.KeyFrames>
+										</ColorAnimationUsingKeyFrames>
+									</Storyboard>
+								</BeginStoryboard>
+							</EventTrigger>
+						</Button.Triggers>
+					</Button>
+					<Button x:Name="Square_Btn" Style="{DynamicResource DefBtn}" Grid.Row="1" Grid.Column="0" Margin="10,0,0,0">
+						<Button.Resources>
+							<Style TargetType="Border">
+								<Setter Property="CornerRadius" Value="10, 0, 0, 0"/>
+							</Style>
+						</Button.Resources>
+						<Rectangle Stroke="White" Width="60" Height="60" StrokeThickness="5" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+					</Button>
+					
+					<Button x:Name="Circle_Btn" Style="{DynamicResource DefBtn}" Grid.Row="1" Grid.Column="1" Margin="0,0,10,0">
+
+						<Button.Resources>
+							<Style TargetType="Border">
+								<Setter Property="CornerRadius" Value="0, 10, 0, 0"/>
+							</Style>
+						</Button.Resources>
+						<Ellipse Stroke="White" StrokeThickness="5" Width="60" Height="60" />
+					</Button>
+					<Button x:Name="Triangle_Btn" Style="{DynamicResource DefBtn}" Grid.Row="2" Grid.Column="0" Margin="10,0,0,0">
+						<Path Stroke="White" StrokeThickness="5" StrokeStartLineCap="Round" StrokeEndLineCap="Round" VerticalAlignment="Center" HorizontalAlignment="Center" StrokeLineJoin="Round">
+							<Path.Data>
+								<PathGeometry Figures="M 30,0 L 60,60 0,60 30,0" FillRule="EvenOdd"/>
+							</Path.Data>
+						</Path>
+					</Button>
+					<Button x:Name="Star_Btn" Style="{DynamicResource DefBtn}" Grid.Row="2" Grid.Column="1" Margin="0,0,10,0">
+						<Path Stroke="White" StrokeThickness="5" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round">
+							<Path.Data>
+								<PathGeometry Figures="M 32,0 L 42,18 62,26 48,36 52,56 32,48 12,56 16,36 2,26 22,18 32,0"/>
+							</Path.Data>
+						</Path>
+					</Button>
+					
+					<Button x:Name="Hourglass_Btn" Style="{DynamicResource DefBtn}" Grid.Row="3" Grid.Column="0" Margin="10,0,0,0">
+						<Button.Resources>
+							<Style TargetType="Border">
+								<Setter Property="CornerRadius" Value="0, 0, 0, 10"/>
+							</Style>
+						</Button.Resources>
+						<Path Stroke="White" StrokeThickness="5">
+							<Path.Data>
+								<PathGeometry Figures="M 20,30 L 0,0 40,0 0,60 40,60 20,30"/>
+							</Path.Data>
+						</Path>
+					</Button>
+					<Button x:Name="Random_Btn" Style="{DynamicResource DefBtn}" Grid.Row="3" Grid.Column="1" Margin="0,0,10,0">
+						<Button.Resources>
+							<Style TargetType="Border">
+								<Setter Property="CornerRadius" Value="0, 0, 10, 0"/>
+							</Style>
+						</Button.Resources>
+						<Path Stroke="White" StrokeThickness="5" StrokeLineJoin="Round" StrokeStartLineCap="Round" StrokeEndLineCap="Round" >
+							<Path.Data>
+								<PathGeometry Figures="M 0,0 L 30,60 60,30 0,60 30,0 60,60 60,0 30,30 0,30"/>
+							</Path.Data>
+						</Path>
+					</Button>
+				</Grid>
+				<Slider x:Name="Horizontal_Pos_Slider" Grid.Row="2" Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top" Cursor="ScrollWE" Maximum="130" LargeChange="5" SmallChange="1" ValueChanged="Horizontal_Pos_Slider_ValueChanged" Margin="236,30,236,0" RenderTransformOrigin="0.5,0.5" TickPlacement="TopLeft" AutoToolTipPlacement="TopLeft" Minimum="-130">
 					<Slider.RenderTransform>
 						<TransformGroup>
 							<ScaleTransform ScaleX="2" ScaleY="2"/>
-							<SkewTransform/>
-							<RotateTransform/>
-							<TranslateTransform/>
 						</TransformGroup>
 					</Slider.RenderTransform>
 				</Slider>

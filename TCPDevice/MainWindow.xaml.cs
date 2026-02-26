@@ -33,7 +33,8 @@ namespace TCPDevice
 		private float[] OPU1_LowerLimits = { -130.0f, 130.0f };
 		private float[] OPU1_UpperLimits = { -105.0f, 105.0f };
 		private bool OPU1_Enabled = false;
-		private double[] OPU1_Position = { 0.0, 0.0, 0.0, 0.0 };
+		private double[] OPU1_Position = { 0.0, 0.0};
+		private double[] OPU1_TargetPos = { 0.0, 0.0 };
 		private bool OPU1_Stopped = false;
 		private bool OPU1_InError = false;
 
@@ -137,26 +138,27 @@ namespace TCPDevice
 		private void Vertical_Pos_Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
 		{
 			//Canvas.SetTop(Target_Pos_Point, 95 + Vertical_Pos_Slider.Value / 10.0);
-			Canvas.SetTop(Slider_Y_Rect, 10 + Vertical_Pos_Slider.Value / 10.0);
+			Canvas.SetTop(Slider_Y_Rect, 10 + Vertical_Pos_Slider.Value + 105.0);
 		}
 
 		private void Horizontal_Pos_Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
 		{
 			//Canvas.SetLeft(Target_Pos_Point, 120 + Horizontal_Pos_Slider.Value / 10.0 );
-			Canvas.SetLeft(Slider_X_Rect, 10 + Horizontal_Pos_Slider.Value / 10.0 );
-			Canvas.SetLeft(Slider_Y_Rect, 10 + Horizontal_Pos_Slider.Value / 10.0 );
+			Canvas.SetLeft(Slider_X_Rect, 10 + Horizontal_Pos_Slider.Value + 130.0);
+			Canvas.SetLeft(Slider_Y_Rect, 10 + Horizontal_Pos_Slider.Value + 130.0);
 		}
 
 		private void Target_Pos_Point_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 		{
 			isDragging = true;
+			Target_Pos_Popup.IsOpen = true;
 		}
 
 		private void Window_MouseMove(object sender, MouseEventArgs e)
 		{
 			if (isDragging)//120 95 380 315
 			{
-				if (Mouse.GetPosition(relativeTo: Demo_Canvas).Y - 20.0 >= 95.0 && Mouse.GetPosition(relativeTo: Demo_Canvas).Y - 20.0 <= 315.0)
+				if (Mouse.GetPosition(relativeTo: Demo_Canvas).Y - 20.0 >= 95.0 && Mouse.GetPosition(relativeTo: Demo_Canvas).Y - 20.0 <= 305.0)
 				{
 					Canvas.SetTop(Target_Pos_Point, Mouse.GetPosition(relativeTo: Demo_Canvas).Y - 20);
 				}
@@ -166,7 +168,7 @@ namespace TCPDevice
 				}
 				else
 				{
-					Canvas.SetTop(Target_Pos_Point, 315.0);
+					Canvas.SetTop(Target_Pos_Point, 305.0);
 				}
 				if (Mouse.GetPosition(relativeTo: Demo_Canvas).X - 20.0 >= 120.0 && Mouse.GetPosition(relativeTo: Demo_Canvas).X - 20.0 <= 380.0)
 				{
@@ -180,17 +182,29 @@ namespace TCPDevice
 				{
 					Canvas.SetLeft(Target_Pos_Point, 380.0);
 				}
+
+				OPU1_TargetPos[0] = Canvas.GetLeft(Target_Pos_Point) - 250.0;
+				OPU1_TargetPos[1] = Canvas.GetTop(Target_Pos_Point) - 200.0;
+				Target_Pos_Popup.HorizontalOffset = Target_Pos_Popup.HorizontalOffset += 0.01;
+				Target_Pos_Popup.HorizontalOffset = 0;
+				Target_Pos_Popup.VerticalOffset = -40;
+				PopupText.Text = OPU1_TargetPos[0].ToString("0.00") + " ; " + OPU1_TargetPos[1].ToString("0.00");
+
+				XPos_Label.Content = "Позиция Х: " + OPU1_TargetPos[0].ToString("0.00 мм");
+				YPos_Label.Content = "Позиция Y: " + OPU1_TargetPos[1].ToString("0.00 мм");
 			}
 		}
 
 		private void Window_MouseUp(object sender, MouseButtonEventArgs e)
 		{
 			isDragging = false;
+			Target_Pos_Popup.IsOpen = false;
 		}
 
 		private void Target_Pos_Point_PreviewTouchDown(object sender, TouchEventArgs e)
 		{
 			isDragging = true;
+			
 		}
 
 		private void Window_TouchMove(object sender, TouchEventArgs e)
@@ -221,6 +235,16 @@ namespace TCPDevice
 				{
 					Canvas.SetLeft(Target_Pos_Point, 380);
 				}
+
+				OPU1_TargetPos[0] = Canvas.GetLeft(Target_Pos_Point) - 250.0;
+				OPU1_TargetPos[1] = Canvas.GetTop(Target_Pos_Point) - 200.0;
+				Target_Pos_Popup.HorizontalOffset = Target_Pos_Popup.HorizontalOffset += 0.01;
+				Target_Pos_Popup.HorizontalOffset = 0;
+				Target_Pos_Popup.VerticalOffset = -40;
+				PopupText.Text = OPU1_TargetPos[0].ToString("0.00") + " ; " + OPU1_TargetPos[1].ToString("0.00");
+
+				XPos_Label.Content = "Позиция Х: " + OPU1_TargetPos[0].ToString("0.00 мм");
+				YPos_Label.Content = "Позиция Y: " + OPU1_TargetPos[1].ToString("0.00 мм");
 			}
 		}
 	}
