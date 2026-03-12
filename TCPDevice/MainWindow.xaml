@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:TCPDevice"
         mc:Ignorable="d"
 		Closing="Window_Closing"
-        Title="ТЕСАРТ Сервисное ПО" Height="720" Width="1280" Background="White" MinWidth="1074" MinHeight="624" MouseMove="Window_MouseMove" MouseUp="Window_MouseUp" TouchMove="Window_TouchMove">
+        Title="ТЕСАРТ Сервисное ПО" Height="720" Width="1280" Background="White" MinWidth="1074" MinHeight="624" MouseMove="Window_MouseMove" MouseUp="Window_MouseUp" TouchMove="Window_TouchMove" Loaded="Window_Loaded" TouchUp="Window_TouchUp">
 	<Window.Resources>
 
 	</Window.Resources>
@@ -70,7 +70,7 @@
 						</Canvas>
 					</Viewbox>
 				</GroupBox>
-				
+
 				<Grid Grid.Row="1" Grid.Column="2">
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="1*"/>
@@ -82,32 +82,37 @@
 						<RowDefinition Height="1*"/>
 						<RowDefinition Height="1*"/>
 					</Grid.RowDefinitions>
-					<Button x:Name="PowerSwitch_Btn" Style="{DynamicResource DefBtn}" Grid.Row="0" Grid.Column="0" Margin="20,10,0,10">
+					<Button x:Name="PowerSwitch_Btn" Style="{DynamicResource DefBtn}" Grid.Row="0" Grid.Column="0" Margin="20,10,0,10" Click="PowerSwitch_Btn_Click">
 						<Button.Resources>
 							<Style TargetType="Border">
 								<Setter Property="CornerRadius" Value="10, 0, 0, 10"/>
 							</Style>
 						</Button.Resources>
-						<Path Stroke="White" StrokeThickness="5">
+						<Path StrokeThickness="5" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Stroke="White">
 							<Path.Data>
 								<PathGeometry Figures="M 50,20 A 30,30 0 1 1 10,20 M 30,5 L 30,30"/>
 							</Path.Data>
 						</Path>
 					</Button>
-					<Button x:Name="Stop_Btn" Style="{DynamicResource DefBtn}" Grid.Row="0" Grid.Column="1" Margin="0,10,20,10">
+					<Button x:Name="Stop_Btn" Style="{DynamicResource DefBtn}" Grid.Row="0" Grid.Column="1" Margin="0,10,20,10" Click="Stop_Btn_Click">
 						<Button.Resources>
 							<Style TargetType="Border">
 								<Setter Property="CornerRadius" Value="0, 10, 10, 0"/>
 							</Style>
 						</Button.Resources>
-						<Path x:Name="StopSign" Stroke="White" StrokeThickness="5">
-							<Path.Data>
-								<PathGeometry Figures="M 20,0 L 40,0 60,20 60,40 40,60 20,60 0,40 0,20 20,0"/>
-							</Path.Data>
-							<Path.Fill>
-								<SolidColorBrush x:Name="StopSignBrush" Color="#FFA50000"/>
-							</Path.Fill>
-						</Path>
+						<Grid>
+							<Path x:Name="StopSign" Stroke="White" StrokeThickness="4" StrokeStartLineCap="Round">
+								<Path.Data>
+									<PathGeometry Figures="M 20,0 L 40,0 60,20 60,40 40,60 20,60 0,40 0,20 Z M 40,16 L 40,30 M 35,13 L 35,30 M 30,12 L 30,30 M 25,14 L 25,30 M 18,26 L 26,38"/>
+								</Path.Data>
+								<Path.Fill>
+									<SolidColorBrush x:Name="StopSignBrush" Color="#FFA50000"/>
+								</Path.Fill>
+							</Path>
+							<Rectangle Fill="White" Margin="23,27,21,26"/>
+							<Ellipse Fill="White" RenderTransformOrigin="0.606,0.52" Margin="22,27,21,17" Height="18" Width="20"/>
+						</Grid>
+
 						<Button.Triggers>
 							<EventTrigger RoutedEvent="Button.Click">
 								<BeginStoryboard>
@@ -123,7 +128,7 @@
 							</EventTrigger>
 						</Button.Triggers>
 					</Button>
-					<Button x:Name="Square_Btn" Style="{DynamicResource DefBtn}" Grid.Row="1" Grid.Column="0" Margin="10,0,0,0">
+					<Button x:Name="Square_Btn" Style="{DynamicResource DefBtn}" Grid.Row="1" Grid.Column="0" Margin="10,0,0,0" Click="Square_Btn_Click">
 						<Button.Resources>
 							<Style TargetType="Border">
 								<Setter Property="CornerRadius" Value="10, 0, 0, 0"/>
@@ -131,8 +136,8 @@
 						</Button.Resources>
 						<Rectangle Stroke="White" Width="60" Height="60" StrokeThickness="5" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 					</Button>
-					
-					<Button x:Name="Circle_Btn" Style="{DynamicResource DefBtn}" Grid.Row="1" Grid.Column="1" Margin="0,0,10,0">
+
+					<Button x:Name="Circle_Btn" Style="{DynamicResource DefBtn}" Grid.Row="1" Grid.Column="1" Margin="0,0,10,0" Click="Circle_Btn_Click">
 
 						<Button.Resources>
 							<Style TargetType="Border">
@@ -141,22 +146,22 @@
 						</Button.Resources>
 						<Ellipse Stroke="White" StrokeThickness="5" Width="60" Height="60" />
 					</Button>
-					<Button x:Name="Triangle_Btn" Style="{DynamicResource DefBtn}" Grid.Row="2" Grid.Column="0" Margin="10,0,0,0">
+					<Button x:Name="Triangle_Btn" Style="{DynamicResource DefBtn}" Grid.Row="2" Grid.Column="0" Margin="10,0,0,0" Click="Triangle_Btn_Click">
 						<Path Stroke="White" StrokeThickness="5" StrokeStartLineCap="Round" StrokeEndLineCap="Round" VerticalAlignment="Center" HorizontalAlignment="Center" StrokeLineJoin="Round">
 							<Path.Data>
-								<PathGeometry Figures="M 30,0 L 60,60 0,60 30,0" FillRule="EvenOdd"/>
+								<PathGeometry Figures="M 30,0 L 60,60 0,60 Z"/>
 							</Path.Data>
 						</Path>
 					</Button>
-					<Button x:Name="Star_Btn" Style="{DynamicResource DefBtn}" Grid.Row="2" Grid.Column="1" Margin="0,0,10,0">
+					<Button x:Name="Star_Btn" Style="{DynamicResource DefBtn}" Grid.Row="2" Grid.Column="1" Margin="0,0,10,0" Click="Star_Btn_Click">
 						<Path Stroke="White" StrokeThickness="5" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round">
 							<Path.Data>
-								<PathGeometry Figures="M 32,0 L 42,18 62,26 48,36 52,56 32,48 12,56 16,36 2,26 22,18 32,0"/>
+								<PathGeometry Figures="M 32,0 L 42,18 62,26 48,36 52,56 32,48 12,56 16,36 2,26 22,18 Z"/>
 							</Path.Data>
 						</Path>
 					</Button>
-					
-					<Button x:Name="Hourglass_Btn" Style="{DynamicResource DefBtn}" Grid.Row="3" Grid.Column="0" Margin="10,0,0,0">
+
+					<Button x:Name="Hourglass_Btn" Style="{DynamicResource DefBtn}" Grid.Row="3" Grid.Column="0" Margin="10,0,0,0" Click="Hourglass_Btn_Click">
 						<Button.Resources>
 							<Style TargetType="Border">
 								<Setter Property="CornerRadius" Value="0, 0, 0, 10"/>
@@ -164,11 +169,11 @@
 						</Button.Resources>
 						<Path Stroke="White" StrokeThickness="5">
 							<Path.Data>
-								<PathGeometry Figures="M 20,30 L 0,0 40,0 0,60 40,60 20,30"/>
+								<PathGeometry Figures="M 20,30 L 0,0 40,0 0,60 40,60 Z"/>
 							</Path.Data>
 						</Path>
 					</Button>
-					<Button x:Name="Random_Btn" Style="{DynamicResource DefBtn}" Grid.Row="3" Grid.Column="1" Margin="0,0,10,0">
+					<Button x:Name="Random_Btn" Style="{DynamicResource DefBtn}" Grid.Row="3" Grid.Column="1" Margin="0,0,10,0" Click="Random_Btn_Click">
 						<Button.Resources>
 							<Style TargetType="Border">
 								<Setter Property="CornerRadius" Value="0, 0, 10, 0"/>
