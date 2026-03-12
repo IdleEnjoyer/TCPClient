@@ -33,6 +33,8 @@ namespace TCPDevice
 		private NetworkStream Stream_OPU1;
 		private float[] OPU1_LowerLimits = new float[4];
 		private float[] OPU1_UpperLimits = new float[4];
+		private float[] OPU1_LowerVelLimits = {3.0f, 3.0f, 3.0f, 25.0f };
+		private float[] OPU1_UpperVelLimits = {12.0f, 12.0f, 12.0f, 50.0f };
 		private bool OPU1_Enabled = false;
 		private double[] OPU1_Position = { 0.0, 0.0, 0.0, 0.0 };
 		private bool OPU1_Stopped = false;
@@ -42,6 +44,8 @@ namespace TCPDevice
 		private NetworkStream Stream_OPU2;
 		private float[] OPU2_LowerLimits = new float[5];
 		private float[] OPU2_UpperLimits = new float[5];
+		private float[] OPU2_LowerVelLimits = { 3.0f, 3.0f, 3.0f, 25.0f, 25.0f };
+		private float[] OPU2_UpperVelLimits = { 6.0f, 6.0f, 6.0f, 50.0f, 50.0f };
 		private bool OPU2_Enabled = false;
 		private double[] OPU2_Position = { 0.0, 0.0, 0.0, 0.0, 0.0 };
 		private bool OPU2_Stopped = false;
@@ -75,6 +79,9 @@ namespace TCPDevice
 		private int OPU1_IngoreLimit_Counter = 0;
 		private int OPU2_IngoreLimit_Counter = 0;
 
+		private DispatcherTimer RandomTimer = new DispatcherTimer();
+		Random r = new Random();
+
 		private RadialGradientBrush GreenBrush = new(Color.FromRgb(255, 255, 255), Color.FromRgb(0, 255, 0));
 		private RadialGradientBrush RedBrush = new(Color.FromRgb(255, 255, 255), Color.FromRgb(255, 0, 0));
 		public MainWindow()
@@ -92,9 +99,26 @@ namespace TCPDevice
 			Wait_Timer = new DispatcherTimer();
 			Wait_Timer.Interval = TimeSpan.FromMilliseconds(3000);
 			Wait_Timer.Tick += Wait_Timer_Tick;
+
+			RandomTimer.Interval = TimeSpan.FromMilliseconds(50);
+			RandomTimer.Tick += RandomTimer_Tick;
+			RandomTimer.Stop();
 		}
 
-		
+		private void RandomTimer_Tick(object? sender, EventArgs e)
+		{
+			
+			if (OPU1_Stopped)
+			{
+				int Axis = r.Next(0, 4);
+				SendCommand_OPU1($"MOVE {"AEPY"[Axis]} {r.Next((int)OPU1_LowerLimits[Axis], (int)OPU1_UpperLimits[Axis])} {r.Next((int)OPU1_LowerVelLimits[Axis], (int)OPU1_UpperVelLimits[Axis])}");
+			}
+			if (OPU2_Stopped)
+			{
+				int Axis = r.Next(0, 5);
+				SendCommand_OPU1($"MOVE {"AEPXY"[Axis]} {r.Next((int)OPU2_LowerLimits[Axis], (int)OPU2_UpperLimits[Axis])} {r.Next((int)OPU2_LowerVelLimits[Axis], (int)OPU2_UpperVelLimits[Axis])}");
+			}
+		}
 
 		private void OPU1_StatusTimer_Tick(object? sender, EventArgs e)
 		{
@@ -1488,6 +1512,7 @@ namespace TCPDevice
 		private void DemoStop_Click(object sender, RoutedEventArgs e)
 		{
 			Wait_Timer.Stop();
+			RandomTimer.Stop();
 			Demo_Ongoing = false;
 		}
 
@@ -1643,6 +1668,17 @@ namespace TCPDevice
 			{
 				SendCommand_OPU2("INGORELIMIT");
 
+			}
+		}
+
+		private void RandomBtn_Click(object sender, RoutedEventArgs e)
+		{
+			if (Client_OPU1 != null & Client_OPU2 != null)
+			{
+				if (OPU1_Enabled & OPU2_Enabled)
+				{
+					RandomTimer.Start();
+				}
 			}
 		}
 	}

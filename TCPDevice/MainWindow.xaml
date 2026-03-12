@@ -1108,6 +1108,13 @@
 						</Button.Resources>
 					</Button>
 					<RadioButton Style="{DynamicResource DemoRadioButton}" x:Name="OPU1_Demo" GroupName="Demo" Grid.Row="1" Content="ОПУ 1" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="36" VerticalContentAlignment="Center" Checked="OPU1_Demo_Checked" IsChecked="True"/>
+					<Button Style="{DynamicResource DefBtn}" Foreground="#FFCFCFCF" x:Name="RandomBtn" Grid.Column="1" Grid.Row="1" Content="Случ. Движ." FontSize="36" Margin="0,5,0,5" Click="RandomBtn_Click">
+						<Button.Resources>
+							<Style TargetType="Border">
+								<Setter Property="CornerRadius" Value="10"/>
+							</Style>
+						</Button.Resources>
+					</Button>
 					<RadioButton Style="{DynamicResource DemoRadioButton}" x:Name="OPU2_Demo" GroupName="Demo" Grid.Row="2" Content="ОПУ 2" HorizontalAlignment="Center" RenderTransformOrigin="0,0" VerticalAlignment="Center" VerticalContentAlignment="Center" FontSize="36" Checked="OPU2_Demo_Checked"/>
 				</Grid>
 				<Grid x:Name="DemoProgressView" Grid.Row="0" Grid.Column="1">
