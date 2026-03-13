@@ -50,11 +50,6 @@ namespace TCPDevice
 			Star,
 			Circle
 		}
-		//private List<Point> Trajectory_Square = new List<Point>(new Point[] {new Point(100.0, 100.0), new Point(-100.0, 100.0), new Point(-100.0, -100.0), new Point(100.0, -100.0) });
-		//private List<Point> Trajectory_Hourglass = new List<Point>(new Point[] { new Point(100.0, 100.0), new Point(-100.0, 100.0), new Point(100.0, -100.0), new Point(-100.0, -100.0) });
-		//private List<Point> Trajectory_Triangle = new List<Point>(new Point[] { new Point(0.0, 100.0), new Point(-100.0, -100.0), new Point(100.0, -100.0) });
-		//private List<Point> Trajectory_Star = new List<Point>(new Point[] { new Point(0.0, 100.0), new Point(66.66, -100.0), new Point(-100.0, 66.66), new Point(100.0, 66.66), new Point(-66.66, -100.0) });
-		//private List<Point> Trajectory_Circle = new List<Point>(new Point[] { new Point(-100.0, 0.0), new Point(-66.66, 50.0), new Point(-33.33, 100.0), new Point(33.33, 100.0), new Point(66.66, 50.0), new Point(100.0, 0.0), new Point(66.66, -50.0), new Point(33.33, -100.0), new Point(-33.33, -100.0), new Point(-66.66, -50.0) });
 		
 		private bool OPU1_Stopped = false;
 		private bool OPU1_InError = false;
@@ -102,11 +97,11 @@ namespace TCPDevice
 				V.Normalize();
 				if (V.X != 0)
 				{
-					SendCommand($"MOVE#1 {Trajectories[(int)Current_Trajectory][Current_Point].X.ToString().Replace(',', '.')} {(20.0 * Math.Abs(V.X)).ToString().Replace(',', '.')}");
+					SendCommand($"MOVE#1 {Trajectories[(int)Current_Trajectory][Current_Point].X.ToString().Replace(',', '.')} {(40.0 * Math.Abs(V.X)).ToString().Replace(',', '.')}");
 				}
 				if (V.Y != 0)
 				{
-					SendCommand($"MOVE#2 {Trajectories[(int)Current_Trajectory][Current_Point].Y.ToString().Replace(',', '.')} {(20.0 * Math.Abs(V.Y)).ToString().Replace(',', '.')}");
+					SendCommand($"MOVE#2 {Trajectories[(int)Current_Trajectory][Current_Point].Y.ToString().Replace(',', '.')} {(40.0 * Math.Abs(V.Y)).ToString().Replace(',', '.')}");
 				}
 			}
 		}
@@ -407,7 +402,7 @@ namespace TCPDevice
 			Trajectory_Timer.Stop();
 			if (Client != null)
 			{
-				SendCommand("DIS");
+				SendCommand("STOP");
 			}
 		}
 
@@ -438,8 +433,8 @@ namespace TCPDevice
 				{
 					Current_Trajectory = Trajectory.Square;
 					Current_Point = 0;
-					SendCommand($"MOVE#1 {Trajectories[(int)Current_Trajectory][Current_Point].X} 20");
-					SendCommand($"MOVE#2 {Trajectories[(int)Current_Trajectory][Current_Point].Y} 20");
+					SendCommand($"MOVE#1 {Trajectories[(int)Current_Trajectory][Current_Point].X} 40");
+					SendCommand($"MOVE#2 {Trajectories[(int)Current_Trajectory][Current_Point].Y} 40");
 					Trajectory_Timer.Start();
 				}
 			}
