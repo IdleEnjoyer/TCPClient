@@ -190,11 +190,13 @@ namespace TCPDevice
 						{
 							case "^EN?:1:1~":
 								OPU1_Enabled = true;
+								PowerSwitch_Figure.Stroke = Brushes.Green;
 								break;
 							default:
 								if (Data.Contains("EN?"))
 								{
 									OPU1_Enabled = false;
+									PowerSwitch_Figure.Stroke = Brushes.Red;
 								}
 								if (Data.Contains("POS?"))
 								{

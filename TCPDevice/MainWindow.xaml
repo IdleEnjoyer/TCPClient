@@ -10,7 +10,7 @@
 	<Window.Resources>
 
 	</Window.Resources>
-	<TabControl x:Name="Control" Background="#FFAAB4C8">
+	<TabControl x:Name="Control" Background="#FF585858">
 		<TabItem x:Name="Demo_Tab" Header="Демонастрация">
 			<Grid>
 				<Grid.RowDefinitions>
@@ -28,10 +28,10 @@
 						<ColumnDefinition Width="1*"/>
 						<ColumnDefinition Width="1*"/>
 					</Grid.ColumnDefinitions>
-					<Label x:Name="XPos_Label" Content="Позиция Х: 130.00 мм" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="34"/>
-					<Label x:Name="YPos_Label" Content="Позиция Y: 105.00 мм" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="34"/>
+					<Label x:Name="XPos_Label" Content="Позиция Х: 130.00 мм" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="34" FontFamily="Bahnschrift"/>
+					<Label x:Name="YPos_Label" Content="Позиция Y: 105.00 мм" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="34" FontFamily="Bahnschrift"/>
 				</Grid>
-				<Label x:Name="Slider_Control" Content="Управление" Grid.Column="2" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="28" />
+				<Label x:Name="Slider_Control" Content="Управление" Grid.Column="2" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="28" FontFamily="Bahnschrift" />
 				<Slider x:Name="Vertical_Pos_Slider" Grid.Row="1" Grid.Column="0" Orientation="Vertical" HorizontalAlignment="Right" Cursor="ScrollNS" Maximum="105" SmallChange="1" LargeChange="5" IsDirectionReversed="True" ValueChanged="Vertical_Pos_Slider_ValueChanged" Margin="83,130,30,129" HorizontalContentAlignment="Center" RenderTransformOrigin="0.5,0.5" TickPlacement="BottomRight" AutoToolTipPlacement="BottomRight" Minimum="-105" AutoToolTipPrecision="2">
 					<Slider.RenderTransform>
 						<TransformGroup>
@@ -44,7 +44,7 @@
 				</Slider>
 				<GroupBox Grid.Row="1" Grid.Column="1">
 					<Viewbox x:Name="viewbox" Margin="0,10,0,10" >
-						<Canvas x:Name="Demo_Canvas" Background="#FF798CBB" Width="540" Height="440">
+						<Canvas x:Name="Demo_Canvas" Background="#FF969696" Width="540" Height="440">
 							<Grid Width="260" Height="260" Canvas.Left="140" Canvas.Top="115">
 								<Rectangle Fill="Black" Height="200" Margin="0,60,0,0" />
 								<Rectangle Fill="Black" Stroke="DimGray" Margin="0,0,0,50" RadiusX="10" RadiusY="10"/>
@@ -88,7 +88,7 @@
 								<Setter Property="CornerRadius" Value="10, 0, 0, 10"/>
 							</Style>
 						</Button.Resources>
-						<Path StrokeThickness="5" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Stroke="White">
+						<Path x:Name="PowerSwitch_Figure" StrokeThickness="5" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Stroke="Red">
 							<Path.Data>
 								<PathGeometry Figures="M 50,20 A 30,30 0 1 1 10,20 M 30,5 L 30,30"/>
 							</Path.Data>
