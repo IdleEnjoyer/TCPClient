@@ -37,11 +37,26 @@ namespace TCPDevice
 					{
 						MainWindow MW = this.Owner as MainWindow;
 						string Com = "SETLIM " + MW.Axis_OPU1 + MW.Axis_OPU2 + " " + Down + " " + Up;
-						MW.SendCommand_OPU1(Com);
+						if (MW.Axis_OPU2 == String.Empty)
+						{
+							MW.SendCommand_OPU1(Com);
+						}
+						if (MW.Axis_OPU1 == String.Empty)
+						{
+							MW.SendCommand_OPU2(Com);
+						}
 						this.Close();
 					}
 				}
 			}
         }
-    }
+
+		private void OPU1_TextBox_TouchDown(object sender, TouchEventArgs e)
+		{
+			KeyboardWindow KW = new KeyboardWindow();
+			KW.TB = (TextBox)sender;
+			KW.Owner = this;
+			KW.ShowDialog();
+		}
+	}
 }
