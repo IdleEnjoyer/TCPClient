@@ -32,7 +32,7 @@
 				</Style>
 			</TextBox.Resources>
 		</TextBox>
-		<Button x:Name="Confirm" Content="ОК" Grid.Row="2" Grid.ColumnSpan="2" FontSize="20" Margin="20,5,20,5" Foreground="#FFCFCFCF" Click="Confirm_Click" Style="{DynamicResource DefBtn}">
+		<Button x:Name="Confirm" Content="ОК" Grid.Row="2" Grid.ColumnSpan="2" FontSize="20" Margin="20,5,20,5" Foreground="#FFCFCFCF" Click="Confirm_Click" Style="{DynamicResource DefBtn}" IsDefault="True">
 			<Button.Resources>
 				<Style TargetType="Border">
 					<Setter Property="CornerRadius" Value="10"/>

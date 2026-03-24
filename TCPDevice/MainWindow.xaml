@@ -272,7 +272,7 @@
 						</Grid.ColumnDefinitions>
 						<Label x:Name="AzimuthLabel" Content="Азимут" Grid.Column="0" FontSize="28" VerticalAlignment="Center" Margin="5,0,0,0"/>
 						<Label x:Name="OPU1_AzCurPos" Content="0.0°" Grid.Column="1" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-						<TextBox x:Name="OPU1_AzTarPos" Text="0.0" Grid.Column="2" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="10,0,0,0" ToolTip="Позиция" TouchDown="OPU1_TextBox_TouchDown">
+						<TextBox x:Name="OPU1_AzTarPos" Text="0.0" Grid.Column="2" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="10,0,0,0" ToolTip="Позиция" TouchDown="OPU1_TextBox_TouchDown" >
 							<TextBox.Resources>
 								<Style TargetType="Border">
 									<Setter Property="CornerRadius" Value="10, 0, 0, 10"/>

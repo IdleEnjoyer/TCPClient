@@ -84,11 +84,13 @@ namespace TCPDevice
 
 		private RadialGradientBrush GreenBrush = new(Color.FromRgb(255, 255, 255), Color.FromRgb(0, 255, 0));
 		private RadialGradientBrush RedBrush = new(Color.FromRgb(255, 255, 255), Color.FromRgb(255, 0, 0));
+		private NumberFormatInfo DoubleFormat = new NumberFormatInfo();
 		public MainWindow()
         {
             InitializeComponent();
 			GreenBrush.Center = new Point(0.25, 0.25);
 			RedBrush.Center = new Point(0.25, 0.25);
+			DoubleFormat.NumberDecimalSeparator = ".";
 			OPU1_StatusTimer = new DispatcherTimer();
 			OPU1_StatusTimer.Interval = TimeSpan.FromMilliseconds(100);
 			OPU1_StatusTimer.Tick += OPU1_StatusTimer_Tick;
@@ -104,6 +106,8 @@ namespace TCPDevice
 			RandomTimer.Tick += RandomTimer_Tick;
 			RandomTimer.Stop();
 		}
+
+		
 
 		private void RandomTimer_Tick(object? sender, EventArgs e)
 		{
@@ -216,7 +220,7 @@ namespace TCPDevice
 		{
 			if (Client_OPU1.Connected)
 			{
-				WriteByteData = Encoding.UTF8.GetBytes("^" + Com + "~\r\n");
+				WriteByteData = Encoding.UTF8.GetBytes("^" + Com.Replace(',','.') + "~\r\n");
 				Stream_OPU1.Write(WriteByteData, 0, WriteByteData.Length);
 			}
 		}
@@ -225,7 +229,7 @@ namespace TCPDevice
 		{
 			if (Client_OPU2.Connected)
 			{
-				WriteByteData = Encoding.UTF8.GetBytes("^" + Com + "~\r\n");
+				WriteByteData = Encoding.UTF8.GetBytes("^" + Com.Replace(',', '.') + "~\r\n");
 				Stream_OPU2.Write(WriteByteData, 0, WriteByteData.Length);
 			}
 		}
@@ -583,7 +587,7 @@ namespace TCPDevice
 
 		private void OPU1_AzJogLeft_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 		{
-			if (float.TryParse(OPU1_AzTarSpd.Text.Replace('.', ','), out float Spd))
+			if (double.TryParse(OPU1_AzTarSpd.Text, DoubleFormat, out double Spd))
 			{
 				SendCommand_OPU1("MOVE A " + OPU1_LowerLimits[0].ToString() + " " + Spd.ToString());
 			}
@@ -596,7 +600,7 @@ namespace TCPDevice
 
 		private void OPU1_AzJogRight_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 		{
-			if (float.TryParse(OPU1_AzTarSpd.Text.Replace('.', ','), out float Spd))
+			if (double.TryParse(OPU1_AzTarSpd.Text, DoubleFormat, out double Spd))
 			{
 				SendCommand_OPU1("MOVE A " + OPU1_UpperLimits[0].ToString() + " " + Spd.ToString());
 			}
@@ -609,9 +613,9 @@ namespace TCPDevice
 
 		private void OPU1_AzMove_Click(object sender, RoutedEventArgs e)
 		{
-			if (float.TryParse(OPU1_AzTarPos.Text.Replace('.', ','), out float Pos))
+			if (double.TryParse(OPU1_AzTarPos.Text, DoubleFormat, out double Pos))
 			{
-				if (float.TryParse(OPU1_AzTarSpd.Text.Replace('.', ','), out float Spd))
+				if (double.TryParse(OPU1_AzTarSpd.Text, DoubleFormat, out double Spd))
 				{
 					SendCommand_OPU1("MOVE A " + Pos.ToString() + " " + Spd.ToString());
 				}
@@ -625,7 +629,7 @@ namespace TCPDevice
 
 		private void OPU1_UmJogLeft_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 		{
-			if (float.TryParse(OPU1_UmTarSpd.Text.Replace('.', ','), out float Spd))
+			if (double.TryParse(OPU1_UmTarSpd.Text, DoubleFormat, out double Spd))
 			{
 				SendCommand_OPU1("MOVE E " + OPU1_LowerLimits[1].ToString() + " " + Spd.ToString());
 			}
@@ -638,9 +642,9 @@ namespace TCPDevice
 
 		private void OPU1_UmMove_Click(object sender, RoutedEventArgs e)
 		{
-			if (float.TryParse(OPU1_UmTarPos.Text.Replace('.', ','), out float Pos))
+			if (double.TryParse(OPU1_UmTarPos.Text, DoubleFormat, out double Pos))
 			{
-				if (float.TryParse(OPU1_UmTarSpd.Text.Replace('.', ','), out float Spd))
+				if (double.TryParse(OPU1_UmTarSpd.Text, DoubleFormat, out double Spd))
 				{
 					SendCommand_OPU1("MOVE E " + Pos.ToString() + " " + Spd.ToString());
 				}
@@ -649,7 +653,7 @@ namespace TCPDevice
 
 		private void OPU1_UmJogRight_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 		{
-			if (float.TryParse(OPU1_UmTarSpd.Text.Replace('.', ','), out float Spd))
+			if (double.TryParse(OPU1_UmTarSpd.Text, DoubleFormat, out double Spd))
 			{
 				SendCommand_OPU1("MOVE E " + OPU1_UpperLimits[1].ToString() + " " + Spd.ToString());
 			}
@@ -667,7 +671,7 @@ namespace TCPDevice
 
 		private void OPU1_PolJogLeft_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 		{
-			if (float.TryParse(OPU1_PolTarSpd.Text.Replace('.', ','), out float Spd))
+			if (double.TryParse(OPU1_PolTarSpd.Text, DoubleFormat, out double Spd))
 			{
 				SendCommand_OPU1("MOVE P " + OPU1_LowerLimits[2].ToString() + " " + Spd.ToString());
 			}
@@ -680,9 +684,9 @@ namespace TCPDevice
 
 		private void OPU1_PolMove_Click(object sender, RoutedEventArgs e)
 		{
-			if (float.TryParse(OPU1_PolTarPos.Text.Replace('.', ','), out float Pos))
+			if (double.TryParse(OPU1_PolTarPos.Text, DoubleFormat, out double Pos))
 			{
-				if (float.TryParse(OPU1_PolTarSpd.Text.Replace('.', ','), out float Spd))
+				if (double.TryParse(OPU1_PolTarSpd.Text, DoubleFormat, out double Spd))
 				{
 					SendCommand_OPU1("MOVE P " + Pos.ToString() + " " + Spd.ToString());
 					this.Title = "MOVE P " + Pos.ToString() + " " + Spd.ToString();
@@ -692,7 +696,7 @@ namespace TCPDevice
 
 		private void OPU1_PolJogRight_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 		{
-			if (float.TryParse(OPU1_PolTarSpd.Text.Replace('.', ','), out float Spd))
+			if (double.TryParse(OPU1_PolTarSpd.Text, DoubleFormat, out double Spd))
 			{
 				SendCommand_OPU1("MOVE P " + OPU1_UpperLimits[2].ToString() + " " + Spd.ToString());
 			}
@@ -710,7 +714,7 @@ namespace TCPDevice
 
 		private void OPU1_YJogLeft_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 		{
-			if (float.TryParse(OPU1_YTarSpd.Text.Replace('.', ','), out float Spd))
+			if (double.TryParse(OPU1_YTarSpd.Text, DoubleFormat, out double Spd))
 			{
 				SendCommand_OPU1("MOVE Y " + OPU1_LowerLimits[3].ToString() + " " + Spd.ToString());
 			}
@@ -723,9 +727,9 @@ namespace TCPDevice
 
 		private void OPU1_YMove_Click(object sender, RoutedEventArgs e)
 		{
-			if (float.TryParse(OPU1_YTarPos.Text.Replace('.', ','), out float Pos))
+			if (double.TryParse(OPU1_YTarPos.Text, DoubleFormat, out double Pos))
 			{
-				if (float.TryParse(OPU1_YTarSpd.Text.Replace('.', ','), out float Spd))
+				if (double.TryParse(OPU1_YTarSpd.Text, DoubleFormat, out double Spd))
 				{
 					SendCommand_OPU1("MOVE Y " + Pos.ToString() + " " + Spd.ToString());
 				}
@@ -734,7 +738,7 @@ namespace TCPDevice
 
 		private void OPU1_YJogRight_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 		{
-			if (float.TryParse(OPU1_YTarSpd.Text.Replace('.', ','), out float Spd))
+			if (double.TryParse(OPU1_YTarSpd.Text, DoubleFormat, out double Spd))
 			{
 				SendCommand_OPU1("MOVE Y " + OPU1_UpperLimits[3].ToString() + " " + Spd.ToString());
 			}
@@ -762,7 +766,7 @@ namespace TCPDevice
 
 		private void OPU1_AzJogLeft_TouchDown(object sender, TouchEventArgs e)
 		{
-			if (float.TryParse(OPU1_AzTarSpd.Text.Replace('.', ','), out float Spd))
+			if (double.TryParse(OPU1_AzTarSpd.Text, DoubleFormat, out double Spd))
 			{
 				SendCommand_OPU1("MOVE A " + OPU1_LowerLimits[0].ToString() + " " + Spd.ToString());
 			}
@@ -775,7 +779,7 @@ namespace TCPDevice
 
 		private void OPU1_AzJogRight_TouchDown(object sender, TouchEventArgs e)
 		{
-			if (float.TryParse(OPU1_AzTarSpd.Text.Replace('.', ','), out float Spd))
+			if (double.TryParse(OPU1_AzTarSpd.Text, DoubleFormat, out double Spd))
 			{
 				SendCommand_OPU1("MOVE A " + OPU1_UpperLimits[0].ToString() + " " + Spd.ToString());
 			}
@@ -788,7 +792,7 @@ namespace TCPDevice
 
 		private void OPU1_UmJogLeft_TouchDown(object sender, TouchEventArgs e)
 		{
-			if (float.TryParse(OPU1_UmTarSpd.Text.Replace('.', ','), out float Spd))
+			if (double.TryParse(OPU1_UmTarSpd.Text, DoubleFormat, out double Spd))
 			{
 				SendCommand_OPU1("MOVE E " + OPU1_LowerLimits[1].ToString() + " " + Spd.ToString());
 			}
@@ -796,7 +800,7 @@ namespace TCPDevice
 
 		private void OPU1_UmJogRight_TouchDown(object sender, TouchEventArgs e)
 		{
-			if (float.TryParse(OPU1_UmTarSpd.Text.Replace('.', ','), out float Spd))
+			if (double.TryParse(OPU1_UmTarSpd.Text, DoubleFormat, out double Spd))
 			{
 				SendCommand_OPU1("MOVE E " + OPU1_UpperLimits[1].ToString() + " " + Spd.ToString());
 			}
@@ -814,7 +818,7 @@ namespace TCPDevice
 
 		private void OPU1_PolJogLeft_TouchDown(object sender, TouchEventArgs e)
 		{
-			if (float.TryParse(OPU1_PolTarSpd.Text.Replace('.', ','), out float Spd))
+			if (double.TryParse(OPU1_PolTarSpd.Text, DoubleFormat, out double Spd))
 			{
 				SendCommand_OPU1("MOVE P " + OPU1_LowerLimits[2].ToString() + " " + Spd.ToString());
 			}
@@ -827,7 +831,7 @@ namespace TCPDevice
 
 		private void OPU1_PolJogRight_TouchDown(object sender, TouchEventArgs e)
 		{
-			if (float.TryParse(OPU1_PolTarSpd.Text.Replace('.', ','), out float Spd))
+			if (double.TryParse(OPU1_PolTarSpd.Text, DoubleFormat, out double Spd))
 			{
 				SendCommand_OPU1("MOVE P " + OPU1_UpperLimits[2].ToString() + " " + Spd.ToString());
 			}
@@ -840,7 +844,7 @@ namespace TCPDevice
 
 		private void OPU1_YJogLeft_TouchDown(object sender, TouchEventArgs e)
 		{
-			if (float.TryParse(OPU1_YTarSpd.Text.Replace('.', ','), out float Spd))
+			if (double.TryParse(OPU1_YTarSpd.Text, DoubleFormat, out double Spd))
 			{
 				SendCommand_OPU1("MOVE Y " + OPU1_LowerLimits[3].ToString() + " " + Spd.ToString());
 			}
@@ -853,7 +857,7 @@ namespace TCPDevice
 
 		private void OPU1_YJogRight_TouchDown(object sender, TouchEventArgs e)
 		{
-			if (float.TryParse(OPU1_YTarSpd.Text.Replace('.', ','), out float Spd))
+			if (double.TryParse(OPU1_YTarSpd.Text, DoubleFormat, out double Spd))
 			{
 				SendCommand_OPU1("MOVE Y " + OPU1_UpperLimits[3].ToString() + " " + Spd.ToString());
 			}
@@ -894,7 +898,7 @@ namespace TCPDevice
 
 		private void OPU2_AzJogLeft_TouchDown(object sender, TouchEventArgs e)
 		{
-			if (float.TryParse(OPU2_AzTarSpd.Text.Replace('.', ','), out float Spd))
+			if (double.TryParse(OPU2_AzTarSpd.Text, DoubleFormat, out double Spd))
 			{
 				SendCommand_OPU2("MOVE A " + OPU2_LowerLimits[0].ToString() + " " + Spd.ToString());
 			}
@@ -907,9 +911,9 @@ namespace TCPDevice
 
 		private void OPU2_AzMove_Click(object sender, RoutedEventArgs e)
 		{
-			if (float.TryParse(OPU2_AzTarPos.Text.Replace('.', ','), out float Pos))
+			if (double.TryParse(OPU2_AzTarPos.Text, out double Pos))
 			{
-				if (float.TryParse(OPU2_AzTarSpd.Text.Replace('.', ','), out float Spd))
+				if (double.TryParse(OPU2_AzTarSpd.Text, out double Spd))
 				{
 					SendCommand_OPU2("MOVE A " + Pos.ToString() + " " + Spd.ToString());
 				}
@@ -918,7 +922,7 @@ namespace TCPDevice
 
 		private void OPU2_AzJogRight_TouchDown(object sender, TouchEventArgs e)
 		{
-			if (float.TryParse(OPU2_AzTarSpd.Text.Replace('.', ','), out float Spd))
+			if (double.TryParse(OPU2_AzTarSpd.Text, DoubleFormat, out double Spd))
 			{
 				SendCommand_OPU2("MOVE A " + OPU2_UpperLimits[0].ToString() + " " + Spd.ToString());
 			}
@@ -945,7 +949,7 @@ namespace TCPDevice
 
 		private void OPU2_UmJogLeft_TouchDown(object sender, TouchEventArgs e)
 		{
-			if (float.TryParse(OPU1_UmTarSpd.Text.Replace('.', ','), out float Spd))
+			if (double.TryParse(OPU1_UmTarSpd.Text, DoubleFormat, out double Spd))
 			{
 				SendCommand_OPU2("MOVE E " + OPU2_LowerLimits[1].ToString() + " " + Spd.ToString());
 			}
@@ -958,9 +962,9 @@ namespace TCPDevice
 
 		private void OPU2_UmMove_Click(object sender, RoutedEventArgs e)
 		{
-			if (float.TryParse(OPU2_UmTarPos.Text.Replace('.', ','), out float Pos))
+			if (double.TryParse(OPU2_UmTarPos.Text, DoubleFormat, out double Pos))
 			{
-				if (float.TryParse(OPU2_UmTarSpd.Text.Replace('.', ','), out float Spd))
+				if (double.TryParse(OPU2_UmTarSpd.Text, DoubleFormat, out double Spd))
 				{
 					SendCommand_OPU2("MOVE E " + Pos.ToString() + " " + Spd.ToString());
 				}
@@ -969,7 +973,7 @@ namespace TCPDevice
 
 		private void OPU2_UmJogRight_TouchDown(object sender, TouchEventArgs e)
 		{
-			if (float.TryParse(OPU2_UmTarSpd.Text.Replace('.', ','), out float Spd))
+			if (double.TryParse(OPU2_UmTarSpd.Text, DoubleFormat, out double Spd))
 			{
 				SendCommand_OPU2("MOVE E " + OPU2_UpperLimits[1].ToString() + " " + Spd.ToString());
 			}
@@ -996,7 +1000,7 @@ namespace TCPDevice
 		
 		private void OPU2_PolJogLeft_TouchDown(object sender, TouchEventArgs e)
 		{
-			if (float.TryParse(OPU2_PolTarSpd.Text.Replace('.', ','), out float Spd))
+			if (double.TryParse(OPU2_PolTarSpd.Text, DoubleFormat, out double Spd))
 			{
 				SendCommand_OPU2("MOVE P " + OPU2_LowerLimits[2].ToString() + " " + Spd.ToString());
 			}
@@ -1009,9 +1013,9 @@ namespace TCPDevice
 
 		private void OPU2_PolMove_Click(object sender, RoutedEventArgs e)
 		{
-			if (float.TryParse(OPU2_PolTarPos.Text.Replace('.', ','), out float Pos))
+			if (double.TryParse(OPU2_PolTarPos.Text, DoubleFormat, out double Pos))
 			{
-				if (float.TryParse(OPU2_PolTarSpd.Text.Replace('.', ','), out float Spd))
+				if (double.TryParse(OPU2_PolTarSpd.Text, DoubleFormat, out double Spd))
 				{
 					SendCommand_OPU2("MOVE P " + Pos.ToString() + " " + Spd.ToString());
 					this.Title = "MOVE P " + Pos.ToString() + " " + Spd.ToString();
@@ -1026,7 +1030,7 @@ namespace TCPDevice
 
 		private void OPU2_PolJogRight_TouchDown(object sender, TouchEventArgs e)
 		{
-			if (float.TryParse(OPU2_PolTarSpd.Text.Replace('.', ','), out float Spd))
+			if (double.TryParse(OPU2_PolTarSpd.Text, DoubleFormat, out double Spd))
 			{
 				SendCommand_OPU2("MOVE P " + OPU2_UpperLimits[2].ToString() + " " + Spd.ToString());
 			}
@@ -1048,7 +1052,7 @@ namespace TCPDevice
 
 		private void OPU2_XJogLeft_TouchDown(object sender, TouchEventArgs e)
 		{
-			if (float.TryParse(OPU2_XTarSpd.Text.Replace('.', ','), out float Spd))
+			if (double.TryParse(OPU2_XTarSpd.Text, DoubleFormat, out double Spd))
 			{
 				SendCommand_OPU2("MOVE X " + OPU2_LowerLimits[3].ToString() + " " + Spd.ToString());
 			}
@@ -1061,9 +1065,9 @@ namespace TCPDevice
 
 		private void OPU2_XMove_Click(object sender, RoutedEventArgs e)
 		{
-			if (float.TryParse(OPU2_XTarPos.Text.Replace('.', ','), out float Pos))
+			if (double.TryParse(OPU2_XTarPos.Text, DoubleFormat, out double Pos))
 			{
-				if (float.TryParse(OPU2_XTarSpd.Text.Replace('.', ','), out float Spd))
+				if (double.TryParse(OPU2_XTarSpd.Text, DoubleFormat, out double Spd))
 				{
 					SendCommand_OPU2("MOVE X " + Pos.ToString() + " " + Spd.ToString());
 					this.Title = "MOVE X " + Pos.ToString() + " " + Spd.ToString();
@@ -1073,7 +1077,7 @@ namespace TCPDevice
 
 		private void OPU2_XJogRight_TouchDown(object sender, TouchEventArgs e)
 		{
-			if (float.TryParse(OPU2_XTarSpd.Text.Replace('.', ','), out float Spd))
+			if (double.TryParse(OPU2_XTarSpd.Text, DoubleFormat, out double Spd))
 			{
 				SendCommand_OPU2("MOVE X " + OPU2_UpperLimits[3].ToString() + " " + Spd.ToString());
 			}
@@ -1100,7 +1104,7 @@ namespace TCPDevice
 
 		private void OPU2_YJogLeft_TouchDown(object sender, TouchEventArgs e)
 		{
-			if (float.TryParse(OPU2_YTarSpd.Text.Replace('.', ','), out float Spd))
+			if (double.TryParse(OPU2_YTarSpd.Text, DoubleFormat, out double Spd))
 			{
 				SendCommand_OPU2("MOVE Y " + OPU2_LowerLimits[4].ToString() + " " + Spd.ToString());
 			}
@@ -1113,9 +1117,9 @@ namespace TCPDevice
 
 		private void OPU2_YMove_Click(object sender, RoutedEventArgs e)
 		{
-			if (float.TryParse(OPU2_YTarPos.Text.Replace('.', ','), out float Pos))
+			if (double.TryParse(OPU2_YTarPos.Text, DoubleFormat, out double Pos))
 			{
-				if (float.TryParse(OPU2_YTarSpd.Text.Replace('.', ','), out float Spd))
+				if (double.TryParse(OPU2_YTarSpd.Text, DoubleFormat, out double Spd))
 				{
 					SendCommand_OPU2("MOVE Y " + Pos.ToString() + " " + Spd.ToString());
 					this.Title = "MOVE Y " + Pos.ToString() + " " + Spd.ToString();
@@ -1130,7 +1134,7 @@ namespace TCPDevice
 
 		private void OPU2_YJogRight_TouchDown(object sender, TouchEventArgs e)
 		{
-			if (float.TryParse(OPU2_YTarSpd.Text.Replace('.', ','), out float Spd))
+			if (double.TryParse(OPU2_YTarSpd.Text, DoubleFormat, out double Spd))
 			{
 				SendCommand_OPU2("MOVE Y " + OPU2_UpperLimits[4].ToString() + " " + Spd.ToString());
 			}
@@ -1523,7 +1527,7 @@ namespace TCPDevice
 
 		private void OPU2_AzJogLeft_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 		{
-			if (float.TryParse(OPU2_AzTarSpd.Text.Replace('.', ','), out float Spd))
+			if (double.TryParse(OPU2_AzTarSpd.Text, DoubleFormat, out double Spd))
 			{
 				SendCommand_OPU2("MOVE A " + OPU2_LowerLimits[0].ToString() + " " + Spd.ToString());
 			}
@@ -1531,7 +1535,7 @@ namespace TCPDevice
 
 		private void OPU2_AzJogRight_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 		{
-			if (float.TryParse(OPU2_AzTarSpd.Text.Replace('.', ','), out float Spd))
+			if (double.TryParse(OPU2_AzTarSpd.Text, DoubleFormat, out double Spd))
 			{
 				SendCommand_OPU2("MOVE A " + OPU2_UpperLimits[0].ToString() + " " + Spd.ToString());
 			}
@@ -1544,7 +1548,7 @@ namespace TCPDevice
 
 		private void OPU2_UmJogLeft_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 		{
-			if (float.TryParse(OPU2_UmTarSpd.Text.Replace('.', ','), out float Spd))
+			if (double.TryParse(OPU2_UmTarSpd.Text, DoubleFormat, out double Spd))
 			{
 				SendCommand_OPU2("MOVE E " + OPU2_LowerLimits[1].ToString() + " " + Spd.ToString());
 			}
@@ -1557,7 +1561,7 @@ namespace TCPDevice
 
 		private void OPU2_UmJogRight_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 		{
-			if (float.TryParse(OPU2_UmTarSpd.Text.Replace('.', ','), out float Spd))
+			if (double.TryParse(OPU2_UmTarSpd.Text, DoubleFormat, out double Spd))
 			{
 				SendCommand_OPU2("MOVE E " + OPU2_UpperLimits[1].ToString() + " " + Spd.ToString());
 			}
@@ -1570,7 +1574,7 @@ namespace TCPDevice
 
 		private void OPU2_PolJogLeft_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 		{
-			if (float.TryParse(OPU2_PolTarSpd.Text.Replace('.', ','), out float Spd))
+			if (double.TryParse(OPU2_PolTarSpd.Text, DoubleFormat, out double Spd))
 			{
 				SendCommand_OPU2("MOVE P " + OPU2_LowerLimits[2].ToString() + " " + Spd.ToString());
 			}
@@ -1583,7 +1587,7 @@ namespace TCPDevice
 
 		private void OPU2_PolJogRight_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 		{
-			if (float.TryParse(OPU2_PolTarSpd.Text.Replace('.', ','), out float Spd))
+			if (double.TryParse(OPU2_PolTarSpd.Text, DoubleFormat, out double Spd))
 			{
 				SendCommand_OPU2("MOVE P " + OPU2_UpperLimits[2].ToString() + " " + Spd.ToString());
 			}
@@ -1596,7 +1600,7 @@ namespace TCPDevice
 
 		private void OPU2_XJogLeft_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 		{
-			if (float.TryParse(OPU2_XTarSpd.Text.Replace('.', ','), out float Spd))
+			if (double.TryParse(OPU2_XTarSpd.Text, DoubleFormat, out double Spd))
 			{
 				SendCommand_OPU2("MOVE X " + OPU2_LowerLimits[3].ToString() + " " + Spd.ToString());
 			}
@@ -1609,7 +1613,7 @@ namespace TCPDevice
 
 		private void OPU2_XJogRight_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 		{
-			if (float.TryParse(OPU2_XTarSpd.Text.Replace('.', ','), out float Spd))
+			if (double.TryParse(OPU2_XTarSpd.Text, DoubleFormat, out double Spd))
 			{
 				SendCommand_OPU2("MOVE X " + OPU2_UpperLimits[3].ToString() + " " + Spd.ToString());
 			}
@@ -1622,7 +1626,7 @@ namespace TCPDevice
 
 		private void OPU2_YJogLeft_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 		{
-			if (float.TryParse(OPU2_YTarSpd.Text.Replace('.', ','), out float Spd))
+			if (double.TryParse(OPU2_YTarSpd.Text, DoubleFormat, out double Spd))
 			{
 				SendCommand_OPU2("MOVE Y " + OPU2_LowerLimits[4].ToString() + " " + Spd.ToString());
 			}
@@ -1635,7 +1639,7 @@ namespace TCPDevice
 
 		private void OPU2_YJogRight_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 		{
-			if (float.TryParse(OPU2_YTarSpd.Text.Replace('.', ','), out float Spd))
+			if (double.TryParse(OPU2_YTarSpd.Text, DoubleFormat, out double Spd))
 			{
 				SendCommand_OPU2("MOVE Y " + OPU2_UpperLimits[4].ToString() + " " + Spd.ToString());
 			}
