@@ -689,7 +689,6 @@ namespace TCPDevice
 				if (double.TryParse(OPU1_PolTarSpd.Text, DoubleFormat, out double Spd))
 				{
 					SendCommand_OPU1("MOVE P " + Pos.ToString() + " " + Spd.ToString());
-					this.Title = "MOVE P " + Pos.ToString() + " " + Spd.ToString();
 				}
 			}
 		}
@@ -1018,7 +1017,6 @@ namespace TCPDevice
 				if (double.TryParse(OPU2_PolTarSpd.Text, DoubleFormat, out double Spd))
 				{
 					SendCommand_OPU2("MOVE P " + Pos.ToString() + " " + Spd.ToString());
-					this.Title = "MOVE P " + Pos.ToString() + " " + Spd.ToString();
 				}
 			}
 		}
@@ -1070,7 +1068,6 @@ namespace TCPDevice
 				if (double.TryParse(OPU2_XTarSpd.Text, DoubleFormat, out double Spd))
 				{
 					SendCommand_OPU2("MOVE X " + Pos.ToString() + " " + Spd.ToString());
-					this.Title = "MOVE X " + Pos.ToString() + " " + Spd.ToString();
 				}
 			}
 		}
@@ -1122,7 +1119,6 @@ namespace TCPDevice
 				if (double.TryParse(OPU2_YTarSpd.Text, DoubleFormat, out double Spd))
 				{
 					SendCommand_OPU2("MOVE Y " + Pos.ToString() + " " + Spd.ToString());
-					this.Title = "MOVE Y " + Pos.ToString() + " " + Spd.ToString();
 				}
 			}
 		}
