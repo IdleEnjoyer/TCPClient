@@ -197,8 +197,8 @@
 		<Menu DockPanel.Dock="Top" FontSize="14">
 			<MenuItem Header="File"/>
 		</Menu>
-		<ToolBar DockPanel.Dock="Top" FontSize="14">
-			<Button x:Name="Connection" Content="Подключение" BorderBrush="#FF717171" Margin="10,0,0,0" FontSize="20"/>
+		<ToolBar DockPanel.Dock="Top" FontSize="14" Background="#FFB1B1B1">
+			<Button x:Name="Connection" Content="Подключение" BorderBrush="#FF717171" Margin="10,0,0,0" FontFamily="Bahnschrift" FontSize="20"/>
 			<Ellipse x:Name="ConnectStatus" StrokeThickness="2" Grid.Row="0" Width="15" Height="15" Stroke="Black" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,0,5,0" >
 				<Ellipse.Fill>
 					<RadialGradientBrush Center="0.25,0.25">
@@ -208,7 +208,7 @@
 				</Ellipse.Fill>
 			</Ellipse>
 			<Separator/>
-			<Button x:Name="Power" Content="Питание" BorderBrush="#FF717171" FontSize="20"/>
+			<Button x:Name="Power" Content="Питание" BorderBrush="#FF717171" FontFamily="Bahnschrift" FontSize="20"/>
 			<Ellipse x:Name="PowerStatus" StrokeThickness="2" Grid.Row="0" Width="15" Height="15" Stroke="Black" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,0,5,0">
 				<Ellipse.Fill>
 					<RadialGradientBrush Center="0.25,0.25">
@@ -218,7 +218,20 @@
 				</Ellipse.Fill>
 			</Ellipse>
 			<Separator/>
-			<Button x:Name="EmStop" Content="СТОП" BorderBrush="#FF717171" Background="#FFB70000" FontWeight="Bold" FontSize="20"/>
+			<Button x:Name="EmStop">
+				<Grid>
+					<Path x:Name="StopSign" Stroke="White" StrokeThickness="4" StrokeStartLineCap="Round">
+						<Path.Data>
+							<PathGeometry Figures="M 20,0 L 40,0 60,20 60,40 40,60 20,60 0,40 0,20 Z M 40,16 L 40,30 M 35,13 L 35,30 M 30,12 L 30,30 M 25,14 L 25,30 M 18,26 L 26,38"/>
+						</Path.Data>
+						<Path.Fill>
+							<SolidColorBrush x:Name="StopSignBrush" Color="#FFA50000"/>
+						</Path.Fill>
+					</Path>
+					<Rectangle Fill="White" Margin="23,27,21,26"/>
+					<Ellipse Fill="White" RenderTransformOrigin="0.606,0.52" Margin="22,27,21,17" Height="18" Width="20"/>
+				</Grid>
+			</Button>
 			<Ellipse x:Name="StopStatus" StrokeThickness="2" Grid.Row="0" Width="15" Height="15" Stroke="Black" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,0,5,0">
 				<Ellipse.Fill>
 					<RadialGradientBrush Center="0.25,0.25">
@@ -245,6 +258,10 @@
 			</TreeView>
 		</StackPanel>
 		<Thumb x:Name="LeftPanelSize" Cursor="SizeWE" DragDelta="LeftPanelSize_DragDelta"/>
+		<StackPanel x:Name="InfoPanel" DockPanel.Dock="Bottom" Orientation="Horizontal">
+			<TextBlock x:Name="Info_CurPos" Text="Позиция: 99999.0" Margin="20,5,20,5" FontFamily="Bahnschrift" FontSize="16" />
+			<TextBlock x:Name="Info_CurVel" Text="Скорость: 99999.0" Margin="0,5,20,5" FontFamily="Bahnschrift" FontSize="16" />
+		</StackPanel>
 		<TabControl Style="{DynamicResource TabControl_UserStyle}" x:Name="Control" Background="#FFAAB4C8" SelectedIndex="0">
 			<TabItem x:Name="OPU1_Tab">
 				<Grid x:Name="OPU1_Control" RenderTransformOrigin="0.5,0.5">
