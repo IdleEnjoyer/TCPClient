@@ -1,4 +1,4 @@
-﻿<Window x:Class="TCPDevice.MainWindow"
+﻿<Window x:Name="window" x:Class="TCPDevice.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -8,1069 +8,335 @@
 		Closing="Window_Closing"
         Title="ТЕСАРТ Сервисное ПО" Height="720" Width="1280" Background="White" MinWidth="1074" MinHeight="624">
 	<Window.Resources>
-		<Style x:Key="FocusVisual">
-			<Setter Property="Control.Template">
-				<Setter.Value>
-					<ControlTemplate>
-						<Rectangle Margin="2" StrokeDashArray="1 2" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" SnapsToDevicePixels="true" StrokeThickness="1"/>
-					</ControlTemplate>
-				</Setter.Value>
-			</Setter>
-		</Style>
-		<Style x:Key="OptionMarkFocusVisual">
-			<Setter Property="Control.Template">
-				<Setter.Value>
-					<ControlTemplate>
-						<Rectangle Margin="14,0,0,0" StrokeDashArray="1 2" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" SnapsToDevicePixels="true" StrokeThickness="1"/>
-					</ControlTemplate>
-				</Setter.Value>
-			</Setter>
-		</Style>
-		<SolidColorBrush x:Key="RadioButton.Static.Background" Color="#FFFFFFFF"/>
-		<SolidColorBrush x:Key="RadioButton.Static.Border" Color="#FF707070"/>
-		<SolidColorBrush x:Key="RadioButton.Static.Glyph" Color="#FF212121"/>
-		<SolidColorBrush x:Key="RadioButton.MouseOver.Background" Color="#FFF3F9FF"/>
-		<SolidColorBrush x:Key="RadioButton.MouseOver.Border" Color="#FF5593FF"/>
-		<SolidColorBrush x:Key="RadioButton.MouseOver.Glyph" Color="#FF212121"/>
-		<SolidColorBrush x:Key="RadioButton.Pressed.Background" Color="#FFD9ECFF"/>
-		<SolidColorBrush x:Key="RadioButton.Pressed.Border" Color="#FF3C77DD"/>
-		<SolidColorBrush x:Key="RadioButton.Pressed.Glyph" Color="#FF212121"/>
-		<SolidColorBrush x:Key="RadioButton.Disabled.Background" Color="#FFE6E6E6"/>
-		<SolidColorBrush x:Key="RadioButton.Disabled.Border" Color="#FFBCBCBC"/>
-		<SolidColorBrush x:Key="RadioButton.Disabled.Glyph" Color="#FF707070"/>
-		<Style x:Key="DemoRadioButton" TargetType="{x:Type RadioButton}">
-			<Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
-			<Setter Property="Background" Value="{StaticResource RadioButton.Static.Background}"/>
-			<Setter Property="BorderBrush" Value="{StaticResource RadioButton.Static.Border}"/>
-			<Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+		<Style x:Key="TabControl_UserStyle" TargetType="{x:Type TabControl}">
+			<Setter Property="Padding" Value="2"/>
+			<Setter Property="HorizontalContentAlignment" Value="Center"/>
+			<Setter Property="VerticalContentAlignment" Value="Center"/>
 			<Setter Property="BorderThickness" Value="1"/>
+			<Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
 			<Setter Property="Template">
 				<Setter.Value>
-					<ControlTemplate TargetType="{x:Type RadioButton}">
-						<Grid x:Name="templateRoot" Background="Transparent" SnapsToDevicePixels="True">
+					<ControlTemplate TargetType="{x:Type TabControl}">
+						<Grid x:Name="templateRoot" ClipToBounds="true" SnapsToDevicePixels="true" KeyboardNavigation.TabNavigation="Local">
 							<Grid.ColumnDefinitions>
+								<ColumnDefinition x:Name="ColumnDefinition0"/>
+								<ColumnDefinition x:Name="ColumnDefinition1" Width="0"/>
+							</Grid.ColumnDefinitions>
+							<Grid.RowDefinitions>
+								<RowDefinition x:Name="RowDefinition0" Height="Auto"/>
+								<RowDefinition x:Name="RowDefinition1" Height="*"/>
+							</Grid.RowDefinitions>
+							
+							<Border x:Name="contentPanel" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Grid.Column="0" KeyboardNavigation.DirectionalNavigation="Contained" Grid.Row="1" KeyboardNavigation.TabIndex="2" KeyboardNavigation.TabNavigation="Local">
+								<ContentPresenter x:Name="PART_SelectedContentHost" ContentSource="SelectedContent" Margin="{TemplateBinding Padding}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+							</Border>
+						</Grid>
+						<ControlTemplate.Triggers>
+							<Trigger Property="TabStripPlacement" Value="Bottom">
+								<!--<Setter Property="Grid.Row" TargetName="headerPanel" Value="1"/>-->
+								<Setter Property="Grid.Row" TargetName="contentPanel" Value="0"/>
+								<Setter Property="Height" TargetName="RowDefinition0" Value="*"/>
+								<Setter Property="Height" TargetName="RowDefinition1" Value="Auto"/>
+								<!--<Setter Property="Margin" TargetName="headerPanel" Value="2,0,2,2"/>-->
+							</Trigger>
+							<Trigger Property="TabStripPlacement" Value="Left">
+								<!--<Setter Property="Grid.Row" TargetName="headerPanel" Value="0"/>-->
+								<Setter Property="Grid.Row" TargetName="contentPanel" Value="0"/>
+								<!--<Setter Property="Grid.Column" TargetName="headerPanel" Value="0"/>-->
+								<Setter Property="Grid.Column" TargetName="contentPanel" Value="1"/>
+								<Setter Property="Width" TargetName="ColumnDefinition0" Value="Auto"/>
+								<Setter Property="Width" TargetName="ColumnDefinition1" Value="*"/>
+								<Setter Property="Height" TargetName="RowDefinition0" Value="*"/>
+								<Setter Property="Height" TargetName="RowDefinition1" Value="0"/>
+								<!--<Setter Property="Margin" TargetName="headerPanel" Value="2,2,0,2"/>-->
+							</Trigger>
+							<Trigger Property="TabStripPlacement" Value="Right">
+								<!--<Setter Property="Grid.Row" TargetName="headerPanel" Value="0"/>-->
+								<Setter Property="Grid.Row" TargetName="contentPanel" Value="0"/>
+								<!--<Setter Property="Grid.Column" TargetName="headerPanel" Value="1"/>-->
+								<Setter Property="Grid.Column" TargetName="contentPanel" Value="0"/>
+								<Setter Property="Width" TargetName="ColumnDefinition0" Value="*"/>
+								<Setter Property="Width" TargetName="ColumnDefinition1" Value="Auto"/>
+								<Setter Property="Height" TargetName="RowDefinition0" Value="*"/>
+								<Setter Property="Height" TargetName="RowDefinition1" Value="0"/>
+								<!--<Setter Property="Margin" TargetName="headerPanel" Value="0,2,2,2"/>-->
+							</Trigger>
+							<Trigger Property="IsEnabled" Value="false">
+								<Setter Property="TextElement.Foreground" TargetName="templateRoot" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+							</Trigger>
+						</ControlTemplate.Triggers>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
+		<SolidColorBrush x:Key="TreeViewItem.TreeArrow.Static.Stroke" Color="#FF818181"/>
+		<SolidColorBrush x:Key="TreeViewItem.TreeArrow.Static.Fill" Color="#FFFFFFFF"/>
+		<SolidColorBrush x:Key="TreeViewItem.TreeArrow.MouseOver.Stroke" Color="#FF27C7F7"/>
+		<SolidColorBrush x:Key="TreeViewItem.TreeArrow.MouseOver.Fill" Color="#FFCCEEFB"/>
+		<SolidColorBrush x:Key="TreeViewItem.TreeArrow.Static.Checked.Stroke" Color="#FF262626"/>
+		<SolidColorBrush x:Key="TreeViewItem.TreeArrow.Static.Checked.Fill" Color="#FF595959"/>
+		<SolidColorBrush x:Key="TreeViewItem.TreeArrow.MouseOver.Checked.Stroke" Color="#FF1CC4F7"/>
+		<SolidColorBrush x:Key="TreeViewItem.TreeArrow.MouseOver.Checked.Fill" Color="#FF82DFFB"/>
+		<PathGeometry x:Key="TreeArrow" Figures="M0,0 L0,6 L6,0 z"/>
+		<Style x:Key="ExpandCollapseToggleStyle" TargetType="{x:Type ToggleButton}">
+			<Setter Property="Focusable" Value="False"/>
+			<Setter Property="Width" Value="16"/>
+			<Setter Property="Height" Value="16"/>
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="{x:Type ToggleButton}">
+						<Border Background="Transparent" Height="16" Padding="5,5,5,5" Width="16">
+							<Path x:Name="ExpandPath" Data="{StaticResource TreeArrow}" Fill="{StaticResource TreeViewItem.TreeArrow.Static.Fill}" Stroke="{StaticResource TreeViewItem.TreeArrow.Static.Stroke}">
+								<Path.RenderTransform>
+									<RotateTransform Angle="135" CenterY="3" CenterX="3"/>
+								</Path.RenderTransform>
+							</Path>
+						</Border>
+						<ControlTemplate.Triggers>
+							<Trigger Property="IsChecked" Value="True">
+								<Setter Property="RenderTransform" TargetName="ExpandPath">
+									<Setter.Value>
+										<RotateTransform Angle="180" CenterY="3" CenterX="3"/>
+									</Setter.Value>
+								</Setter>
+								<Setter Property="Fill" TargetName="ExpandPath" Value="{StaticResource TreeViewItem.TreeArrow.Static.Checked.Fill}"/>
+								<Setter Property="Stroke" TargetName="ExpandPath" Value="{StaticResource TreeViewItem.TreeArrow.Static.Checked.Stroke}"/>
+							</Trigger>
+							<Trigger Property="IsMouseOver" Value="True">
+								<Setter Property="Stroke" TargetName="ExpandPath" Value="{StaticResource TreeViewItem.TreeArrow.MouseOver.Stroke}"/>
+								<Setter Property="Fill" TargetName="ExpandPath" Value="{StaticResource TreeViewItem.TreeArrow.MouseOver.Fill}"/>
+							</Trigger>
+							<MultiTrigger>
+								<MultiTrigger.Conditions>
+									<Condition Property="IsMouseOver" Value="True"/>
+									<Condition Property="IsChecked" Value="True"/>
+								</MultiTrigger.Conditions>
+								<Setter Property="Stroke" TargetName="ExpandPath" Value="{StaticResource TreeViewItem.TreeArrow.MouseOver.Checked.Stroke}"/>
+								<Setter Property="Fill" TargetName="ExpandPath" Value="{StaticResource TreeViewItem.TreeArrow.MouseOver.Checked.Fill}"/>
+							</MultiTrigger>
+						</ControlTemplate.Triggers>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
+		<Style x:Key="TreeViewItemFocusVisual">
+			<Setter Property="Control.Template">
+				<Setter.Value>
+					<ControlTemplate>
+						<Rectangle/>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
+		<Style x:Key="TreeViewItem_UserStyle" TargetType="{x:Type TreeViewItem}">
+			<Setter Property="Background" Value="Transparent"/>
+			<Setter Property="HorizontalContentAlignment" Value="{Binding HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
+			<Setter Property="VerticalContentAlignment" Value="{Binding VerticalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
+			<Setter Property="Padding" Value="1,0,0,0"/>
+			<Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+			<Setter Property="FocusVisualStyle" Value="{StaticResource TreeViewItemFocusVisual}"/>
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="{x:Type TreeViewItem}">
+						<Grid>
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition MinWidth="19" Width="Auto"/>
 								<ColumnDefinition Width="Auto"/>
 								<ColumnDefinition Width="*"/>
 							</Grid.ColumnDefinitions>
-							<Border x:Name="radioButtonBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="100" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="1,1,2,1" VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
-								<Grid x:Name="markGrid" Margin="2">
-									<Ellipse x:Name="optionMark" Fill="{StaticResource RadioButton.Static.Glyph}" Width="35" MinWidth="6" Height="35" MinHeight="6" Opacity="0"/>
-								</Grid>
+							<Grid.RowDefinitions>
+								<RowDefinition Height="Auto"/>
+								<RowDefinition/>
+							</Grid.RowDefinitions>
+							<ToggleButton x:Name="Expander" ClickMode="Press" IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource Mode=TemplatedParent}}" Style="{StaticResource ExpandCollapseToggleStyle}"/>
+							<Border x:Name="Bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Grid.Column="1" Padding="{TemplateBinding Padding}" SnapsToDevicePixels="true">
+								<ContentPresenter x:Name="PART_Header" ContentSource="Header" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
 							</Border>
-							<ContentPresenter x:Name="contentPresenter" Grid.Column="1" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+							<ItemsPresenter x:Name="ItemsHost" Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="1"/>
 						</Grid>
 						<ControlTemplate.Triggers>
-							<Trigger Property="HasContent" Value="true">
-								<Setter Property="FocusVisualStyle" Value="{StaticResource OptionMarkFocusVisual}"/>
-								<Setter Property="Padding" Value="4,-1,0,0"/>
+							<Trigger Property="IsExpanded" Value="false">
+								<Setter Property="Visibility" TargetName="ItemsHost" Value="Collapsed"/>
 							</Trigger>
-							<Trigger Property="IsMouseOver" Value="true">
-								<Setter Property="Background" TargetName="radioButtonBorder" Value="{StaticResource RadioButton.MouseOver.Background}"/>
-								<Setter Property="BorderBrush" TargetName="radioButtonBorder" Value="{StaticResource RadioButton.MouseOver.Border}"/>
-								<Setter Property="Fill" TargetName="optionMark" Value="{StaticResource RadioButton.MouseOver.Glyph}"/>
+							<Trigger Property="HasItems" Value="false">
+								<Setter Property="Visibility" TargetName="Expander" Value="Hidden"/>
 							</Trigger>
+							<Trigger Property="IsSelected" Value="true">
+								<Setter Property="Background" TargetName="Bd" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
+								<Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}"/>
+							</Trigger>
+							<MultiTrigger>
+								<MultiTrigger.Conditions>
+									<Condition Property="IsSelected" Value="true"/>
+									<Condition Property="IsSelectionActive" Value="false"/>
+								</MultiTrigger.Conditions>
+								<Setter Property="Background" TargetName="Bd" Value="{DynamicResource {x:Static SystemColors.InactiveSelectionHighlightBrushKey}}"/>
+								<Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}}"/>
+							</MultiTrigger>
 							<Trigger Property="IsEnabled" Value="false">
-								<Setter Property="Background" TargetName="radioButtonBorder" Value="{StaticResource RadioButton.Disabled.Background}"/>
-								<Setter Property="BorderBrush" TargetName="radioButtonBorder" Value="{StaticResource RadioButton.Disabled.Border}"/>
-								<Setter Property="Fill" TargetName="optionMark" Value="{StaticResource RadioButton.Disabled.Glyph}"/>
-							</Trigger>
-							<Trigger Property="IsPressed" Value="true">
-								<Setter Property="Background" TargetName="radioButtonBorder" Value="{StaticResource RadioButton.Pressed.Background}"/>
-								<Setter Property="BorderBrush" TargetName="radioButtonBorder" Value="{StaticResource RadioButton.Pressed.Border}"/>
-								<Setter Property="Fill" TargetName="optionMark" Value="{StaticResource RadioButton.Pressed.Glyph}"/>
-							</Trigger>
-							<Trigger Property="IsChecked" Value="true">
-								<Setter Property="Opacity" TargetName="optionMark" Value="1"/>
-							</Trigger>
-							<Trigger Property="IsChecked" Value="{x:Null}">
-								<Setter Property="Opacity" TargetName="optionMark" Value="0.56"/>
+								<Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
 							</Trigger>
 						</ControlTemplate.Triggers>
 					</ControlTemplate>
 				</Setter.Value>
 			</Setter>
-		</Style>
-		<SolidColorBrush x:Key="ProgressBar.Progress" Color="#FF06B025"/>
-		<SolidColorBrush x:Key="ProgressBar.Background" Color="#FFE6E6E6"/>
-		<SolidColorBrush x:Key="ProgressBar.Border" Color="#FFBCBCBC"/>
-		<Style x:Key="DemoProgressBar" TargetType="{x:Type ProgressBar}">
-			<Setter Property="Foreground" Value="{StaticResource ProgressBar.Progress}"/>
-			<Setter Property="Background" Value="{StaticResource ProgressBar.Background}"/>
-			<Setter Property="BorderBrush" Value="{StaticResource ProgressBar.Border}"/>
-			<Setter Property="BorderThickness" Value="1"/>
-			<Setter Property="Template">
-				<Setter.Value>
-					<ControlTemplate TargetType="{x:Type ProgressBar}">
-						<Grid x:Name="TemplateRoot">
-							<VisualStateManager.VisualStateGroups>
-								<VisualStateGroup x:Name="CommonStates">
-									<VisualState x:Name="Determinate"/>
-									<VisualState x:Name="Indeterminate">
-										<Storyboard RepeatBehavior="Forever">
-											<DoubleAnimationUsingKeyFrames Storyboard.TargetName="Animation" Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[0].(ScaleTransform.ScaleX)">
-												<EasingDoubleKeyFrame KeyTime="0" Value="0.25"/>
-												<EasingDoubleKeyFrame KeyTime="0:0:1" Value="0.25"/>
-												<EasingDoubleKeyFrame KeyTime="0:0:2" Value="0.25"/>
-											</DoubleAnimationUsingKeyFrames>
-											<PointAnimationUsingKeyFrames Storyboard.TargetName="Animation" Storyboard.TargetProperty="(UIElement.RenderTransformOrigin)">
-												<EasingPointKeyFrame KeyTime="0" Value="-0.5,0.5"/>
-												<EasingPointKeyFrame KeyTime="0:0:1" Value="0.5,0.5"/>
-												<EasingPointKeyFrame KeyTime="0:0:2" Value="1.5,0.5"/>
-											</PointAnimationUsingKeyFrames>
-										</Storyboard>
-									</VisualState>
-								</VisualStateGroup>
-							</VisualStateManager.VisualStateGroups>
-							<Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="30"/>
-							<Rectangle x:Name="PART_Track"/>
-							<Grid x:Name="PART_Indicator" ClipToBounds="true" HorizontalAlignment="Left">
-								<Rectangle x:Name="Indicator" Fill="{TemplateBinding Foreground}" RadiusX="30" RadiusY="30"/>
-								<Rectangle x:Name="Animation" Fill="{TemplateBinding Foreground}" RenderTransformOrigin="0.5,0.5" RadiusX="30" RadiusY="30">
-									<Rectangle.RenderTransform>
-										<TransformGroup>
-											<ScaleTransform/>
-											<SkewTransform/>
-											<RotateTransform/>
-											<TranslateTransform/>
-										</TransformGroup>
-									</Rectangle.RenderTransform>
-								</Rectangle>
-							</Grid>
-						</Grid>
-						<ControlTemplate.Triggers>
-							<Trigger Property="Orientation" Value="Vertical">
-								<Setter Property="LayoutTransform" TargetName="TemplateRoot">
-									<Setter.Value>
-										<RotateTransform Angle="-90"/>
-									</Setter.Value>
-								</Setter>
-							</Trigger>
-							<Trigger Property="IsIndeterminate" Value="true">
-								<Setter Property="Visibility" TargetName="Indicator" Value="Collapsed"/>
-							</Trigger>
-						</ControlTemplate.Triggers>
-					</ControlTemplate>
-				</Setter.Value>
-			</Setter>
+			<Style.Triggers>
+				<Trigger Property="VirtualizingPanel.IsVirtualizing" Value="true">
+					<Setter Property="ItemsPanel">
+						<Setter.Value>
+							<ItemsPanelTemplate>
+								<VirtualizingStackPanel/>
+							</ItemsPanelTemplate>
+						</Setter.Value>
+					</Setter>
+				</Trigger>
+			</Style.Triggers>
 		</Style>
 	</Window.Resources>
-	<TabControl x:Name="Control" Background="#FFAAB4C8">
-		<TabItem x:Name="OPU1_Tab" Header="ОПУ 1">
-			<Grid x:Name="OPU1_Control" RenderTransformOrigin="0.5,0.5">
-				<Grid.RowDefinitions>
-					<RowDefinition Height="1*"/>
-					<RowDefinition Height="1*"/>
-					<RowDefinition Height="1*"/>
-					<RowDefinition Height="1*"/>
-					<RowDefinition Height="1*"/>
-					<RowDefinition Height="1*"/>
-				</Grid.RowDefinitions>
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="1*"/>
-					<ColumnDefinition Width="1*"/>
-					<ColumnDefinition Width="1*"/>
-					<ColumnDefinition Width="1*"/>
-					<ColumnDefinition Width="1*"/>
-					<ColumnDefinition Width="1*"/>
-				</Grid.ColumnDefinitions>
-
-
-				<Grid Grid.Row="0" Grid.Column="0">
+	<DockPanel LastChildFill="True">
+		<Menu DockPanel.Dock="Top" FontSize="14">
+			<MenuItem Header="File"/>
+		</Menu>
+		<ToolBar DockPanel.Dock="Top" FontSize="14">
+			<Button x:Name="Connection" Content="Подключение" BorderBrush="#FF717171" Margin="10,0,0,0" FontSize="20"/>
+			<Ellipse x:Name="ConnectStatus" StrokeThickness="2" Grid.Row="0" Width="15" Height="15" Stroke="Black" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,0,5,0" >
+				<Ellipse.Fill>
+					<RadialGradientBrush Center="0.25,0.25">
+						<GradientStop Color="Red" Offset="1"/>
+						<GradientStop Color="White" Offset="0"/>
+					</RadialGradientBrush>
+				</Ellipse.Fill>
+			</Ellipse>
+			<Separator/>
+			<Button x:Name="Power" Content="Питание" BorderBrush="#FF717171" FontSize="20"/>
+			<Ellipse x:Name="PowerStatus" StrokeThickness="2" Grid.Row="0" Width="15" Height="15" Stroke="Black" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,0,5,0">
+				<Ellipse.Fill>
+					<RadialGradientBrush Center="0.25,0.25">
+						<GradientStop Color="Red" Offset="1"/>
+						<GradientStop Color="White" Offset="0"/>
+					</RadialGradientBrush>
+				</Ellipse.Fill>
+			</Ellipse>
+			<Separator/>
+			<Button x:Name="EmStop" Content="СТОП" BorderBrush="#FF717171" Background="#FFB70000" FontWeight="Bold" FontSize="20"/>
+			<Ellipse x:Name="StopStatus" StrokeThickness="2" Grid.Row="0" Width="15" Height="15" Stroke="Black" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,0,5,0">
+				<Ellipse.Fill>
+					<RadialGradientBrush Center="0.25,0.25">
+						<GradientStop Color="Red" Offset="1"/>
+						<GradientStop Color="White" Offset="0"/>
+					</RadialGradientBrush>
+				</Ellipse.Fill>
+			</Ellipse>
+		</ToolBar>
+		<StatusBar DockPanel.Dock="Bottom" HorizontalContentAlignment="Right">
+			<StatusBarItem Content="Status"/>
+			<ProgressBar x:Name="StatusProgress" Width="75" Height="15" IsIndeterminate="True" Visibility="Hidden" HorizontalAlignment="Right"/>
+		</StatusBar>
+		<StackPanel x:Name="LeftPanel" DockPanel.Dock="Left" Width="125" MinWidth="10" MaxWidth="600">
+			<TreeView ScrollViewer.VerticalScrollBarVisibility="Hidden" ScrollViewer.HorizontalScrollBarVisibility="Hidden" BorderBrush="{x:Null}" >
+				<TreeViewItem Style="{DynamicResource TreeViewItem_UserStyle}" Header="Ручное управление" >
+					<TreeViewItem Header="Абсолютное" Selected="Tool_Click" Tag="0"/>
+					<TreeViewItem Header="Инкремент"/>
+					<TreeViewItem Header="Шаговое"/>
+				</TreeViewItem>
+				<TreeViewItem Header="Снятие АФЧХ" Selected="Tool_Click" Tag="1"/>
+				<TreeViewItem Header="Демонстрация"/>
+				<TreeViewItem Header="Аттестация"/>
+			</TreeView>
+		</StackPanel>
+		<Thumb x:Name="LeftPanelSize" Cursor="SizeWE" DragDelta="LeftPanelSize_DragDelta"/>
+		<TabControl Style="{DynamicResource TabControl_UserStyle}" x:Name="Control" Background="#FFAAB4C8" SelectedIndex="0">
+			<TabItem x:Name="OPU1_Tab">
+				<Grid x:Name="OPU1_Control" RenderTransformOrigin="0.5,0.5">
 					<Grid.RowDefinitions>
 						<RowDefinition Height="1*"/>
 						<RowDefinition Height="1*"/>
-					</Grid.RowDefinitions>
-					<Button x:Name="OPU1_Connect" Content="Подключение" Grid.Row="1" FontSize="20" Click="OPU1_Connect_Click" Foreground="#FFCFCFCF" Style="{DynamicResource DefBtn}" MinWidth="150">
-						<Button.Resources>
-							<Style TargetType="Border">
-								<Setter Property="CornerRadius" Value="10, 0, 0, 10"/>
-							</Style>
-						</Button.Resources>
-					</Button>
-					<Ellipse x:Name="OPU1_ConnectStatus" StrokeThickness="3" Grid.Row="0" Width="25" Height="25" Stroke="Black" VerticalAlignment="Center" HorizontalAlignment="Center" >
-						<Ellipse.Fill>
-							<RadialGradientBrush Center="0.25,0.25">
-								<GradientStop Color="Red" Offset="1"/>
-								<GradientStop Color="White" Offset="0"/>
-							</RadialGradientBrush>
-						</Ellipse.Fill>
-					</Ellipse>
-				</Grid>
-
-				<Grid Grid.Row="0" Grid.Column="1">
-					<Grid.RowDefinitions>
+						<RowDefinition Height="1*"/>
+						<RowDefinition Height="1*"/>
 						<RowDefinition Height="1*"/>
 						<RowDefinition Height="1*"/>
 					</Grid.RowDefinitions>
-					<Button x:Name="OPU1_Power" Content="Питание" Grid.Row="1" FontSize="20" Click="OPU1_Power_Click" Foreground="#FFCFCFCF" Style="{DynamicResource DefBtn}" MinWidth="150"/>
-					<Ellipse x:Name="OPU1_PowerStatus" StrokeThickness="3" Grid.Row="0" Width="25" Height="25" Stroke="Black" VerticalAlignment="Center" HorizontalAlignment="Center">
-						<Ellipse.Fill>
-							<RadialGradientBrush Center="0.25,0.25">
-								<GradientStop Color="Red" Offset="1"/>
-								<GradientStop Color="White" Offset="0"/>
-							</RadialGradientBrush>
-						</Ellipse.Fill>
-					</Ellipse>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="1*"/>
+						<ColumnDefinition Width="1*"/>
+						<ColumnDefinition Width="1*"/>
+						<ColumnDefinition Width="1*"/>
+						<ColumnDefinition Width="1*"/>
+						<ColumnDefinition Width="1*"/>
+					</Grid.ColumnDefinitions>
+
+
+					<Grid Grid.Row="0" Grid.Column="2">
+						<Grid.RowDefinitions>
+							<RowDefinition Height="1*"/>
+							<RowDefinition Height="1*"/>
+						</Grid.RowDefinitions>
+						<Button x:Name="OPU1_Connect" Content="Подключение" Grid.Row="1" FontSize="20" Click="OPU1_Connect_Click" Foreground="#FFCFCFCF" Style="{DynamicResource DefBtn}" MinWidth="150">
+							<Button.Resources>
+								<Style TargetType="Border">
+									<Setter Property="CornerRadius" Value="10, 0, 0, 10"/>
+								</Style>
+							</Button.Resources>
+						</Button>
+						
+					</Grid>
+
+					<Grid Grid.Row="0" Grid.Column="3">
+						<Grid.RowDefinitions>
+							<RowDefinition Height="1*"/>
+							<RowDefinition Height="1*"/>
+						</Grid.RowDefinitions>
+						<Button x:Name="OPU1_Power" Content="Питание" Grid.Row="1" FontSize="20" Click="OPU1_Power_Click" Foreground="#FFCFCFCF" Style="{DynamicResource DefBtn}" MinWidth="150"/>
+						
+					</Grid>
+
+					<Grid Grid.Row="0" Grid.Column="4">
+						<Grid.RowDefinitions>
+							<RowDefinition Height="1*"/>
+							<RowDefinition Height="1*"/>
+						</Grid.RowDefinitions>
+						<Button x:Name="OPU1_Stop" Content="СТОП" Grid.Row="1" FontSize="20" Click="OPU1_Stop_Click" Foreground="#FFCFCFCF" Style="{DynamicResource DefBtn}" MinWidth="150"/>
+						<Ellipse x:Name="OPU1_StopStatus" StrokeThickness="3" Grid.Row="0" Width="25" Height="25" Stroke="Black" VerticalAlignment="Center" HorizontalAlignment="Center">
+							<Ellipse.Fill>
+								<RadialGradientBrush Center="0.25,0.25">
+									<GradientStop Color="Red" Offset="1"/>
+									<GradientStop Color="White" Offset="0"/>
+								</RadialGradientBrush>
+							</Ellipse.Fill>
+						</Ellipse>
+					</Grid>
+
+					<Grid Grid.Row="0" Grid.Column="5">
+						<Grid.RowDefinitions>
+							<RowDefinition Height="1*"/>
+							<RowDefinition Height="1*"/>
+						</Grid.RowDefinitions>
+						<Button x:Name="OPU1_Clear" Content="Сброс" Grid.Row="1" FontSize="20" Click="OPU1_Clear_Click" Foreground="#FFCFCFCF" Style="{DynamicResource DefBtn}" MinWidth="150">
+							<Button.Resources>
+								<Style TargetType="Border">
+									<Setter Property="CornerRadius" Value="0, 10, 10, 0"/>
+								</Style>
+							</Button.Resources>
+						</Button>
+						<Ellipse x:Name="OPU1_ClearStatus" StrokeThickness="3" Grid.Row="0" Width="25" Height="25" Stroke="Black" VerticalAlignment="Center" HorizontalAlignment="Center" >
+							<Ellipse.Fill>
+								<RadialGradientBrush Center="0.25,0.25">
+									<GradientStop Color="Red" Offset="1"/>
+									<GradientStop Color="White" Offset="0"/>
+								</RadialGradientBrush>
+							</Ellipse.Fill>
+						</Ellipse>
+					</Grid>
+
+
 				</Grid>
-
-				<Grid Grid.Row="0" Grid.Column="2">
-					<Grid.RowDefinitions>
-						<RowDefinition Height="1*"/>
-						<RowDefinition Height="1*"/>
-					</Grid.RowDefinitions>
-					<Button x:Name="OPU1_Stop" Content="СТОП" Grid.Row="1" FontSize="20" Click="OPU1_Stop_Click" Foreground="#FFCFCFCF" Style="{DynamicResource DefBtn}" MinWidth="150"/>
-					<Ellipse x:Name="OPU1_StopStatus" StrokeThickness="3" Grid.Row="0" Width="25" Height="25" Stroke="Black" VerticalAlignment="Center" HorizontalAlignment="Center">
-						<Ellipse.Fill>
-							<RadialGradientBrush Center="0.25,0.25">
-								<GradientStop Color="Red" Offset="1"/>
-								<GradientStop Color="White" Offset="0"/>
-							</RadialGradientBrush>
-						</Ellipse.Fill>
-					</Ellipse>
+			</TabItem>
+			<TabItem x:Name="SecondTab">
+				<Grid>
+					<Button Content="btn"/>
 				</Grid>
+			</TabItem>
+		</TabControl>
+	</DockPanel>
 
-				<Grid Grid.Row="0" Grid.Column="3">
-					<Grid.RowDefinitions>
-						<RowDefinition Height="1*"/>
-						<RowDefinition Height="1*"/>
-					</Grid.RowDefinitions>
-					<Button x:Name="OPU1_Clear" Content="Сброс" Grid.Row="1" FontSize="20" Click="OPU1_Clear_Click" Foreground="#FFCFCFCF" Style="{DynamicResource DefBtn}" MinWidth="150">
-						<Button.Resources>
-							<Style TargetType="Border">
-								<Setter Property="CornerRadius" Value="0, 10, 10, 0"/>
-							</Style>
-						</Button.Resources>
-					</Button>
-					<Ellipse x:Name="OPU1_ClearStatus" StrokeThickness="3" Grid.Row="0" Width="25" Height="25" Stroke="Black" VerticalAlignment="Center" HorizontalAlignment="Center" >
-						<Ellipse.Fill>
-							<RadialGradientBrush Center="0.25,0.25">
-								<GradientStop Color="Red" Offset="1"/>
-								<GradientStop Color="White" Offset="0"/>
-							</RadialGradientBrush>
-						</Ellipse.Fill>
-					</Ellipse>
-				</Grid>
-
-				<Image x:Name="OPU1_ServiceImage" Grid.Row="0" Grid.Column="5" Source="/TESART.png" PreviewMouseLeftButtonUp="OPU1_ServiceImage_PreviewMouseLeftButtonUp"/>
-
-				<Label x:Name="OPU1_Axis" Content="Ось" Grid.Row="1" Grid.Column="0" VerticalAlignment="Bottom" HorizontalAlignment="Center" FontSize="30" FontWeight="Bold"/>
-				<TextBlock x:Name="OPU1_CurrentPosition" Text="Текущая позиция" Grid.Row="1" Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Center" FontSize="30" TextWrapping="Wrap" FontWeight="Bold"/>
-				<TextBlock x:Name="OPU1_TargetPosition" Text="Целевая позиция" Grid.Row="1" Grid.Column="2" VerticalAlignment="Bottom" HorizontalAlignment="Center" FontSize="30" TextWrapping="Wrap" FontWeight="Bold"/>
-				<TextBlock x:Name="OPU1_TargetSpeed" Text="Целевая скорость" Grid.Row="1" Grid.Column="3" VerticalAlignment="Bottom" HorizontalAlignment="Center" FontSize="30" TextWrapping="Wrap" FontWeight="Bold"/>
-				<TextBlock x:Name="OPU1_ControlText" Text="Управление движением" Grid.Row="1" Grid.Column="4" VerticalAlignment="Bottom" HorizontalAlignment="Center" FontSize="30" TextWrapping="Wrap" FontWeight="Bold"/>
-				<Label x:Name="OPU1_Limits" Content="Лимиты" Grid.Row="1" Grid.Column="5" VerticalAlignment="Bottom" HorizontalAlignment="Center" FontSize="30" FontWeight="Bold"/>
-
-				<GroupBox x:Name="Azimuth" Grid.Row="2" Grid.ColumnSpan="6">
-					<Grid>
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="1*"/>
-							<ColumnDefinition Width="1*"/>
-							<ColumnDefinition Width="1*"/>
-							<ColumnDefinition Width="1*"/>
-							<ColumnDefinition Width="1*"/>
-							<ColumnDefinition Width="1*"/>
-						</Grid.ColumnDefinitions>
-						<Label x:Name="AzimuthLabel" Content="Азимут" Grid.Column="0" FontSize="28" VerticalAlignment="Center" Margin="5,0,0,0"/>
-						<Label x:Name="OPU1_AzCurPos" Content="0.0°" Grid.Column="1" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-						<TextBox x:Name="OPU1_AzTarPos" Text="0.0" Grid.Column="2" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="10,0,0,0" ToolTip="Позиция" TouchDown="OPU1_TextBox_TouchDown" >
-							<TextBox.Resources>
-								<Style TargetType="Border">
-									<Setter Property="CornerRadius" Value="10, 0, 0, 10"/>
-								</Style>
-							</TextBox.Resources>
-						</TextBox>
-						<TextBox x:Name="OPU1_AzTarSpd" Text="1.0" Grid.Column="3" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="0,0,10,0" ToolTip="Скорость" TouchDown="OPU1_TextBox_TouchDown" TextChanged="OPU1_Speed_TextChanged">
-							<TextBox.Resources>
-								<Style TargetType="Border">
-									<Setter Property="CornerRadius" Value="0, 10, 10, 0"/>
-								</Style>
-							</TextBox.Resources>
-						</TextBox>
-						<Grid x:Name="AzPosControl" Grid.Row="2"  Grid.Column="4">
-							<Grid.RowDefinitions>
-								<RowDefinition Height="1*"/>
-								<RowDefinition Height="1*"/>
-							</Grid.RowDefinitions>
-							<Grid.ColumnDefinitions>
-								<ColumnDefinition Width="1*"/>
-								<ColumnDefinition Width="1*"/>
-								<ColumnDefinition Width="1*"/>
-							</Grid.ColumnDefinitions>
-							<Button x:Name="OPU1_AzJogLeft" Content="←" Grid.Row="0" Grid.Column="0" FontSize="35" HorizontalContentAlignment="Center" Margin="0,5,0,0" PreviewMouseLeftButtonDown="OPU1_AzJogLeft_PreviewMouseLeftButtonDown" PreviewMouseLeftButtonUp="OPU1_AzJogLeft_PreviewMouseLeftButtonUp" Foreground="#FFCFCFCF" Style="{DynamicResource DefBtn}" FontFamily="Global User Interface" TouchDown="OPU1_AzJogLeft_TouchDown" TouchLeave="OPU1_AzJogLeft_TouchLeave">
-								<Button.Resources>
-									<Style TargetType="Border">
-										<Setter Property="CornerRadius" Value="10, 0, 0, 0"/>
-									</Style>
-								</Button.Resources>
-							</Button>
-							<Button x:Name="OPU1_AzMove" Content="⨀" Grid.Row="0" Grid.Column="1" FontSize="35" HorizontalContentAlignment="Center" Margin="0,5,0,0" Click="OPU1_AzMove_Click" Foreground="#FFCFCFCF" Style="{DynamicResource DefBtn}" FontFamily="Global User Interface">
-								<Button.Resources>
-									<Style TargetType="Border">
-										<Setter Property="CornerRadius" Value="0"/>
-									</Style>
-								</Button.Resources>
-							</Button>
-							<Button x:Name="OPU1_AzJogRight" Content="→" Grid.Row="0" Grid.Column="2" FontSize="35" HorizontalContentAlignment="Center" Margin="0,5,0,0" PreviewMouseLeftButtonDown="OPU1_AzJogRight_PreviewMouseLeftButtonDown" PreviewMouseLeftButtonUp="OPU1_AzJogRight_PreviewMouseLeftButtonUp" Foreground="#FFCFCFCF" Style="{DynamicResource DefBtn}" FontFamily="Global User Interface" TouchDown="OPU1_AzJogRight_TouchDown" TouchLeave="OPU1_AzJogRight_TouchLeave">
-								<Button.Resources>
-									<Style TargetType="Border">
-										<Setter Property="CornerRadius" Value="0, 10, 0, 0"/>
-									</Style>
-								</Button.Resources>
-							</Button>
-							<Button x:Name="OPU1_AZStop" Content="СТОП" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" FontSize="30" HorizontalContentAlignment="Center" Margin="0,0,0,0" Click="OPU1_AZStop_Click" Foreground="#FFCFCFCF" Style="{DynamicResource DefBtn}">
-								<Button.Resources>
-									<Style TargetType="Border">
-										<Setter Property="CornerRadius" Value="0, 0, 10, 10"/>
-									</Style>
-								</Button.Resources>
-							</Button>
-						</Grid>
-						<Grid Grid.Column="5">
-							<Grid.RowDefinitions>
-								<RowDefinition Height="1*"/>
-								<RowDefinition Height="1*"/>
-							</Grid.RowDefinitions>
-							<Label x:Name="OPU1_AzLimitsLabel" Content="[ 0.0 ; 1.0 ]" Grid.Row="0" FontSize="26" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-							<Button x:Name="OPU1_AzSetLim" Content="Изменить" Grid.Row="1" FontSize="26" Margin="20,0,20,0" Click="OPU1_AzSetLim_Click" Style="{DynamicResource DefBtn}" Foreground="#FFCFCFCF">
-								<Button.Resources>
-									<Style TargetType="Border">
-										<Setter Property="CornerRadius" Value="10"/>
-									</Style>
-								</Button.Resources>
-							</Button>
-						</Grid>
-
-
-					</Grid>
-				</GroupBox>
-				<GroupBox x:Name="UgolMesta" Grid.Row="3" Grid.ColumnSpan="6">
-					<Grid>
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="1*"/>
-							<ColumnDefinition Width="1*"/>
-							<ColumnDefinition Width="1*"/>
-							<ColumnDefinition Width="1*"/>
-							<ColumnDefinition Width="1*"/>
-							<ColumnDefinition Width="1*"/>
-						</Grid.ColumnDefinitions>
-						<Label x:Name="UgolMestaLabel" Content="Угол места" Grid.Column="0" FontSize="28" VerticalAlignment="Center" Margin="5,0,0,0"/>
-						<Label x:Name="OPU1_UmCurPos" Content="0.0°" Grid.Column="1" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-						<TextBox x:Name="OPU1_UmTarPos" Text="0.0" Grid.Column="2" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="10,0,0,0" ToolTip="Позиция" TouchDown="OPU1_TextBox_TouchDown">
-							<TextBox.Resources>
-								<Style TargetType="Border">
-									<Setter Property="CornerRadius" Value="10, 0, 0, 10"/>
-								</Style>
-							</TextBox.Resources>
-						</TextBox>
-						<TextBox x:Name="OPU1_UmTarSpd" Text="1.0" Grid.Column="3" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="0,0,10,0" ToolTip="Скорость" TouchDown="OPU1_TextBox_TouchDown" TextChanged="OPU1_Speed_TextChanged">
-							<TextBox.Resources>
-								<Style TargetType="Border">
-									<Setter Property="CornerRadius" Value="0, 10, 10, 0"/>
-								</Style>
-							</TextBox.Resources>
-						</TextBox>
-						<Grid x:Name="UmPosControl" Grid.Row="2"  Grid.Column="4">
-							<Grid.RowDefinitions>
-								<RowDefinition Height="1*"/>
-								<RowDefinition Height="1*"/>
-							</Grid.RowDefinitions>
-							<Grid.ColumnDefinitions>
-								<ColumnDefinition Width="1*"/>
-								<ColumnDefinition Width="1*"/>
-								<ColumnDefinition Width="1*"/>
-							</Grid.ColumnDefinitions>
-							<Button x:Name="OPU1_UmJogLeft" Content="←" Grid.Row="0" Grid.Column="0" FontSize="35" HorizontalContentAlignment="Center" Margin="0,5,0,0" PreviewMouseLeftButtonDown="OPU1_UmJogLeft_PreviewMouseLeftButtonDown" PreviewMouseLeftButtonUp="OPU1_UmJogLeft_PreviewMouseLeftButtonUp" Style="{DynamicResource DefBtn}" Foreground="#FFCFCFCF" FontFamily="Global User Interface" TouchDown="OPU1_UmJogLeft_TouchDown" TouchLeave="OPU1_UmJogLeft_TouchLeave">
-								<Button.Resources>
-									<Style TargetType="Border">
-										<Setter Property="CornerRadius" Value="10, 0, 0, 0"/>
-									</Style>
-								</Button.Resources>
-							</Button>
-							<Button x:Name="OPU1_UmMove" Content="⨀" Grid.Row="0" Grid.Column="1" FontSize="35" HorizontalContentAlignment="Center" Margin="0,5,0,0" Click="OPU1_UmMove_Click" Style="{DynamicResource DefBtn}" Foreground="#FFCFCFCF" FontFamily="Global User Interface"/>
-							<Button x:Name="OPU1_UmJogRight" Content="→" Grid.Row="0" Grid.Column="2" FontSize="35" HorizontalContentAlignment="Center" Margin="0,5,0,0" PreviewMouseLeftButtonDown="OPU1_UmJogRight_PreviewMouseLeftButtonDown" PreviewMouseLeftButtonUp="OPU1_UmJogRight_PreviewMouseLeftButtonUp" Style="{DynamicResource DefBtn}" Foreground="#FFCFCFCF" FontFamily="Global User Interface" TouchDown="OPU1_UmJogRight_TouchDown" TouchLeave="OPU1_UmJogRight_TouchLeave">
-								<Button.Resources>
-									<Style TargetType="Border">
-										<Setter Property="CornerRadius" Value="0, 10, 0, 0"/>
-									</Style>
-								</Button.Resources>
-							</Button>
-							<Button x:Name="OPU1_UmStop" Content="СТОП" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" FontSize="30" HorizontalContentAlignment="Center" Click="OPU1_UmStop_Click" Style="{DynamicResource DefBtn}" Foreground="#FFCFCFCF">
-								<Button.Resources>
-									<Style TargetType="Border">
-										<Setter Property="CornerRadius" Value="0, 0, 10, 10"/>
-									</Style>
-								</Button.Resources>
-							</Button>
-						</Grid>
-						<Grid Grid.Column="5">
-							<Grid.RowDefinitions>
-								<RowDefinition Height="1*"/>
-								<RowDefinition Height="1*"/>
-							</Grid.RowDefinitions>
-							<Label x:Name="OPU1_UmLimitsLabel" Content="[ 0.0 ; 1.0 ]" Grid.Row="0" FontSize="26" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-							<Button x:Name="OPU1_UmSetLim" Content="Изменить" Grid.Row="1" FontSize="26" Margin="20,0,20,0" Click="OPU1_UmSetLim_Click" Style="{DynamicResource DefBtn}" Foreground="#FFCFCFCF">
-								<Button.Resources>
-									<Style TargetType="Border">
-										<Setter Property="CornerRadius" Value="10"/>
-									</Style>
-								</Button.Resources>
-							</Button>
-						</Grid>
-
-
-					</Grid>
-				</GroupBox>
-				<GroupBox x:Name="Polarization" Grid.Row="4" Grid.ColumnSpan="6">
-					<Grid>
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="1*"/>
-							<ColumnDefinition Width="1*"/>
-							<ColumnDefinition Width="1*"/>
-							<ColumnDefinition Width="1*"/>
-							<ColumnDefinition Width="1*"/>
-							<ColumnDefinition Width="1*"/>
-						</Grid.ColumnDefinitions>
-						<TextBlock x:Name="PolarizationLabel" Text="Поляризация" FontSize="28" VerticalAlignment="Center" Margin="5,0,0,0"/>
-						<Label x:Name="OPU1_PolCurPos" Content="0.0°" Grid.Column="1" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-						<TextBox x:Name="OPU1_PolTarPos" Text="0.0" Grid.Column="2" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="10,0,0,0" ToolTip="Позиция" TouchDown="OPU1_TextBox_TouchDown">
-							<TextBox.Resources>
-								<Style TargetType="Border">
-									<Setter Property="CornerRadius" Value="10, 0, 0, 10"/>
-								</Style>
-							</TextBox.Resources>
-						</TextBox>
-						<TextBox x:Name="OPU1_PolTarSpd" Text="1.0" Grid.Column="3" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="0,0,10,0" ToolTip="Скорость" TouchDown="OPU1_TextBox_TouchDown" TextChanged="OPU1_Speed_TextChanged">
-							<TextBox.Resources>
-								<Style TargetType="Border">
-									<Setter Property="CornerRadius" Value="0, 10, 10, 0"/>
-								</Style>
-							</TextBox.Resources>
-						</TextBox>
-						<Grid x:Name="PolPosControl" Grid.Row="2"  Grid.Column="4">
-							<Grid.RowDefinitions>
-								<RowDefinition Height="1*"/>
-								<RowDefinition Height="1*"/>
-							</Grid.RowDefinitions>
-							<Grid.ColumnDefinitions>
-								<ColumnDefinition Width="1*"/>
-								<ColumnDefinition Width="1*"/>
-								<ColumnDefinition Width="1*"/>
-							</Grid.ColumnDefinitions>
-							<Button x:Name="OPU1_PolJogLeft" Content="←" Grid.Row="0" Grid.Column="0" FontSize="35" HorizontalContentAlignment="Center" Margin="0,5,0,0" PreviewMouseLeftButtonDown="OPU1_PolJogLeft_PreviewMouseLeftButtonDown" PreviewMouseLeftButtonUp="OPU1_PolJogLeft_PreviewMouseLeftButtonUp" Style="{DynamicResource DefBtn}" Foreground="#FFCFCFCF" FontFamily="Global User Interface" TouchDown="OPU1_PolJogLeft_TouchDown" TouchLeave="OPU1_PolJogLeft_TouchLeave">
-								<Button.Resources>
-									<Style TargetType="Border">
-										<Setter Property="CornerRadius" Value="10, 0, 0, 0"/>
-									</Style>
-								</Button.Resources>
-							</Button>
-							<Button x:Name="OPU1_PolMove" Content="⨀" Grid.Row="0" Grid.Column="1" FontSize="35" HorizontalContentAlignment="Center" Margin="0,5,0,0" Click="OPU1_PolMove_Click" Style="{DynamicResource DefBtn}" Foreground="#FFCFCFCF" FontFamily="Global User Interface"/>
-							<Button x:Name="OPU1_PolJogRight" Content="→" Grid.Row="0" Grid.Column="2" FontSize="35" HorizontalContentAlignment="Center" Margin="0,5,0,0" PreviewMouseLeftButtonDown="OPU1_PolJogRight_PreviewMouseLeftButtonDown" PreviewMouseLeftButtonUp="OPU1_PolJogRight_PreviewMouseLeftButtonUp" Style="{DynamicResource DefBtn}" Foreground="#FFCFCFCF" FontFamily="Global User Interface" TouchDown="OPU1_PolJogRight_TouchDown" TouchLeave="OPU1_PolJogRight_TouchLeave">
-								<Button.Resources>
-									<Style TargetType="Border">
-										<Setter Property="CornerRadius" Value="0, 10, 0, 0"/>
-									</Style>
-								</Button.Resources>
-							</Button>
-							<Button x:Name="OPU1_PolStop" Content="СТОП" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" FontSize="30" HorizontalContentAlignment="Center" Click="OPU1_PolStop_Click" Style="{DynamicResource DefBtn}" Foreground="#FFCFCFCF">
-								<Button.Resources>
-									<Style TargetType="Border">
-										<Setter Property="CornerRadius" Value="0, 0, 10, 10"/>
-									</Style>
-								</Button.Resources>
-							</Button>
-						</Grid>
-						<Grid Grid.Column="5">
-							<Grid.RowDefinitions>
-								<RowDefinition Height="1*"/>
-								<RowDefinition Height="1*"/>
-							</Grid.RowDefinitions>
-							<Label x:Name="OPU1_PolLimitsLabel" Content="[ 0.0 ; 1.0 ]" FontSize="26" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-							<Button x:Name="OPU1_PolSetLim" Content="Изменить" FontSize="26" Margin="20,0,20,0" Click="OPU1_PolSetLim_Click" Style="{DynamicResource DefBtn}" Foreground="#FFCFCFCF" Grid.Row="80">
-								<Button.Resources>
-									<Style TargetType="Border">
-										<Setter Property="CornerRadius" Value="10"/>
-									</Style>
-								</Button.Resources>
-							</Button>
-						</Grid>
-
-
-					</Grid>
-				</GroupBox>
-				<GroupBox x:Name="Y" Grid.Row="5" Grid.ColumnSpan="6">
-					<Grid>
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="1*"/>
-							<ColumnDefinition Width="1*"/>
-							<ColumnDefinition Width="1*"/>
-							<ColumnDefinition Width="1*"/>
-							<ColumnDefinition Width="1*"/>
-							<ColumnDefinition Width="1*"/>
-						</Grid.ColumnDefinitions>
-						<Label x:Name="YLabel" Content="Ось Y" Grid.Column="0" FontSize="28" VerticalAlignment="Center" Margin="5,0,0,0"/>
-						<Label x:Name="OPU1_YCurPos" Content="0.0 мм" Grid.Column="1" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-						<TextBox x:Name="OPU1_YTarPos" Text="0.0" Grid.Column="2" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="10,0,0,0" ToolTip="Позиция" TouchDown="OPU1_TextBox_TouchDown">
-							<TextBox.Resources>
-								<Style TargetType="Border">
-									<Setter Property="CornerRadius" Value="10, 0, 0, 10"/>
-								</Style>
-							</TextBox.Resources>
-						</TextBox>
-						<TextBox x:Name="OPU1_YTarSpd" Text="1.0" Grid.Column="3" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="0,0,10,0" ToolTip="Скорость" TouchDown="OPU1_TextBox_TouchDown" TextChanged="OPU1_Speed_TextChanged">
-							<TextBox.Resources>
-								<Style TargetType="Border">
-									<Setter Property="CornerRadius" Value="0, 10, 10, 0"/>
-								</Style>
-							</TextBox.Resources>
-						</TextBox>
-						<Grid x:Name="PosControl" Grid.Row="2"  Grid.Column="4">
-							<Grid.RowDefinitions>
-								<RowDefinition Height="1*"/>
-								<RowDefinition Height="1*"/>
-							</Grid.RowDefinitions>
-							<Grid.ColumnDefinitions>
-								<ColumnDefinition Width="1*"/>
-								<ColumnDefinition Width="1*"/>
-								<ColumnDefinition Width="1*"/>
-							</Grid.ColumnDefinitions>
-							<Button x:Name="OPU1_YJogLeft" Content="←" Grid.Row="0" Grid.Column="0" FontSize="35" HorizontalContentAlignment="Center" Margin="0,5,0,0" PreviewMouseLeftButtonDown="OPU1_YJogLeft_PreviewMouseLeftButtonDown" PreviewMouseLeftButtonUp="OPU1_YJogLeft_PreviewMouseLeftButtonUp" Style="{DynamicResource DefBtn}" Foreground="#FFCFCFCF" FontFamily="Global User Interface" TouchDown="OPU1_YJogLeft_TouchDown" TouchLeave="OPU1_YJogLeft_TouchLeave">
-								<Button.Resources>
-									<Style TargetType="Border">
-										<Setter Property="CornerRadius" Value="10, 0, 0, 0"/>
-									</Style>
-								</Button.Resources>
-							</Button>
-							<Button x:Name="OPU1_YMove" Content="⨀" Grid.Row="0" Grid.Column="1" FontSize="35" HorizontalContentAlignment="Center" Margin="0,5,0,0" Click="OPU1_YMove_Click" Style="{DynamicResource DefBtn}" Foreground="#FFCFCFCF" FontFamily="Global User Interface"/>
-							<Button x:Name="OPU1_YJogRight" Content="→" Grid.Row="0" Grid.Column="2" FontSize="35" HorizontalContentAlignment="Center" Margin="0,5,0,0" PreviewMouseLeftButtonDown="OPU1_YJogRight_PreviewMouseLeftButtonDown" PreviewMouseLeftButtonUp="OPU1_YJogRight_PreviewMouseLeftButtonUp" Style="{DynamicResource DefBtn}" Foreground="#FFCFCFCF" FontFamily="Global User Interface" TouchDown="OPU1_YJogRight_TouchDown" TouchLeave="OPU1_YJogRight_TouchLeave">
-								<Button.Resources>
-									<Style TargetType="Border">
-										<Setter Property="CornerRadius" Value="0, 10, 0, 0"/>
-									</Style>
-								</Button.Resources>
-							</Button>
-							<Button x:Name="OPU1_YStop" Content="СТОП" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" FontSize="30" HorizontalContentAlignment="Center" Click="OPU1_YStop_Click" Style="{DynamicResource DefBtn}" Foreground="#FFCFCFCF">
-								<Button.Resources>
-									<Style TargetType="Border">
-										<Setter Property="CornerRadius" Value="0, 0, 10, 10"/>
-									</Style>
-								</Button.Resources>
-							</Button>
-						</Grid>
-						<Grid Grid.Column="5">
-							<Grid.RowDefinitions>
-								<RowDefinition Height="1*"/>
-								<RowDefinition Height="1*"/>
-							</Grid.RowDefinitions>
-							<Label x:Name="OPU1_YLimitsLabel" Content="[ 0.0 ; 1.0 ]" FontSize="26" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-							<Button x:Name="OPU1_YSetLim" Content="Изменить" Grid.Row="1" FontSize="26" Margin="20,0,20,0" Click="OPU1_YSetLim_Click" Style="{DynamicResource DefBtn}" Foreground="#FFCFCFCF">
-								<Button.Resources>
-									<Style TargetType="Border">
-										<Setter Property="CornerRadius" Value="10"/>
-									</Style>
-								</Button.Resources>
-							</Button>
-						</Grid>
-
-					</Grid>
-				</GroupBox>
-			</Grid>
-		</TabItem>
-		<TabItem x:Name="OPU2_Tab" Header="ОПУ 2">
-			<Grid x:Name="OPU2_Control" RenderTransformOrigin="0.5,0.5">
-				<Grid.RowDefinitions>
-					<RowDefinition Height="6*"/>
-					<RowDefinition Height="5*"/>
-					<RowDefinition Height="5*"/>
-					<RowDefinition Height="5*"/>
-					<RowDefinition Height="5*"/>
-					<RowDefinition Height="5*"/>
-					<RowDefinition Height="5*"/>
-				</Grid.RowDefinitions>
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="1*"/>
-					<ColumnDefinition Width="1*"/>
-					<ColumnDefinition Width="1*"/>
-					<ColumnDefinition Width="1*"/>
-					<ColumnDefinition Width="1*"/>
-					<ColumnDefinition Width="1*"/>
-				</Grid.ColumnDefinitions>
-
-
-				<Grid Grid.Row="0" Grid.Column="0">
-					<Grid.RowDefinitions>
-						<RowDefinition Height="1*"/>
-						<RowDefinition Height="1*"/>
-					</Grid.RowDefinitions>
-					<Button x:Name="OPU2_Connect" Content="Подключение" Grid.Row="1" FontSize="20" Click="OPU2_Connect_Click" Foreground="#FFCFCFCF" Style="{DynamicResource DefBtn}" MinWidth="150">
-						<Button.Resources>
-							<Style TargetType="Border">
-								<Setter Property="CornerRadius" Value="10, 0, 0, 10"/>
-							</Style>
-						</Button.Resources>
-					</Button>
-					<Ellipse x:Name="OPU2_ConnectStatus" StrokeThickness="3" Grid.Row="0" Width="25" Height="25" Stroke="Black" VerticalAlignment="Center" HorizontalAlignment="Center" >
-						<Ellipse.Fill>
-							<RadialGradientBrush Center="0.25,0.25">
-								<GradientStop Color="Red" Offset="1"/>
-								<GradientStop Color="White" Offset="0"/>
-							</RadialGradientBrush>
-						</Ellipse.Fill>
-					</Ellipse>
-				</Grid>
-
-				<Grid Grid.Row="0" Grid.Column="1">
-					<Grid.RowDefinitions>
-						<RowDefinition Height="1*"/>
-						<RowDefinition Height="1*"/>
-					</Grid.RowDefinitions>
-					<Button x:Name="OPU2_Power" Content="Питание" Grid.Row="1" FontSize="20" Click="OPU2_Power_Click" Foreground="#FFCFCFCF" Style="{DynamicResource DefBtn}" MinWidth="150"/>
-					<Ellipse x:Name="OPU2_PowerStatus" StrokeThickness="3" Grid.Row="0" Width="25" Height="25" Stroke="Black" VerticalAlignment="Center" HorizontalAlignment="Center">
-						<Ellipse.Fill>
-							<RadialGradientBrush Center="0.25,0.25">
-								<GradientStop Color="Red" Offset="1"/>
-								<GradientStop Color="White" Offset="0"/>
-							</RadialGradientBrush>
-						</Ellipse.Fill>
-					</Ellipse>
-				</Grid>
-
-				<Grid Grid.Row="0" Grid.Column="2">
-					<Grid.RowDefinitions>
-						<RowDefinition Height="1*"/>
-						<RowDefinition Height="1*"/>
-					</Grid.RowDefinitions>
-					<Button x:Name="OPU2_Stop" Content="СТОП" Grid.Row="1" FontSize="20" Click="OPU2_Stop_Click" Foreground="#FFCFCFCF" Style="{DynamicResource DefBtn}" MinWidth="150"/>
-					<Ellipse x:Name="OPU2_StopStatus" StrokeThickness="3" Grid.Row="0" Width="25" Height="25" Stroke="Black" VerticalAlignment="Center" HorizontalAlignment="Center">
-						<Ellipse.Fill>
-							<RadialGradientBrush Center="0.25,0.25">
-								<GradientStop Color="Red" Offset="1"/>
-								<GradientStop Color="White" Offset="0"/>
-							</RadialGradientBrush>
-						</Ellipse.Fill>
-					</Ellipse>
-				</Grid>
-
-				<Grid Grid.Row="0" Grid.Column="3">
-					<Grid.RowDefinitions>
-						<RowDefinition Height="1*"/>
-						<RowDefinition Height="1*"/>
-					</Grid.RowDefinitions>
-					<Button x:Name="OPU2_Clear" Content="Сброс" Grid.Row="1" FontSize="20" Click="OPU2_Clear_Click" Foreground="#FFCFCFCF" Style="{DynamicResource DefBtn}" MinWidth="150">
-						<Button.Resources>
-							<Style TargetType="Border">
-								<Setter Property="CornerRadius" Value="0, 10, 10, 0"/>
-							</Style>
-						</Button.Resources>
-					</Button>
-					<Ellipse x:Name="OPU2_ClearStatus" StrokeThickness="3" Grid.Row="0" Width="25" Height="25" Stroke="Black" VerticalAlignment="Center" HorizontalAlignment="Center" >
-						<Ellipse.Fill>
-							<RadialGradientBrush Center="0.25,0.25">
-								<GradientStop Color="Red" Offset="1"/>
-								<GradientStop Color="White" Offset="0"/>
-							</RadialGradientBrush>
-						</Ellipse.Fill>
-					</Ellipse>
-				</Grid>
-
-				<Image x:Name="OPU2_ServiceImage" Grid.Row="0" Grid.Column="5" Source="/TESART.png" PreviewMouseLeftButtonUp="OPU2_ServiceImage_PreviewMouseLeftButtonUp"/>
-
-				<Label x:Name="OPU2_Axis" Content="Ось" Grid.Row="1" Grid.Column="0" VerticalAlignment="Bottom" HorizontalAlignment="Center" FontSize="30" FontWeight="Bold"/>
-				<TextBlock x:Name="OPU2_CurrentPosition" Text="Текущая позиция" Grid.Row="1" Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Center" FontSize="30" TextWrapping="Wrap" FontWeight="Bold"/>
-				<TextBlock x:Name="OPU2_TargetPosition" Text="Целевая позиция" Grid.Row="1" Grid.Column="2" VerticalAlignment="Bottom" HorizontalAlignment="Center" FontSize="30" TextWrapping="Wrap" FontWeight="Bold"/>
-				<TextBlock x:Name="OPU2_TargetSpeed" Text="Целевая скорость" Grid.Row="1" Grid.Column="3" VerticalAlignment="Bottom" HorizontalAlignment="Center" FontSize="30" TextWrapping="Wrap" FontWeight="Bold"/>
-				<TextBlock x:Name="OPU2_ControlText" Text="Управление движением" Grid.Row="1" Grid.Column="4" VerticalAlignment="Bottom" HorizontalAlignment="Center" FontSize="30" TextWrapping="Wrap" FontWeight="Bold"/>
-				<Label x:Name="OPU2_Limits" Content="Лимиты" Grid.Row="1" Grid.Column="5" VerticalAlignment="Bottom" HorizontalAlignment="Center" FontSize="30" FontWeight="Bold"/>
-
-				<GroupBox x:Name="OPU2_Azimuth" Grid.Row="2" Grid.ColumnSpan="6">
-					<Grid>
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="1*"/>
-							<ColumnDefinition Width="1*"/>
-							<ColumnDefinition Width="1*"/>
-							<ColumnDefinition Width="1*"/>
-							<ColumnDefinition Width="1*"/>
-							<ColumnDefinition Width="1*"/>
-						</Grid.ColumnDefinitions>
-						<Label x:Name="OPU2_AzimuthLabel" Content="Азимут" Grid.Column="0" FontSize="28" VerticalAlignment="Center" Margin="5,0,0,0"/>
-						<Label x:Name="OPU2_AzCurPos" Content="0.0°" Grid.Column="1" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-						<TextBox x:Name="OPU2_AzTarPos" Text="0.0" Grid.Column="2" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="10,0,0,0" ToolTip="Позиция" TouchDown="OPU1_TextBox_TouchDown">
-							<TextBox.Resources>
-								<Style TargetType="Border">
-									<Setter Property="CornerRadius" Value="10, 0, 0, 10"/>
-								</Style>
-							</TextBox.Resources>
-						</TextBox>
-						<TextBox x:Name="OPU2_AzTarSpd" Text="1.0" Grid.Column="3" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="0,0,10,0" ToolTip="Скорость" TouchDown="OPU1_TextBox_TouchDown">
-							<TextBox.Resources>
-								<Style TargetType="Border">
-									<Setter Property="CornerRadius" Value="0, 10, 10, 0"/>
-								</Style>
-							</TextBox.Resources>
-						</TextBox>
-						<Grid x:Name="OPU2_AzPosControl" Grid.Row="2"  Grid.Column="4">
-							<Grid.RowDefinitions>
-								<RowDefinition Height="1*"/>
-								<RowDefinition Height="1*"/>
-							</Grid.RowDefinitions>
-							<Grid.ColumnDefinitions>
-								<ColumnDefinition Width="1*"/>
-								<ColumnDefinition Width="1*"/>
-								<ColumnDefinition Width="1*"/>
-							</Grid.ColumnDefinitions>
-							<Button x:Name="OPU2_AzJogLeft" Content="←" Grid.Row="0" Grid.Column="0" FontSize="35" HorizontalContentAlignment="Center" Margin="0,5,0,0" PreviewMouseLeftButtonDown="OPU2_AzJogLeft_PreviewMouseLeftButtonDown"  PreviewMouseLeftButtonUp="OPU2_AzJogLeft_PreviewMouseLeftButtonUp"  Foreground="#FFCFCFCF" Style="{DynamicResource DefBtn}" FontFamily="Global User Interface" TouchDown="OPU2_AzJogLeft_TouchDown" TouchLeave="OPU2_AzJogLeft_TouchLeave">
-								<Button.Resources>
-									<Style TargetType="Border">
-										<Setter Property="CornerRadius" Value="10, 0, 0, 0"/>
-									</Style>
-								</Button.Resources>
-							</Button>
-							<Button x:Name="OPU2_AzMove" Content="⨀" Grid.Row="0" Grid.Column="1" FontSize="35" HorizontalContentAlignment="Center" Margin="0,5,0,0" Click="OPU2_AzMove_Click" Foreground="#FFCFCFCF" Style="{DynamicResource DefBtn}" FontFamily="Global User Interface">
-								<Button.Resources>
-									<Style TargetType="Border">
-										<Setter Property="CornerRadius" Value="0"/>
-									</Style>
-								</Button.Resources>
-							</Button>
-							<Button x:Name="OPU2_AzJogRight" Content="→" Grid.Row="0" Grid.Column="2" FontSize="35" HorizontalContentAlignment="Center" Margin="0,5,0,0" PreviewMouseLeftButtonDown="OPU2_AzJogRight_PreviewMouseLeftButtonDown"  PreviewMouseLeftButtonUp="OPU2_AzJogRight_PreviewMouseLeftButtonUp"  Foreground="#FFCFCFCF" Style="{DynamicResource DefBtn}" FontFamily="Global User Interface" TouchDown="OPU2_AzJogRight_TouchDown" TouchLeave="OPU2_AzJogRight_TouchLeave">
-								<Button.Resources>
-									<Style TargetType="Border">
-										<Setter Property="CornerRadius" Value="0, 10, 0, 0"/>
-									</Style>
-								</Button.Resources>
-							</Button>
-							<Button x:Name="OPU2_AZStop" Content="СТОП" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" FontSize="30" HorizontalContentAlignment="Center" Margin="0,0,0,0" Click="OPU2_AZStop_Click" Foreground="#FFCFCFCF" Style="{DynamicResource DefBtn}">
-								<Button.Resources>
-									<Style TargetType="Border">
-										<Setter Property="CornerRadius" Value="0, 0, 10, 10"/>
-									</Style>
-								</Button.Resources>
-							</Button>
-						</Grid>
-						<Grid Grid.Column="5">
-							<Grid.RowDefinitions>
-								<RowDefinition Height="1*"/>
-								<RowDefinition Height="1*"/>
-							</Grid.RowDefinitions>
-							<Label x:Name="OPU2_AzLimitsLabel" Content="[ 0.0 ; 1.0 ]" Grid.Row="0" FontSize="26" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-							<Button x:Name="OPU2_AzSetLim" Content="Изменить" Grid.Row="1" FontSize="26" Margin="20,0,20,0" Click="OPU2_AzSetLim_Click" Style="{DynamicResource DefBtn}" Foreground="#FFCFCFCF">
-								<Button.Resources>
-									<Style TargetType="Border">
-										<Setter Property="CornerRadius" Value="10"/>
-									</Style>
-								</Button.Resources>
-							</Button>
-						</Grid>
-
-
-					</Grid>
-				</GroupBox>
-				<GroupBox x:Name="OPU2_UgolMesta" Grid.Row="3" Grid.ColumnSpan="6">
-					<Grid>
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="1*"/>
-							<ColumnDefinition Width="1*"/>
-							<ColumnDefinition Width="1*"/>
-							<ColumnDefinition Width="1*"/>
-							<ColumnDefinition Width="1*"/>
-							<ColumnDefinition Width="1*"/>
-						</Grid.ColumnDefinitions>
-						<Label x:Name="OPU2_UgolMestaLabel" Content="Угол места" Grid.Column="0" FontSize="28" VerticalAlignment="Center" Margin="5,0,0,0"/>
-						<Label x:Name="OPU2_UmCurPos" Content="0.0°" Grid.Column="1" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-						<TextBox x:Name="OPU2_UmTarPos" Text="0.0" Grid.Column="2" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="10,0,0,0" ToolTip="Позиция" TouchDown="OPU1_TextBox_TouchDown">
-							<TextBox.Resources>
-								<Style TargetType="Border">
-									<Setter Property="CornerRadius" Value="10, 0, 0, 10"/>
-								</Style>
-							</TextBox.Resources>
-						</TextBox>
-						<TextBox x:Name="OPU2_UmTarSpd" Text="1.0" Grid.Column="3" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="0,0,10,0" ToolTip="Скорость" TouchDown="OPU1_TextBox_TouchDown">
-							<TextBox.Resources>
-								<Style TargetType="Border">
-									<Setter Property="CornerRadius" Value="0, 10, 10, 0"/>
-								</Style>
-							</TextBox.Resources>
-						</TextBox>
-						<Grid x:Name="OPU2_UmPosControl" Grid.Row="2"  Grid.Column="4">
-							<Grid.RowDefinitions>
-								<RowDefinition Height="1*"/>
-								<RowDefinition Height="1*"/>
-							</Grid.RowDefinitions>
-							<Grid.ColumnDefinitions>
-								<ColumnDefinition Width="1*"/>
-								<ColumnDefinition Width="1*"/>
-								<ColumnDefinition Width="1*"/>
-							</Grid.ColumnDefinitions>
-							<Button x:Name="OPU2_UmJogLeft" Content="←" Grid.Row="0" Grid.Column="0" FontSize="35" HorizontalContentAlignment="Center" Margin="0,5,0,0" PreviewMouseLeftButtonDown="OPU2_UmJogLeft_PreviewMouseLeftButtonDown"  PreviewMouseLeftButtonUp="OPU2_UmJogLeft_PreviewMouseLeftButtonUp"  Style="{DynamicResource DefBtn}" Foreground="#FFCFCFCF" FontFamily="Global User Interface" TouchDown="OPU2_UmJogLeft_TouchDown" TouchLeave="OPU2_UmJogLeft_TouchLeave">
-								<Button.Resources>
-									<Style TargetType="Border">
-										<Setter Property="CornerRadius" Value="10, 0, 0, 0"/>
-									</Style>
-								</Button.Resources>
-							</Button>
-							<Button x:Name="OPU2_UmMove" Content="⨀" Grid.Row="0" Grid.Column="1" FontSize="35" HorizontalContentAlignment="Center" Margin="0,5,0,0" Click="OPU2_UmMove_Click" Style="{DynamicResource DefBtn}" Foreground="#FFCFCFCF" FontFamily="Global User Interface"/>
-							<Button x:Name="OPU2_UmJogRight" Content="→" Grid.Row="0" Grid.Column="2" FontSize="35" HorizontalContentAlignment="Center" Margin="0,5,0,0" PreviewMouseLeftButtonDown="OPU2_UmJogRight_PreviewMouseLeftButtonDown"  PreviewMouseLeftButtonUp="OPU2_UmJogRight_PreviewMouseLeftButtonUp"  Style="{DynamicResource DefBtn}" Foreground="#FFCFCFCF" FontFamily="Global User Interface" TouchDown="OPU2_UmJogRight_TouchDown" TouchLeave="OPU2_UmJogRight_TouchLeave">
-								<Button.Resources>
-									<Style TargetType="Border">
-										<Setter Property="CornerRadius" Value="0, 10, 0, 0"/>
-									</Style>
-								</Button.Resources>
-							</Button>
-							<Button x:Name="OPU2_UmStop" Content="СТОП" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" FontSize="30" HorizontalContentAlignment="Center" Click="OPU2_UmStop_Click" Style="{DynamicResource DefBtn}" Foreground="#FFCFCFCF">
-								<Button.Resources>
-									<Style TargetType="Border">
-										<Setter Property="CornerRadius" Value="0, 0, 10, 10"/>
-									</Style>
-								</Button.Resources>
-							</Button>
-						</Grid>
-						<Grid Grid.Column="5">
-							<Grid.RowDefinitions>
-								<RowDefinition Height="1*"/>
-								<RowDefinition Height="1*"/>
-							</Grid.RowDefinitions>
-							<Label x:Name="OPU2_UmLimitsLabel" Content="[ 0.0 ; 1.0 ]" Grid.Row="0" FontSize="26" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-							<Button x:Name="OPU2_UmSetLim" Content="Изменить" Grid.Row="1" FontSize="26" Margin="20,0,20,0" Click="OPU2_UmSetLim_Click" Style="{DynamicResource DefBtn}" Foreground="#FFCFCFCF">
-								<Button.Resources>
-									<Style TargetType="Border">
-										<Setter Property="CornerRadius" Value="10"/>
-									</Style>
-								</Button.Resources>
-							</Button>
-						</Grid>
-
-
-					</Grid>
-				</GroupBox>
-				<GroupBox x:Name="OPU2_Polarization" Grid.Row="4" Grid.ColumnSpan="6">
-					<Grid>
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="1*"/>
-							<ColumnDefinition Width="1*"/>
-							<ColumnDefinition Width="1*"/>
-							<ColumnDefinition Width="1*"/>
-							<ColumnDefinition Width="1*"/>
-							<ColumnDefinition Width="1*"/>
-						</Grid.ColumnDefinitions>
-						<TextBlock x:Name="OPU2_PolarizationLabel" Text="Поляризация" FontSize="28" VerticalAlignment="Center" Margin="5,0,0,0"/>
-						<Label x:Name="OPU2_PolCurPos" Content="0.0°" Grid.Column="1" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-						<TextBox x:Name="OPU2_PolTarPos" Text="0.0" Grid.Column="2" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="10,0,0,0" ToolTip="Позиция" TouchDown="OPU1_TextBox_TouchDown">
-							<TextBox.Resources>
-								<Style TargetType="Border">
-									<Setter Property="CornerRadius" Value="10, 0, 0, 10"/>
-								</Style>
-							</TextBox.Resources>
-						</TextBox>
-						<TextBox x:Name="OPU2_PolTarSpd" Text="1.0" Grid.Column="3" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="0,0,10,0" ToolTip="Скорость" TouchDown="OPU1_TextBox_TouchDown">
-							<TextBox.Resources>
-								<Style TargetType="Border">
-									<Setter Property="CornerRadius" Value="0, 10, 10, 0"/>
-								</Style>
-							</TextBox.Resources>
-						</TextBox>
-						<Grid x:Name="OPU2_PolPosControl" Grid.Row="2"  Grid.Column="4">
-							<Grid.RowDefinitions>
-								<RowDefinition Height="1*"/>
-								<RowDefinition Height="1*"/>
-							</Grid.RowDefinitions>
-							<Grid.ColumnDefinitions>
-								<ColumnDefinition Width="1*"/>
-								<ColumnDefinition Width="1*"/>
-								<ColumnDefinition Width="1*"/>
-							</Grid.ColumnDefinitions>
-							<Button x:Name="OPU2_PolJogLeft" Content="←" Grid.Row="0" Grid.Column="0" FontSize="35" HorizontalContentAlignment="Center" Margin="0,5,0,0" PreviewMouseLeftButtonDown="OPU2_PolJogLeft_PreviewMouseLeftButtonDown"  PreviewMouseLeftButtonUp="OPU2_PolJogLeft_PreviewMouseLeftButtonUp"  Style="{DynamicResource DefBtn}" Foreground="#FFCFCFCF" FontFamily="Global User Interface" TouchDown="OPU2_PolJogLeft_TouchDown" TouchLeave="OPU2_PolJogLeft_TouchLeave">
-								<Button.Resources>
-									<Style TargetType="Border">
-										<Setter Property="CornerRadius" Value="10, 0, 0, 0"/>
-									</Style>
-								</Button.Resources>
-							</Button>
-							<Button x:Name="OPU2_PolMove" Content="⨀" Grid.Row="0" Grid.Column="1" FontSize="35" HorizontalContentAlignment="Center" Margin="0,5,0,0" Click="OPU2_PolMove_Click" Style="{DynamicResource DefBtn}" Foreground="#FFCFCFCF" FontFamily="Global User Interface"/>
-							<Button x:Name="OPU2_PolJogRight" Content="→" Grid.Row="0" Grid.Column="2" FontSize="35" HorizontalContentAlignment="Center" Margin="0,5,0,0" PreviewMouseLeftButtonDown="OPU2_PolJogRight_PreviewMouseLeftButtonDown"  PreviewMouseLeftButtonUp="OPU2_PolJogRight_PreviewMouseLeftButtonUp"  Style="{DynamicResource DefBtn}" Foreground="#FFCFCFCF" FontFamily="Global User Interface" TouchDown="OPU2_PolJogRight_TouchDown" TouchLeave="OPU2_PolJogRight_TouchLeave">
-								<Button.Resources>
-									<Style TargetType="Border">
-										<Setter Property="CornerRadius" Value="0, 10, 0, 0"/>
-									</Style>
-								</Button.Resources>
-							</Button>
-							<Button x:Name="OPU2_PolStop" Content="СТОП" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" FontSize="30" HorizontalContentAlignment="Center" Click="OPU2_PolStop_Click" Style="{DynamicResource DefBtn}" Foreground="#FFCFCFCF">
-								<Button.Resources>
-									<Style TargetType="Border">
-										<Setter Property="CornerRadius" Value="0, 0, 10, 10"/>
-									</Style>
-								</Button.Resources>
-							</Button>
-						</Grid>
-						<Grid Grid.Column="5">
-							<Grid.RowDefinitions>
-								<RowDefinition Height="1*"/>
-								<RowDefinition Height="1*"/>
-							</Grid.RowDefinitions>
-							<Label x:Name="OPU2_PolLimitsLabel" Content="[ 0.0 ; 1.0 ]" FontSize="26" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-							<Button x:Name="OPU2_PolSetLim" Content="Изменить" FontSize="26" Margin="20,0,20,0" Click="OPU2_PolSetLim_Click" Style="{DynamicResource DefBtn}" Foreground="#FFCFCFCF" Grid.Row="80">
-								<Button.Resources>
-									<Style TargetType="Border">
-										<Setter Property="CornerRadius" Value="10"/>
-									</Style>
-								</Button.Resources>
-							</Button>
-						</Grid>
-
-
-					</Grid>
-				</GroupBox>
-				<GroupBox x:Name="OPU2_X" Grid.Row="5" Grid.ColumnSpan="6">
-					<Grid>
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="1*"/>
-							<ColumnDefinition Width="1*"/>
-							<ColumnDefinition Width="1*"/>
-							<ColumnDefinition Width="1*"/>
-							<ColumnDefinition Width="1*"/>
-							<ColumnDefinition Width="1*"/>
-						</Grid.ColumnDefinitions>
-						<Label x:Name="OPU2_XLabel" Content="Ось X" Grid.Column="0" FontSize="28" VerticalAlignment="Center" Margin="5,0,0,0"/>
-						<Label x:Name="OPU2_XCurPos" Content="0.0 мм" Grid.Column="1" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-						<TextBox x:Name="OPU2_XTarPos" Text="0.0" Grid.Column="2" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="10,0,0,0" ToolTip="Позиция" TouchDown="OPU1_TextBox_TouchDown">
-							<TextBox.Resources>
-								<Style TargetType="Border">
-									<Setter Property="CornerRadius" Value="10, 0, 0, 10"/>
-								</Style>
-							</TextBox.Resources>
-						</TextBox>
-						<TextBox x:Name="OPU2_XTarSpd" Text="1.0" Grid.Column="3" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="0,0,10,0" ToolTip="Скорость" TouchDown="OPU1_TextBox_TouchDown">
-							<TextBox.Resources>
-								<Style TargetType="Border">
-									<Setter Property="CornerRadius" Value="0, 10, 10, 0"/>
-								</Style>
-							</TextBox.Resources>
-						</TextBox>
-						<Grid x:Name="OPU2_XPosControl" Grid.Row="2"  Grid.Column="4">
-							<Grid.RowDefinitions>
-								<RowDefinition Height="1*"/>
-								<RowDefinition Height="1*"/>
-							</Grid.RowDefinitions>
-							<Grid.ColumnDefinitions>
-								<ColumnDefinition Width="1*"/>
-								<ColumnDefinition Width="1*"/>
-								<ColumnDefinition Width="1*"/>
-							</Grid.ColumnDefinitions>
-							<Button x:Name="OPU2_XJogLeft" Content="←" Grid.Row="0" Grid.Column="0" FontSize="35" HorizontalContentAlignment="Center" Margin="0,5,0,0" PreviewMouseLeftButtonDown="OPU2_XJogLeft_PreviewMouseLeftButtonDown"  PreviewMouseLeftButtonUp="OPU2_XJogLeft_PreviewMouseLeftButtonUp"  Style="{DynamicResource DefBtn}" Foreground="#FFCFCFCF" FontFamily="Global User Interface" TouchDown="OPU2_XJogLeft_TouchDown" TouchLeave="OPU2_XJogLeft_TouchLeave">
-								<Button.Resources>
-									<Style TargetType="Border">
-										<Setter Property="CornerRadius" Value="10, 0, 0, 0"/>
-									</Style>
-								</Button.Resources>
-							</Button>
-							<Button x:Name="OPU2_XMove" Content="⨀" Grid.Row="0" Grid.Column="1" FontSize="35" HorizontalContentAlignment="Center" Margin="0,5,0,0" Click="OPU2_XMove_Click" Style="{DynamicResource DefBtn}" Foreground="#FFCFCFCF" FontFamily="Global User Interface"/>
-							<Button x:Name="OPU2_XJogRight" Content="→" Grid.Row="0" Grid.Column="2" FontSize="35" HorizontalContentAlignment="Center" Margin="0,5,0,0" PreviewMouseLeftButtonDown="OPU2_XJogRight_PreviewMouseLeftButtonDown"  PreviewMouseLeftButtonUp="OPU2_XJogRight_PreviewMouseLeftButtonUp"  Style="{DynamicResource DefBtn}" Foreground="#FFCFCFCF" FontFamily="Global User Interface" TouchDown="OPU2_XJogRight_TouchDown" TouchLeave="OPU2_XJogRight_TouchLeave">
-								<Button.Resources>
-									<Style TargetType="Border">
-										<Setter Property="CornerRadius" Value="0, 10, 0, 0"/>
-									</Style>
-								</Button.Resources>
-							</Button>
-							<Button x:Name="OPU2_XStop" Content="СТОП" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" FontSize="30" HorizontalContentAlignment="Center" Click="OPU2_XStop_Click" Style="{DynamicResource DefBtn}" Foreground="#FFCFCFCF">
-								<Button.Resources>
-									<Style TargetType="Border">
-										<Setter Property="CornerRadius" Value="0, 0, 10, 10"/>
-									</Style>
-								</Button.Resources>
-							</Button>
-						</Grid>
-						<Grid Grid.Column="5">
-							<Grid.RowDefinitions>
-								<RowDefinition Height="1*"/>
-								<RowDefinition Height="1*"/>
-							</Grid.RowDefinitions>
-							<Label x:Name="OPU2_XLimitsLabel" Content="[ 0.0 ; 1.0 ]" FontSize="26" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-							<Button x:Name="OPU2_XSetLim" Content="Изменить" Grid.Row="1" FontSize="26" Margin="20,0,20,0" Click="OPU2_XSetLim_Click" Style="{DynamicResource DefBtn}" Foreground="#FFCFCFCF">
-								<Button.Resources>
-									<Style TargetType="Border">
-										<Setter Property="CornerRadius" Value="10"/>
-									</Style>
-								</Button.Resources>
-							</Button>
-						</Grid>
-
-					</Grid>
-				</GroupBox>
-				<GroupBox x:Name="OPU2_Y" Grid.Row="6" Grid.ColumnSpan="6">
-					<Grid>
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="1*"/>
-							<ColumnDefinition Width="1*"/>
-							<ColumnDefinition Width="1*"/>
-							<ColumnDefinition Width="1*"/>
-							<ColumnDefinition Width="1*"/>
-							<ColumnDefinition Width="1*"/>
-						</Grid.ColumnDefinitions>
-						<Label x:Name="OPU2_YLabel" Content="Ось Y" Grid.Column="0" FontSize="28" VerticalAlignment="Center" Margin="5,0,0,0"/>
-						<Label x:Name="OPU2_YCurPos" Content="0.0 мм" Grid.Column="1" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-						<TextBox x:Name="OPU2_YTarPos" Text="0.0" Grid.Column="2" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="10,0,0,0" ToolTip="Позиция" TouchDown="OPU1_TextBox_TouchDown">
-							<TextBox.Resources>
-								<Style TargetType="Border">
-									<Setter Property="CornerRadius" Value="10, 0, 0, 10"/>
-								</Style>
-							</TextBox.Resources>
-						</TextBox>
-						<TextBox x:Name="OPU2_YTarSpd" Text="1.0" Grid.Column="3" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="0,0,10,0" ToolTip="Скорость" TouchDown="OPU1_TextBox_TouchDown">
-							<TextBox.Resources>
-								<Style TargetType="Border">
-									<Setter Property="CornerRadius" Value="0, 10, 10, 0"/>
-								</Style>
-							</TextBox.Resources>
-						</TextBox>
-						<Grid x:Name="OPU2_YPosControl" Grid.Row="2"  Grid.Column="4">
-							<Grid.RowDefinitions>
-								<RowDefinition Height="1*"/>
-								<RowDefinition Height="1*"/>
-							</Grid.RowDefinitions>
-							<Grid.ColumnDefinitions>
-								<ColumnDefinition Width="1*"/>
-								<ColumnDefinition Width="1*"/>
-								<ColumnDefinition Width="1*"/>
-							</Grid.ColumnDefinitions>
-							<Button x:Name="OPU2_YJogLeft" Content="←" Grid.Row="0" Grid.Column="0" FontSize="35" HorizontalContentAlignment="Center" Margin="0,5,0,0" PreviewMouseLeftButtonDown="OPU2_YJogLeft_PreviewMouseLeftButtonDown"  PreviewMouseLeftButtonUp="OPU2_YJogLeft_PreviewMouseLeftButtonUp"  Style="{DynamicResource DefBtn}" Foreground="#FFCFCFCF" FontFamily="Global User Interface" TouchDown="OPU2_YJogLeft_TouchDown" TouchLeave="OPU2_YJogLeft_TouchLeave">
-								<Button.Resources>
-									<Style TargetType="Border">
-										<Setter Property="CornerRadius" Value="10, 0, 0, 0"/>
-									</Style>
-								</Button.Resources>
-							</Button>
-							<Button x:Name="OPU2_YMove" Content="⨀" Grid.Row="0" Grid.Column="1" FontSize="35" HorizontalContentAlignment="Center" Margin="0,5,0,0" Click="OPU2_YMove_Click" Style="{DynamicResource DefBtn}" Foreground="#FFCFCFCF" FontFamily="Global User Interface"/>
-							<Button x:Name="OPU2_YJogRight" Content="→" Grid.Row="0" Grid.Column="2" FontSize="35" HorizontalContentAlignment="Center" Margin="0,5,0,0" PreviewMouseLeftButtonDown="OPU2_YJogRight_PreviewMouseLeftButtonDown"  PreviewMouseLeftButtonUp="OPU2_YJogRight_PreviewMouseLeftButtonUp"  Style="{DynamicResource DefBtn}" Foreground="#FFCFCFCF" FontFamily="Global User Interface" TouchDown="OPU2_YJogRight_TouchDown" TouchLeave="OPU2_YJogRight_TouchLeave">
-								<Button.Resources>
-									<Style TargetType="Border">
-										<Setter Property="CornerRadius" Value="0, 10, 0, 0"/>
-									</Style>
-								</Button.Resources>
-							</Button>
-							<Button x:Name="OPU2_YStop" Content="СТОП" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" FontSize="30" HorizontalContentAlignment="Center" Click="OPU2_YStop_Click" Style="{DynamicResource DefBtn}" Foreground="#FFCFCFCF">
-								<Button.Resources>
-									<Style TargetType="Border">
-										<Setter Property="CornerRadius" Value="0, 0, 10, 10"/>
-									</Style>
-								</Button.Resources>
-							</Button>
-						</Grid>
-						<Grid Grid.Column="5">
-							<Grid.RowDefinitions>
-								<RowDefinition Height="1*"/>
-								<RowDefinition Height="1*"/>
-							</Grid.RowDefinitions>
-							<Label x:Name="OPU2_YLimitsLabel" Content="[ 0.0 ; 1.0 ]" FontSize="26" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-							<Button x:Name="OPU2_YSetLim" Content="Изменить" Grid.Row="1" FontSize="26" Margin="20,0,20,0" Click="OPU2_YSetLim_Click" Style="{DynamicResource DefBtn}" Foreground="#FFCFCFCF">
-								<Button.Resources>
-									<Style TargetType="Border">
-										<Setter Property="CornerRadius" Value="10"/>
-									</Style>
-								</Button.Resources>
-							</Button>
-						</Grid>
-
-					</Grid>
-				</GroupBox>
-			</Grid>
-		</TabItem>
-	</TabControl>
 </Window>
