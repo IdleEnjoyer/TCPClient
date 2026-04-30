@@ -29,7 +29,7 @@ namespace TCPDevice
 	/// </summary>
 	public partial class MainWindow : Window
 	{
-		private TcpClient Client_OPU1 = new TcpClient();
+		private TcpClient Client_OPU1;
 		private NetworkStream Stream_OPU1;
 		private double OPU1_LowerLimits;
 		private double OPU1_UpperLimits;
@@ -73,28 +73,31 @@ namespace TCPDevice
 
 		private void OPU1_StatusTimer_Tick(object? sender, EventArgs e)
 		{
-			switch (OPU1_Status)
+			if (Client_OPU1 != null)
 			{
-				case 0:
-					SendCommand_OPU1("EN?");
-					OPU1_Status++;
-					break;
-				case 1:
-					SendCommand_OPU1("FH?");
-					OPU1_Status++;
-					break;
-				case 2:
-					SendCommand_OPU1("STAT?");
-					OPU1_Status++;
-					break;
-				case 3:
-					SendCommand_OPU1("STOP?");
-					OPU1_Status++;
-					break;
-				case 4:
-					SendCommand_OPU1("FLT?");
-					OPU1_Status = 0;
-					break;
+				switch (OPU1_Status)
+				{
+					case 0:
+						SendCommand_OPU1("EN?");
+						OPU1_Status++;
+						break;
+					case 1:
+						SendCommand_OPU1("FH?");
+						OPU1_Status++;
+						break;
+					case 2:
+						SendCommand_OPU1("STAT?");
+						OPU1_Status++;
+						break;
+					case 3:
+						SendCommand_OPU1("STOP?");
+						OPU1_Status++;
+						break;
+					case 4:
+						SendCommand_OPU1("FLT?");
+						OPU1_Status = 0;
+						break;
+				}
 			}
 		}
 
@@ -117,14 +120,14 @@ namespace TCPDevice
 
 				if (Client_OPU1.Connected)
 				{
-					ConnectStatus.Fill = GreenBrush;
+					//ConnectStatus.Fill = GreenBrush;
 					Stream_OPU1 = Client_OPU1.GetStream();
 					OPU1_StatusTimer.Start();
 					await StartReadingOPU1DataAsync();
 				}
 				else
 				{
-					ConnectStatus.Fill = RedBrush;
+					//ConnectStatus.Fill = RedBrush;
 				}
 			}
 			catch(Exception ex) { 
@@ -153,32 +156,30 @@ namespace TCPDevice
 						{
 							case "^EN?:1~":
 								OPU1_Enabled = true;
-								PowerStatus.Fill = GreenBrush;
 								break;
 							case "^STOP?:1~":
 								OPU1_Stopped = true;
-								OPU1_StopStatus.Fill = GreenBrush;
+								MoveStatus.Fill = Brushes.Green;
 								break;
 							case "^FLT?:0~":
 								OPU1_InError = false;
-								OPU1_ClearStatus.Fill = GreenBrush;
+								InFaultCheck.IsChecked = false;
 								break;
 							default:
 								if (Data.Contains("EN?"))
 								{
 									OPU1_Enabled = false;
-									PowerStatus.Fill = RedBrush;
 								}
 								if (Data.Contains("STOP?"))
 								{
 									OPU1_Stopped = false;
-									OPU1_StopStatus.Fill = RedBrush;
+									MoveStatus.Fill = Brushes.Red;
 									
 								}
 								if (Data.Contains("FLT?"))
 								{
 									OPU1_InError = true;
-									OPU1_ClearStatus.Fill= RedBrush;
+									InFaultCheck.IsChecked = true;
 								}
 								if (Data.Contains("POS?"))
 								{
@@ -196,7 +197,7 @@ namespace TCPDevice
 					catch (IOException)
 					{
 						MessageBox.Show("Connection error");
-						ConnectStatus.Fill = RedBrush;
+						//ConnectStatus.Fill = RedBrush;
 						OPU1_StatusTimer.Stop();
 						break;
 					}
@@ -205,7 +206,7 @@ namespace TCPDevice
 			catch (Exception ex)
 			{
 				MessageBox.Show($"Connection Error: {ex.Message}");
-				ConnectStatus.Fill = RedBrush;
+				//ConnectStatus.Fill = RedBrush;
 				OPU1_StatusTimer.Stop();
 			}
 		}
@@ -251,15 +252,56 @@ namespace TCPDevice
 
 		private void LeftPanelSize_DragDelta(object sender, System.Windows.Controls.Primitives.DragDeltaEventArgs e)
 		{
-			if (LeftPanel.Width + e.HorizontalChange >= LeftPanel.MinWidth || LeftPanel.Width + e.HorizontalChange <= LeftPanel.MaxWidth)
+			if (LeftPanel.Width + e.HorizontalChange >= LeftPanel.MinWidth && LeftPanel.Width + e.HorizontalChange <= LeftPanel.MaxWidth)
 			{
 				LeftPanel.Width += e.HorizontalChange;
+			}
+			else if (LeftPanel.Width + e.HorizontalChange <= LeftPanel.MinWidth)
+			{
+				LeftPanel.Width = LeftPanel.MinWidth;
+			}
+			else
+			{
+				LeftPanel.Width = LeftPanel.MaxWidth;
 			}
 		}
 
 		private void Tool_Click(object sender, RoutedEventArgs e)
 		{
 			Control.SelectedIndex = int.Parse((string)((TreeViewItem)sender).Tag);
+		}
+
+		private void Abs_TgtPos_TextChanged(object sender, TextChangedEventArgs e)
+		{
+
+		}
+
+		private void Power_Click(object sender, RoutedEventArgs e)
+		{
+			PowerCheck.IsChecked = !PowerCheck.IsChecked;
+		}
+
+		private void Connection_Click(object sender, RoutedEventArgs e)
+		{
+			ConnectionCheck.IsChecked = !ConnectionCheck.IsChecked;
+		}
+
+		private void Fault_Click(object sender, RoutedEventArgs e)
+		{
+			InFaultCheck.IsChecked = !InFaultCheck.IsChecked;
+		}
+
+		private void Abs_StartMove_Click(object sender, RoutedEventArgs e)
+		{
+			if (PowerCheck.IsChecked == false)
+			{
+				((ToolTip)Abs_StartMove.ToolTip).Visibility = Visibility.Visible;
+			}
+        }
+
+		private void Abs_StopMove_Click(object sender, RoutedEventArgs e)
+		{
+
 		}
 	}
 }

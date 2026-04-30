@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:TCPDevice"
         mc:Ignorable="d"
 		Closing="Window_Closing"
-        Title="ТЕСАРТ Сервисное ПО" Height="720" Width="1280" Background="White" MinWidth="1074" MinHeight="624">
+        Title="ТЕСАРТ Сервисное ПО" Height="720" Width="1024" Background="White" MinWidth="512" MinHeight="384"
+	xmlns:theme="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2">
 	<Window.Resources>
 		<Style x:Key="TabControl_UserStyle" TargetType="{x:Type TabControl}">
 			<Setter Property="Padding" Value="2"/>
@@ -26,7 +27,7 @@
 								<RowDefinition x:Name="RowDefinition0" Height="Auto"/>
 								<RowDefinition x:Name="RowDefinition1" Height="*"/>
 							</Grid.RowDefinitions>
-							
+
 							<Border x:Name="contentPanel" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Grid.Column="0" KeyboardNavigation.DirectionalNavigation="Contained" Grid.Row="1" KeyboardNavigation.TabIndex="2" KeyboardNavigation.TabNavigation="Local">
 								<ContentPresenter x:Name="PART_SelectedContentHost" ContentSource="SelectedContent" Margin="{TemplateBinding Padding}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
 							</Border>
@@ -69,15 +70,15 @@
 				</Setter.Value>
 			</Setter>
 		</Style>
-		<SolidColorBrush x:Key="TreeViewItem.TreeArrow.Static.Stroke" Color="#FF818181"/>
-		<SolidColorBrush x:Key="TreeViewItem.TreeArrow.Static.Fill" Color="#FFFFFFFF"/>
-		<SolidColorBrush x:Key="TreeViewItem.TreeArrow.MouseOver.Stroke" Color="#FF27C7F7"/>
-		<SolidColorBrush x:Key="TreeViewItem.TreeArrow.MouseOver.Fill" Color="#FFCCEEFB"/>
-		<SolidColorBrush x:Key="TreeViewItem.TreeArrow.Static.Checked.Stroke" Color="#FF262626"/>
-		<SolidColorBrush x:Key="TreeViewItem.TreeArrow.Static.Checked.Fill" Color="#FF595959"/>
-		<SolidColorBrush x:Key="TreeViewItem.TreeArrow.MouseOver.Checked.Stroke" Color="#FF1CC4F7"/>
-		<SolidColorBrush x:Key="TreeViewItem.TreeArrow.MouseOver.Checked.Fill" Color="#FF82DFFB"/>
-		<PathGeometry x:Key="TreeArrow" Figures="M0,0 L0,6 L6,0 z"/>
+		<SolidColorBrush x:Key="TreeViewItem.TreeArrow.Static.Stroke" Color="#1E1F29"/>
+		<SolidColorBrush x:Key="TreeViewItem.TreeArrow.Static.Fill" Color="#404258"/>
+		<SolidColorBrush x:Key="TreeViewItem.TreeArrow.MouseOver.Stroke" Color="#6B728E"/>
+		<SolidColorBrush x:Key="TreeViewItem.TreeArrow.MouseOver.Fill" Color="#BCBFCD"/>
+		<SolidColorBrush x:Key="TreeViewItem.TreeArrow.Static.Checked.Stroke" Color="#1E1F29"/>
+		<SolidColorBrush x:Key="TreeViewItem.TreeArrow.Static.Checked.Fill" Color="#404258"/>
+		<SolidColorBrush x:Key="TreeViewItem.TreeArrow.MouseOver.Checked.Stroke" Color="#6B728E"/>
+		<SolidColorBrush x:Key="TreeViewItem.TreeArrow.MouseOver.Checked.Fill" Color="#BCBFCD"/>
+		<PathGeometry x:Key="TreeArrow" Figures="M0,0 L0,10 L10,0 z"/>
 		<Style x:Key="ExpandCollapseToggleStyle" TargetType="{x:Type ToggleButton}">
 			<Setter Property="Focusable" Value="False"/>
 			<Setter Property="Width" Value="16"/>
@@ -85,7 +86,7 @@
 			<Setter Property="Template">
 				<Setter.Value>
 					<ControlTemplate TargetType="{x:Type ToggleButton}">
-						<Border Background="Transparent" Height="16" Padding="5,5,5,5" Width="16">
+						<Border Background="Transparent" Height="20" Padding="8,5,0,0" Width="20">
 							<Path x:Name="ExpandPath" Data="{StaticResource TreeArrow}" Fill="{StaticResource TreeViewItem.TreeArrow.Static.Fill}" Stroke="{StaticResource TreeViewItem.TreeArrow.Static.Stroke}">
 								<Path.RenderTransform>
 									<RotateTransform Angle="135" CenterY="3" CenterX="3"/>
@@ -192,161 +193,330 @@
 				</Trigger>
 			</Style.Triggers>
 		</Style>
+		<Style x:Key="FocusVisual">
+			<Setter Property="Control.Template">
+				<Setter.Value>
+					<ControlTemplate>
+						<Rectangle Margin="2" StrokeDashArray="1 2" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" SnapsToDevicePixels="true" StrokeThickness="1"/>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
 	</Window.Resources>
 	<DockPanel LastChildFill="True">
-		<Menu DockPanel.Dock="Top" FontSize="14">
+		<Menu DockPanel.Dock="Top" FontSize="14" Background="#BCBFCD">
 			<MenuItem Header="File"/>
 		</Menu>
-		<ToolBar DockPanel.Dock="Top" FontSize="14" Background="#FFB1B1B1">
-			<Button x:Name="Connection" Content="Подключение" BorderBrush="#FF717171" Margin="10,0,0,0" FontFamily="Bahnschrift" FontSize="20"/>
-			<Ellipse x:Name="ConnectStatus" StrokeThickness="2" Grid.Row="0" Width="15" Height="15" Stroke="Black" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,0,5,0" >
-				<Ellipse.Fill>
-					<RadialGradientBrush Center="0.25,0.25">
-						<GradientStop Color="Red" Offset="1"/>
-						<GradientStop Color="White" Offset="0"/>
-					</RadialGradientBrush>
-				</Ellipse.Fill>
-			</Ellipse>
-			<Separator/>
-			<Button x:Name="Power" Content="Питание" BorderBrush="#FF717171" FontFamily="Bahnschrift" FontSize="20"/>
-			<Ellipse x:Name="PowerStatus" StrokeThickness="2" Grid.Row="0" Width="15" Height="15" Stroke="Black" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,0,5,0">
-				<Ellipse.Fill>
-					<RadialGradientBrush Center="0.25,0.25">
-						<GradientStop Color="Red" Offset="1"/>
-						<GradientStop Color="White" Offset="0"/>
-					</RadialGradientBrush>
-				</Ellipse.Fill>
-			</Ellipse>
-			<Separator/>
-			<Button x:Name="EmStop">
-				<Grid>
-					<Path x:Name="StopSign" Stroke="White" StrokeThickness="4" StrokeStartLineCap="Round">
-						<Path.Data>
-							<PathGeometry Figures="M 20,0 L 40,0 60,20 60,40 40,60 20,60 0,40 0,20 Z M 40,16 L 40,30 M 35,13 L 35,30 M 30,12 L 30,30 M 25,14 L 25,30 M 18,26 L 26,38"/>
-						</Path.Data>
-						<Path.Fill>
-							<SolidColorBrush x:Name="StopSignBrush" Color="#FFA50000"/>
-						</Path.Fill>
-					</Path>
-					<Rectangle Fill="White" Margin="23,27,21,26"/>
-					<Ellipse Fill="White" RenderTransformOrigin="0.606,0.52" Margin="22,27,21,17" Height="18" Width="20"/>
-				</Grid>
+		<DockPanel Height="65" DockPanel.Dock="Top" FlowDirection="RightToLeft" Background="#404258">
+			<Button x:Name="Fault" Margin="5,0,5,0" Click="Fault_Click" Background="{x:Null}" BorderBrush="{x:Null}" Width="60" Height="60" Padding="0,0,0,0">
+				<Button.Style>
+					<Style TargetType="Button">
+						<Setter Property="Template">
+							<Setter.Value>
+								<ControlTemplate TargetType="Button">
+									<Grid Width="50" Height="50" >
+										<Rectangle x:Name="FaultPathRect" Fill="White" Height="30" Width="8"/>
+										<Path x:Name="FaultPath" Stroke="White" StrokeThickness="3" StrokeLineJoin="Round" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Stretch="Uniform">
+											<Path.Data>
+												<PathGeometry Figures="M 22,0 L 45,45 0,45 Z M 22,33 C 21,30 17,12 22,12 M 22,33 C 23,30 27,12 22,12"/>
+											</Path.Data>
+											<Path.Fill>
+												<SolidColorBrush x:Name="PathFill" Color="#1E1F29"/>
+											</Path.Fill>
+											<Path.Resources>
+												<Style TargetType="Path">
+													<Style.Triggers>
+														<DataTrigger Binding="{Binding IsChecked, ElementName=InFaultCheck}" Value="True">
+															<DataTrigger.EnterActions>
+																<BeginStoryboard>
+																	<Storyboard>
+																		<ColorAnimationUsingKeyFrames RepeatBehavior="Forever" Storyboard.TargetProperty="Fill.Color" Duration="0:0:0.5">
+																			<ColorAnimationUsingKeyFrames.KeyFrames>
+																				<LinearColorKeyFrame Value="LightBlue" KeyTime="0:0:0"/>
+																				<LinearColorKeyFrame Value="#1E1F29" KeyTime="0:0:0.5"/>
+																			</ColorAnimationUsingKeyFrames.KeyFrames>
+																		</ColorAnimationUsingKeyFrames>
+																	</Storyboard>
+																</BeginStoryboard>
+															</DataTrigger.EnterActions>
+															<DataTrigger.ExitActions>
+																<BeginStoryboard>
+																	<Storyboard>
+																		<ColorAnimationUsingKeyFrames Storyboard.TargetProperty="Fill.Color" Duration="0:0:0.5">
+																			<ColorAnimationUsingKeyFrames.KeyFrames>
+																				<LinearColorKeyFrame Value="LightBlue" KeyTime="0:0:0"/>
+																				<LinearColorKeyFrame Value="#1E1F29" KeyTime="0:0:0.5"/>
+																			</ColorAnimationUsingKeyFrames.KeyFrames>
+																		</ColorAnimationUsingKeyFrames>
+																	</Storyboard>
+																</BeginStoryboard>
+															</DataTrigger.ExitActions>
+														</DataTrigger>
+													</Style.Triggers>
+												</Style>
+											</Path.Resources>
+										</Path>
+										<Ellipse x:Name="FaultPathEll" Width="5" Height="5" Margin="0,32,1,0" Fill="White"/>
+									</Grid>
+									<ControlTemplate.Triggers>
+										<Trigger Property="IsMouseOver" Value="True">
+											<Setter TargetName="FaultPath" Property="Stroke" Value="#BCBFCD"/>
+											<Setter TargetName="FaultPathRect" Property="Fill" Value="#BCBFCD"/>
+											<Setter TargetName="FaultPathEll" Property="Fill" Value="#BCBFCD"/>
+										</Trigger>
+									</ControlTemplate.Triggers>
+								</ControlTemplate>
+							</Setter.Value>
+						</Setter>
+					</Style>
+				</Button.Style>
 			</Button>
-			<Ellipse x:Name="StopStatus" StrokeThickness="2" Grid.Row="0" Width="15" Height="15" Stroke="Black" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,0,5,0">
-				<Ellipse.Fill>
-					<RadialGradientBrush Center="0.25,0.25">
-						<GradientStop Color="Red" Offset="1"/>
-						<GradientStop Color="White" Offset="0"/>
-					</RadialGradientBrush>
-				</Ellipse.Fill>
-			</Ellipse>
-		</ToolBar>
-		<StatusBar DockPanel.Dock="Bottom" HorizontalContentAlignment="Right">
-			<StatusBarItem Content="Status"/>
+			<Button x:Name="EmStop"  RenderTransformOrigin="0.5,0.5" Grid.Column="1" Background="{x:Null}" BorderBrush="{x:Null}" Width="70" Height="70" >
+				<Button.RenderTransform>
+					<TransformGroup>
+						<ScaleTransform ScaleX="0.8" ScaleY="0.8"/>
+						<SkewTransform/>
+						<RotateTransform/>
+						<TranslateTransform/>
+					</TransformGroup>
+				</Button.RenderTransform>
+				<Button.Style>
+					<Style TargetType="Button">
+						<Setter Property="Template">
+							<Setter.Value>
+								<ControlTemplate>
+									<Grid>
+										<Path x:Name="StopSign" Stroke="White" StrokeThickness="4" StrokeStartLineCap="Round" HorizontalAlignment="Center" VerticalAlignment="Center">
+											<Path.Data>
+												<PathGeometry Figures="M 20,0 L 40,0 60,20 60,40 40,60 20,60 0,40 0,20 Z M 40,16 L 40,30 M 35,13 L 35,30 M 30,12 L 30,30 M 25,14 L 25,30 M 18,26 L 26,38"/>
+											</Path.Data>
+											<Path.Fill>
+												<SolidColorBrush x:Name="StopSignBrush" Color="#750000"/>
+											</Path.Fill>
+										</Path>
+										<Rectangle x:Name="StopSignRect" Fill="White" Margin="27,31,24,29"/>
+										<Ellipse x:Name="StopSignEll" Fill="White" RenderTransformOrigin="0.606,0.52" Margin="26,31,24,21" Height="18" Width="20"/>
+									</Grid>
+									<ControlTemplate.Triggers>
+										<EventTrigger RoutedEvent="Button.Click">
+											<BeginStoryboard>
+												<Storyboard>
+													<ColorAnimationUsingKeyFrames Storyboard.TargetName="StopSignBrush" Storyboard.TargetProperty="Color" Duration="0:0:0.5">
+														<ColorAnimationUsingKeyFrames.KeyFrames>
+															<LinearColorKeyFrame Value="Red" KeyTime="0:0:0"/>
+															<LinearColorKeyFrame Value="#750000" KeyTime="0:0:0.5"/>
+														</ColorAnimationUsingKeyFrames.KeyFrames>
+													</ColorAnimationUsingKeyFrames>
+												</Storyboard>
+											</BeginStoryboard>
+										</EventTrigger>
+										<Trigger Property="IsMouseOver" Value="True">
+											<Setter TargetName="StopSign" Property="Stroke" Value="#BCBFCD"/>
+											<Setter TargetName="StopSignRect" Property="Fill" Value="#BCBFCD"/>
+											<Setter TargetName="StopSignEll" Property="Fill" Value="#BCBFCD"/>
+										</Trigger>
+									</ControlTemplate.Triggers>
+								</ControlTemplate>
+							</Setter.Value>
+						</Setter>
+					</Style>
+				</Button.Style>
+			</Button>
+			<Button x:Name="Power" Width="60" Height="60" Margin="5,0,5,0" Padding="0,0,0,0" ScrollViewer.CanContentScroll="True" Click="Power_Click" Background="{x:Null}" BorderBrush="{x:Null}" >
+				<Button.Resources>
+					<Style TargetType="Button">
+						<Setter Property="Template">
+							<Setter.Value>
+								<ControlTemplate>
+									<Grid Width="50" Height="50">
+										<!--<Ellipse Width="50" Height="50" Stroke="White" StrokeThickness="3" Stretch="Uniform"/>-->
+										<Ellipse x:Name="PowerEll" Width="50" Height="50" Stroke="White" StrokeThickness="3" Stretch="Uniform">
+											<Ellipse.Fill>
+												<SolidColorBrush x:Name="PowerColor" Color="#1E1F29"/>
+											</Ellipse.Fill>
+											<Ellipse.Effect>
+												<BlurEffect x:Name="PowerBlur" Radius="0"/>
+											</Ellipse.Effect>
+										</Ellipse>
+										<Path x:Name="PowerPath" Stroke="White" StrokeThickness="3" StrokeStartLineCap="Round" StrokeEndLineCap="Round" >
+											<Path.Data>
+												<PathGeometry Figures="M 18,16 A 12,12 0 1 0 32,16 M 25,23 L 25,12" />
+											</Path.Data>
+										</Path>
+									</Grid>
+									<ControlTemplate.Triggers>
+										<DataTrigger Binding="{Binding ElementName=PowerCheck, Path=IsChecked}" Value="True">
+											<DataTrigger.EnterActions>
+												<BeginStoryboard>
+													<Storyboard>
+														<!--<DoubleAnimation From="0" To="5" Duration="0:0:0.1" Storyboard.TargetProperty="Effect.BlurEffect.Radius"/>-->
+														<ColorAnimation From="#1E1F29" To="LightBlue" Duration="0:0:0.25" Storyboard.TargetName="PowerEll" Storyboard.TargetProperty="Fill.Color"/>
+													</Storyboard>
+												</BeginStoryboard>
+											</DataTrigger.EnterActions>
+											<DataTrigger.ExitActions>
+												<BeginStoryboard>
+													<Storyboard>
+														<!--<DoubleAnimation To="0" From="5" Duration="0:0:0.1" Storyboard.TargetProperty="Effect.BlurEffect.Radius"/>-->
+														<ColorAnimation To="#1E1F29" From="LightBlue" Duration="0:0:0.25" Storyboard.TargetName="PowerEll" Storyboard.TargetProperty="Fill.Color"/>
+													</Storyboard>
+												</BeginStoryboard>
+											</DataTrigger.ExitActions>
+										</DataTrigger>
+										<Trigger Property="IsMouseOver" Value="True">
+											<Setter TargetName="PowerPath" Property="Stroke" Value="#BCBFCD"/>
+											<Setter TargetName="PowerEll" Property="Stroke" Value="#BCBFCD"/>
+										</Trigger>
+									</ControlTemplate.Triggers>
+								</ControlTemplate>
+							</Setter.Value>
+						</Setter>
+					</Style>
+				</Button.Resources>
+			</Button>
+			<Button x:Name="Connection" Width="60" Height="60" Margin="5,0,0,0" Click="Connection_Click" Background="{x:Null}" BorderBrush="{x:Null}" >
+				
+				<Button.Resources>
+					<Style TargetType="Button">
+						<Setter Property="Template">
+							<Setter.Value>
+								<ControlTemplate>
+									<Grid Width="50" Height="50">
+										<Rectangle x:Name="ConnectRect" Width="50" Height="50" Stroke="White" StrokeThickness="3" Fill="#1E1F29" RadiusX="5" RadiusY="5"/>
+										<Path x:Name="ConnectPath" Stroke="White" StrokeThickness="3" StrokeLineJoin="Round" StrokeStartLineCap="Round" StrokeEndLineCap="Round">
+											<Path.Data>
+												<PathGeometry Figures="M 12,12 L 38,12 38,38 12,38 Z M 17,17 L 33,17 33,29 29,29 29,33 21,33 21,29 17,29 Z M 25,17 L 25,20 M 21,17 L 21,20 M 29,17 L 29,20"/>
+											</Path.Data>
+										</Path>
+									</Grid>
+									<ControlTemplate.Triggers>
+										<DataTrigger Binding="{Binding ElementName=ConnectionCheck, Path=IsChecked}" Value="True">
+											<DataTrigger.EnterActions>
+												<BeginStoryboard>
+													<Storyboard>
+														<!--<DoubleAnimation From="0" To="5" Duration="0:0:0.1" Storyboard.TargetProperty="Effect.BlurEffect.Radius"/>-->
+														<ColorAnimation From="#1E1F29" To="LightBlue" Duration="0:0:0.25" Storyboard.TargetName="ConnectRect" Storyboard.TargetProperty="Fill.Color"/>
+													</Storyboard>
+												</BeginStoryboard>
+											</DataTrigger.EnterActions>
+											<DataTrigger.ExitActions>
+												<BeginStoryboard>
+													<Storyboard>
+														<!--<DoubleAnimation To="0" From="5" Duration="0:0:0.1" Storyboard.TargetProperty="Effect.BlurEffect.Radius"/>-->
+														<ColorAnimation To="#1E1F29" From="LightBlue" Duration="0:0:0.25" Storyboard.TargetName="ConnectRect" Storyboard.TargetProperty="Fill.Color"/>
+													</Storyboard>
+												</BeginStoryboard>
+											</DataTrigger.ExitActions>
+										</DataTrigger>
+										<Trigger Property="IsMouseOver" Value="True">
+											<Setter TargetName="ConnectPath" Property="Stroke" Value="#BCBFCD"/>
+											<Setter TargetName="ConnectRect" Property="Stroke" Value="#BCBFCD"/>
+										</Trigger>
+									</ControlTemplate.Triggers>
+								</ControlTemplate>
+							</Setter.Value>
+						</Setter>
+					</Style>
+					<Style TargetType="Rectangle">
+						<Style.Triggers>
+							
+						</Style.Triggers>
+					</Style>
+				</Button.Resources>
+			</Button>
+			<TextBlock Text="ТЕСАРТ" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="36" Width="120" Margin="0,0,20,0" Foreground="White" />
+		</DockPanel>
+		<StatusBar x:Name="AppStatus" DockPanel.Dock="Bottom" HorizontalContentAlignment="Right" FlowDirection="RightToLeft" Height="21.96" Background="#BCBFCD">
 			<ProgressBar x:Name="StatusProgress" Width="75" Height="15" IsIndeterminate="True" Visibility="Hidden" HorizontalAlignment="Right"/>
+			<Separator/>
+			<StatusBarItem Content="Готов" Width="50" HorizontalContentAlignment="Right"/>
+			<Separator/>
+			<Rectangle x:Name="MoveStatus" Width="15" Height="15" Fill="Red"/>
+			<StatusBarItem Content="Движение"/>
 		</StatusBar>
-		<StackPanel x:Name="LeftPanel" DockPanel.Dock="Left" Width="125" MinWidth="10" MaxWidth="600">
-			<TreeView ScrollViewer.VerticalScrollBarVisibility="Hidden" ScrollViewer.HorizontalScrollBarVisibility="Hidden" BorderBrush="{x:Null}" >
-				<TreeViewItem Style="{DynamicResource TreeViewItem_UserStyle}" Header="Ручное управление" >
-					<TreeViewItem Header="Абсолютное" Selected="Tool_Click" Tag="0"/>
-					<TreeViewItem Header="Инкремент"/>
-					<TreeViewItem Header="Шаговое"/>
+		<StackPanel x:Name="LeftPanel" DockPanel.Dock="Left" Width="150" MinWidth="20" MaxWidth="600" Background="#50577A">
+			<TreeView Background="#50577A" ScrollViewer.VerticalScrollBarVisibility="Hidden" ScrollViewer.HorizontalScrollBarVisibility="Hidden" BorderBrush="{x:Null}" FontSize="16" HorizontalAlignment="Left" >
+				<TreeViewItem Style="{DynamicResource TreeViewItem_UserStyle}" Header="Ручное управление" Foreground="White" FontWeight="Bold" >
+					<TreeViewItem Header="Абсолютное" Selected="Tool_Click" Tag="0" Foreground="White" FontWeight="Normal" FontStyle="Italic"/>
+					<TreeViewItem Header="Инкрементальное" Selected="Tool_Click" Tag="1" Foreground="White" FontWeight="Normal" FontStyle="Italic"/>
+					<TreeViewItem Header="Шаговое" Foreground="White" FontWeight="Normal" FontStyle="Italic"/>
+					<TreeViewItem Header="Постоянное вращение" Foreground="White" FontWeight="Normal" FontStyle="Italic"/>
 				</TreeViewItem>
-				<TreeViewItem Header="Снятие АФЧХ" Selected="Tool_Click" Tag="1"/>
-				<TreeViewItem Header="Демонстрация"/>
-				<TreeViewItem Header="Аттестация"/>
+				<TreeViewItem Header="Снятие АФЧХ" Selected="Tool_Click" Tag="1" Foreground="White" FontWeight="Bold"/>
+				<TreeViewItem Header="Демонстрация" Foreground="White" FontWeight="Bold"/>
+				<TreeViewItem Header="Аттестация" Foreground="White" FontWeight="Bold"/>
 			</TreeView>
+			<CheckBox x:Name="InFaultCheck" IsChecked="False" Visibility="Hidden"/>
+			<CheckBox x:Name="PowerCheck" IsChecked="False" Visibility="Hidden"/>
+			<CheckBox x:Name="ConnectionCheck" IsChecked="False" Visibility="Hidden"/>
 		</StackPanel>
-		<Thumb x:Name="LeftPanelSize" Cursor="SizeWE" DragDelta="LeftPanelSize_DragDelta"/>
-		<StackPanel x:Name="InfoPanel" DockPanel.Dock="Bottom" Orientation="Horizontal">
-			<TextBlock x:Name="Info_CurPos" Text="Позиция: 99999.0" Margin="20,5,20,5" FontFamily="Bahnschrift" FontSize="16" />
-			<TextBlock x:Name="Info_CurVel" Text="Скорость: 99999.0" Margin="0,5,20,5" FontFamily="Bahnschrift" FontSize="16" />
+		<Thumb x:Name="LeftPanelSize" Cursor="SizeWE" DragDelta="LeftPanelSize_DragDelta" Width="2"/>
+		<StackPanel x:Name="InfoPanel" DockPanel.Dock="Bottom" Orientation="Horizontal" FlowDirection="RightToLeft" Background="#404258">
+			<TextBlock Style="{DynamicResource LightText}" x:Name="Info_CurPos" Text="Позиция: -99999.0" Margin="20,5,20,5" FontSize="16" Width="150" HorizontalAlignment="Right" />
+			<TextBlock Style="{DynamicResource LightText}" x:Name="Info_CurVel" Text="Скорость: -99999.0" Margin="0,5,20,5" FontSize="16" Width="150" HorizontalAlignment="Right" />
 		</StackPanel>
-		<TabControl Style="{DynamicResource TabControl_UserStyle}" x:Name="Control" Background="#FFAAB4C8" SelectedIndex="0">
-			<TabItem x:Name="OPU1_Tab">
-				<Grid x:Name="OPU1_Control" RenderTransformOrigin="0.5,0.5">
+
+		<TabControl x:Name="Control" Style="{DynamicResource TabControl_UserStyle}" Background="#6B728E" SelectedIndex="0" >
+			<TabItem x:Name="Absolute_Move">
+				<StackPanel>
+					<TextBlock Text="Абсолютное позиционирование" Style="{DynamicResource LightText}" FontSize="30" Margin="10,5,0,0" />
+					<Canvas x:Name="Abs_Canvas" Background="White" Width="600" Height="275" HorizontalAlignment="Left" Margin="10,10,0,0" >
+						<Line X1="10" Y1="10" X2="10" Y2="265" Stroke="Black" StrokeEndLineCap="Square"/>
+						<Line X1="10" Y1="265" X2="590" Y2="265" Stroke="Black"/>
+					</Canvas>
+					<Separator Margin="0,5,0,5" Background="#FFD6D6D6"/>
+					<Grid Width="600" Height="120" HorizontalAlignment="Left" Margin="10,10,0,0" >
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="1*"/>
+							<ColumnDefinition Width="1*"/>
+							<ColumnDefinition Width="1*"/>
+						</Grid.ColumnDefinitions>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="1*"/>
+							<RowDefinition Height="1*"/>
+							<RowDefinition Height="1*"/>
+						</Grid.RowDefinitions>
+
+						<TextBlock Style="{DynamicResource LightText}" Text="Целевая Позиция" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="18"/>
+						<TextBox x:Name="Abs_TgtPos" Grid.Column="1" Grid.Row="0" Width="180" Height="30" HorizontalAlignment="Left" Margin="10,5,10,5" TextChanged="Abs_TgtPos_TextChanged" FontSize="18" HorizontalContentAlignment="Right"/>
+						<TextBlock Style="{DynamicResource LightText}" x:Name="Abs_PosUnit" Grid.Column="2" Grid.Row="0" Text="град." VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="18"/>
+
+						<TextBlock Style="{DynamicResource LightText}" Text="Целевая Скорость" Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="18"/>
+						<TextBox x:Name="Abs_TgtVel" Grid.Column="1" Grid.Row="1" Width="180" Height="30" HorizontalAlignment="Left" Margin="10,5,10,5" FontSize="18"/>
+						<TextBlock Style="{DynamicResource LightText}" x:Name="Abs_VelUnit" Grid.Column="2" Grid.Row="1" Text="град./с" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="18"/>
+
+						<TextBlock Style="{DynamicResource LightText}" Text="Ускорение" Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="18"/>
+						<TextBox x:Name="Abs_TgtAcc" Grid.Column="1" Grid.Row="2" Width="180" Height="30" HorizontalAlignment="Left" Margin="10,5,10,5" FontSize="18"/>
+						<TextBlock Style="{DynamicResource LightText}" x:Name="Abs_AccUnit" Grid.Column="2" Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="18">
+							град./с<Run Typography.Variants="Superscript">2</Run>
+						</TextBlock>
+					</Grid>
+
+					<Grid Width="200" Height="50" HorizontalAlignment="Left" Margin="10,20,0,0" >
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="1*"/>
+							<ColumnDefinition Width="1*"/>
+						</Grid.ColumnDefinitions>
+						<Button Style="{DynamicResource DefBtn}" x:Name="Abs_StartMove" Content="Старт" Grid.Column="0" Width="80" Height="40" HorizontalAlignment="Left" FontSize="18" Click="Abs_StartMove_Click"/>
+						<Button Style="{DynamicResource DefBtn}" x:Name="Abs_StopMove" Content="Стоп" Grid.Column="1" Width="80" Height="40" HorizontalAlignment="Left" FontSize="18" Click="Abs_StopMove_Click"/>
+					</Grid>
+
+
+				</StackPanel>
+				<!--<Grid ClipToBounds="True">
 					<Grid.RowDefinitions>
-						<RowDefinition Height="1*"/>
-						<RowDefinition Height="1*"/>
-						<RowDefinition Height="1*"/>
-						<RowDefinition Height="1*"/>
 						<RowDefinition Height="1*"/>
 						<RowDefinition Height="1*"/>
 					</Grid.RowDefinitions>
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="1*"/>
 						<ColumnDefinition Width="1*"/>
-						<ColumnDefinition Width="1*"/>
-						<ColumnDefinition Width="1*"/>
-						<ColumnDefinition Width="1*"/>
-						<ColumnDefinition Width="1*"/>
 					</Grid.ColumnDefinitions>
-
-
-					<Grid Grid.Row="0" Grid.Column="2">
-						<Grid.RowDefinitions>
-							<RowDefinition Height="1*"/>
-							<RowDefinition Height="1*"/>
-						</Grid.RowDefinitions>
-						<Button x:Name="OPU1_Connect" Content="Подключение" Grid.Row="1" FontSize="20" Click="OPU1_Connect_Click" Foreground="#FFCFCFCF" Style="{DynamicResource DefBtn}" MinWidth="150">
-							<Button.Resources>
-								<Style TargetType="Border">
-									<Setter Property="CornerRadius" Value="10, 0, 0, 10"/>
-								</Style>
-							</Button.Resources>
-						</Button>
+					<Canvas Grid.ColumnSpan="2" Grid.Row="0" Background="White" Margin="10,10,10,10" Width="600" HorizontalAlignment="Left" >
 						
-					</Grid>
-
-					<Grid Grid.Row="0" Grid.Column="3">
-						<Grid.RowDefinitions>
-							<RowDefinition Height="1*"/>
-							<RowDefinition Height="1*"/>
-						</Grid.RowDefinitions>
-						<Button x:Name="OPU1_Power" Content="Питание" Grid.Row="1" FontSize="20" Click="OPU1_Power_Click" Foreground="#FFCFCFCF" Style="{DynamicResource DefBtn}" MinWidth="150"/>
-						
-					</Grid>
-
-					<Grid Grid.Row="0" Grid.Column="4">
-						<Grid.RowDefinitions>
-							<RowDefinition Height="1*"/>
-							<RowDefinition Height="1*"/>
-						</Grid.RowDefinitions>
-						<Button x:Name="OPU1_Stop" Content="СТОП" Grid.Row="1" FontSize="20" Click="OPU1_Stop_Click" Foreground="#FFCFCFCF" Style="{DynamicResource DefBtn}" MinWidth="150"/>
-						<Ellipse x:Name="OPU1_StopStatus" StrokeThickness="3" Grid.Row="0" Width="25" Height="25" Stroke="Black" VerticalAlignment="Center" HorizontalAlignment="Center">
-							<Ellipse.Fill>
-								<RadialGradientBrush Center="0.25,0.25">
-									<GradientStop Color="Red" Offset="1"/>
-									<GradientStop Color="White" Offset="0"/>
-								</RadialGradientBrush>
-							</Ellipse.Fill>
-						</Ellipse>
-					</Grid>
-
-					<Grid Grid.Row="0" Grid.Column="5">
-						<Grid.RowDefinitions>
-							<RowDefinition Height="1*"/>
-							<RowDefinition Height="1*"/>
-						</Grid.RowDefinitions>
-						<Button x:Name="OPU1_Clear" Content="Сброс" Grid.Row="1" FontSize="20" Click="OPU1_Clear_Click" Foreground="#FFCFCFCF" Style="{DynamicResource DefBtn}" MinWidth="150">
-							<Button.Resources>
-								<Style TargetType="Border">
-									<Setter Property="CornerRadius" Value="0, 10, 10, 0"/>
-								</Style>
-							</Button.Resources>
-						</Button>
-						<Ellipse x:Name="OPU1_ClearStatus" StrokeThickness="3" Grid.Row="0" Width="25" Height="25" Stroke="Black" VerticalAlignment="Center" HorizontalAlignment="Center" >
-							<Ellipse.Fill>
-								<RadialGradientBrush Center="0.25,0.25">
-									<GradientStop Color="Red" Offset="1"/>
-									<GradientStop Color="White" Offset="0"/>
-								</RadialGradientBrush>
-							</Ellipse.Fill>
-						</Ellipse>
-					</Grid>
-
-
-				</Grid>
+					</Canvas>
+					<Separator Grid.ColumnSpan="2" Grid.Row="0" VerticalAlignment="Bottom" Margin="0,5,0,0"/>
+				</Grid>-->
 			</TabItem>
 			<TabItem x:Name="SecondTab">
 				<Grid>

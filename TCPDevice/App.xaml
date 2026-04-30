@@ -5,29 +5,27 @@
              StartupUri="MainWindow.xaml">
     <Application.Resources>
 		<ResourceDictionary>
-			<Style x:Key="DefBtn" TargetType="Button">
-				<Setter Property="Background" Value="{DynamicResource NotPressedBtn}"/>
-				<Setter Property="Template">
-					<Setter.Value>
-						<ControlTemplate TargetType="Button">
-							<Border Background="{TemplateBinding Background}" BorderBrush="Gray" BorderThickness="1">
-								<ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-							</Border>
-						</ControlTemplate>
-					</Setter.Value>
-				</Setter>
-				<Style.Triggers>
-					<Trigger Property="IsMouseOver" Value="True">
-						<Setter Property="Background" Value="{DynamicResource PressedBtn}"/>
-					</Trigger>
-				</Style.Triggers>
+			<Style x:Key="LightText" TargetType="TextBlock">
+				<Setter Property="Foreground" Value="White"/>
+				<!--Value="#1E1F29" -->
+
+				<Setter Property="FontFamily" Value="Bahnschrift"/>
 			</Style>
-			<Style x:Key="EmStopBtn" TargetType="Button">
-				<Setter Property="Background" Value="{DynamicResource NotPressedBtn}"/>
+			<Style x:Key="LeftPanel_TopText" TargetType="TextBlock">
+				<Setter Property="Foreground" Value="White"/>
+				<Setter Property="FontWeight" Value="Bold"/>
+				<!--Value="#1E1F29" -->
+
+				<Setter Property="FontFamily" Value="Bahnschrift"/>
+			</Style>
+			<Style x:Key="DefBtn" TargetType="Button">
+				<Setter Property="Background" Value="#404258"/>
+				<Setter Property="Foreground" Value="White"/>
+				<Setter Property="FontFamily" Value="Bahnschrift"/>
 				<Setter Property="Template">
 					<Setter.Value>
 						<ControlTemplate TargetType="Button">
-							<Border Background="{TemplateBinding Background}" BorderBrush="Gray" BorderThickness="1">
+							<Border Background="{TemplateBinding Background}" BorderBrush="White" BorderThickness="3" CornerRadius="3">
 								<ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
 							</Border>
 						</ControlTemplate>
@@ -35,7 +33,10 @@
 				</Setter>
 				<Style.Triggers>
 					<Trigger Property="IsMouseOver" Value="True">
-						<Setter Property="Background" Value="{DynamicResource PressedBtn}"/>
+						<Setter Property="Background" Value="#585B79"/>
+					</Trigger>
+					<Trigger Property="IsPressed" Value="True">
+						<Setter Property="Background" Value="LightBlue"/>
 					</Trigger>
 				</Style.Triggers>
 			</Style>
@@ -46,24 +47,17 @@
 				<GradientStop Color="#FF7B7B7B" Offset="0"/>
 			</LinearGradientBrush>
 
-			<LinearGradientBrush x:Key="PressedBtn" EndPoint="0.5,1" StartPoint="0.5,0">
+			<LinearGradientBrush x:Key="MouseOverBtn" EndPoint="0.5,1" StartPoint="0.5,0">
 				<GradientStop Color="Black" Offset="0.5"/>
 				<GradientStop Color="#FFA7A7A7" Offset="1"/>
 				<GradientStop Color="#FFA7A7A7" Offset="0"/>
 			</LinearGradientBrush>
 
-			<LinearGradientBrush x:Key="NotPressedEmStopBtn" EndPoint="0.5,1" StartPoint="0.5,0">
-				<GradientStop Color="Black" Offset="0.5"/>
+			<LinearGradientBrush x:Key="PressedBtn" EndPoint="0.5,1" StartPoint="0.5,0">
+				<GradientStop Color="#FF212121" Offset="0.5"/>
 				<GradientStop Color="#FF7B7B7B" Offset="1"/>
 				<GradientStop Color="#FF7B7B7B" Offset="0"/>
 			</LinearGradientBrush>
-
-			<LinearGradientBrush x:Key="PressedEmStopBtn" EndPoint="0.5,1" StartPoint="0.5,0">
-				<GradientStop Color="Black" Offset="0.5"/>
-				<GradientStop Color="#FFA7A7A7" Offset="1"/>
-				<GradientStop Color="#FFA7A7A7" Offset="0"/>
-			</LinearGradientBrush>
-
 		</ResourceDictionary>
     </Application.Resources>
 </Application>
