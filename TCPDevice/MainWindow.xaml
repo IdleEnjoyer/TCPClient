@@ -202,6 +202,46 @@
 				</Setter.Value>
 			</Setter>
 		</Style>
+		<SolidColorBrush x:Key="TextBox.Static.Border" Color="#FFABAdB3"/>
+		<SolidColorBrush x:Key="TextBox.Focus.Border" Color="#FF569DE5"/>
+		<Style x:Key="TextInput_UserStyle" TargetType="{x:Type TextBox}">
+			<Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"/>
+			<Setter Property="BorderBrush" Value="{StaticResource TextBox.Static.Border}"/>
+			<Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+			<Setter Property="BorderThickness" Value="1"/>
+			<Setter Property="KeyboardNavigation.TabNavigation" Value="None"/>
+			<Setter Property="HorizontalContentAlignment" Value="Left"/>
+			<Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+			<Setter Property="AllowDrop" Value="true"/>
+			<Setter Property="ScrollViewer.PanningMode" Value="VerticalFirst"/>
+			<Setter Property="Stylus.IsFlicksEnabled" Value="False"/>
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="{x:Type TextBox}">
+						<Border x:Name="border" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="True">
+							<ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
+						</Border>
+						<ControlTemplate.Triggers>
+							<Trigger Property="IsEnabled" Value="false">
+								<Setter Property="Opacity" TargetName="border" Value="0.56"/>
+							</Trigger>
+							<Trigger Property="IsKeyboardFocused" Value="true">
+								<Setter Property="BorderBrush" TargetName="border" Value="{StaticResource TextBox.Focus.Border}"/>
+							</Trigger>
+						</ControlTemplate.Triggers>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+			<Style.Triggers>
+				<MultiTrigger>
+					<MultiTrigger.Conditions>
+						<Condition Property="IsInactiveSelectionHighlightEnabled" Value="true"/>
+						<Condition Property="IsSelectionActive" Value="false"/>
+					</MultiTrigger.Conditions>
+					<Setter Property="SelectionBrush" Value="{DynamicResource {x:Static SystemColors.InactiveSelectionHighlightBrushKey}}"/>
+				</MultiTrigger>
+			</Style.Triggers>
+		</Style>
 	</Window.Resources>
 	<DockPanel LastChildFill="True">
 		<Menu DockPanel.Dock="Top" FontSize="14" Background="#BCBFCD">
@@ -431,7 +471,30 @@
 			<Separator/>
 			<StatusBarItem Content="Готов" Width="50" HorizontalContentAlignment="Right"/>
 			<Separator/>
-			<Rectangle x:Name="MoveStatus" Width="15" Height="15" Fill="Red"/>
+			<Rectangle x:Name="MoveStatus" Width="15" Height="15" Fill="Red">
+				<Rectangle.Resources>
+					<Style TargetType="Rectangle">
+						<Style.Triggers>
+							<DataTrigger Binding="{Binding ElementName=MovingCheck, Path=IsChecked}" Value="True">
+								<DataTrigger.EnterActions>
+									<BeginStoryboard>
+										<Storyboard>
+											<ColorAnimation From="Red" To="Green" Storyboard.TargetProperty="Fill"/>
+										</Storyboard>
+									</BeginStoryboard>
+								</DataTrigger.EnterActions>
+								<DataTrigger.ExitActions>
+									<BeginStoryboard>
+										<Storyboard>
+											<ColorAnimation To="Red" From="Green" Storyboard.TargetProperty="Fill"/>
+										</Storyboard>
+									</BeginStoryboard>
+								</DataTrigger.ExitActions>
+							</DataTrigger>
+						</Style.Triggers>
+					</Style>
+				</Rectangle.Resources>
+			</Rectangle>
 			<StatusBarItem Content="Движение"/>
 		</StatusBar>
 		<StackPanel x:Name="LeftPanel" DockPanel.Dock="Left" Width="150" MinWidth="20" MaxWidth="600" Background="#50577A">
@@ -449,20 +512,21 @@
 			<CheckBox x:Name="InFaultCheck" IsChecked="False" Visibility="Hidden"/>
 			<CheckBox x:Name="PowerCheck" IsChecked="False" Visibility="Hidden"/>
 			<CheckBox x:Name="ConnectionCheck" IsChecked="False" Visibility="Hidden"/>
+			<CheckBox x:Name="MovingCheck" IsChecked="False" Visibility="Hidden"/>
 		</StackPanel>
 		<Thumb x:Name="LeftPanelSize" Cursor="SizeWE" DragDelta="LeftPanelSize_DragDelta" Width="2"/>
 		<StackPanel x:Name="InfoPanel" DockPanel.Dock="Bottom" Orientation="Horizontal" FlowDirection="RightToLeft" Background="#404258">
 			<TextBlock Style="{DynamicResource LightText}" x:Name="Info_CurPos" Text="Позиция: -99999.0" Margin="20,5,20,5" FontSize="16" Width="150" HorizontalAlignment="Right" />
 			<TextBlock Style="{DynamicResource LightText}" x:Name="Info_CurVel" Text="Скорость: -99999.0" Margin="0,5,20,5" FontSize="16" Width="150" HorizontalAlignment="Right" />
 		</StackPanel>
-
-		<TabControl x:Name="Control" Style="{DynamicResource TabControl_UserStyle}" Background="#6B728E" SelectedIndex="0" >
+		<!--Style="{DynamicResource TabControl_UserStyle}"-->
+		<TabControl x:Name="Control"  Background="#6B728E" SelectedIndex="0" >
 			<TabItem x:Name="Absolute_Move">
 				<StackPanel>
 					<TextBlock Text="Абсолютное позиционирование" Style="{DynamicResource LightText}" FontSize="30" Margin="10,5,0,0" />
-					<Canvas x:Name="Abs_Canvas" Background="White" Width="600" Height="275" HorizontalAlignment="Left" Margin="10,10,0,0" >
-						<Line X1="10" Y1="10" X2="10" Y2="265" Stroke="Black" StrokeEndLineCap="Square"/>
-						<Line X1="10" Y1="265" X2="590" Y2="265" Stroke="Black"/>
+					<Canvas x:Name="Abs_Canvas" Background="White" Width="500" Height="250" HorizontalAlignment="Left" Margin="10,10,0,0" >
+						<Line X1="10" Y1="10" X2="10" Y2="240" Stroke="Black" StrokeEndLineCap="Square"/>
+						<Line X1="10" Y1="240" X2="490" Y2="240" Stroke="Black"/>
 					</Canvas>
 					<Separator Margin="0,5,0,5" Background="#FFD6D6D6"/>
 					<Grid Width="600" Height="120" HorizontalAlignment="Left" Margin="10,10,0,0" >
@@ -478,15 +542,15 @@
 						</Grid.RowDefinitions>
 
 						<TextBlock Style="{DynamicResource LightText}" Text="Целевая Позиция" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="18"/>
-						<TextBox x:Name="Abs_TgtPos" Grid.Column="1" Grid.Row="0" Width="180" Height="30" HorizontalAlignment="Left" Margin="10,5,10,5" TextChanged="Abs_TgtPos_TextChanged" FontSize="18" HorizontalContentAlignment="Right"/>
+						<TextBox Style="{DynamicResource TextInput_UserStyle}" x:Name="Abs_TgtPos" Grid.Column="1" Grid.Row="0" Width="180" Height="30" HorizontalAlignment="Left" Margin="10,5,10,5" LostFocus="NumberInputTextbox_LostFocus" FontSize="18" HorizontalContentAlignment="Right"/>
 						<TextBlock Style="{DynamicResource LightText}" x:Name="Abs_PosUnit" Grid.Column="2" Grid.Row="0" Text="град." VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="18"/>
 
 						<TextBlock Style="{DynamicResource LightText}" Text="Целевая Скорость" Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="18"/>
-						<TextBox x:Name="Abs_TgtVel" Grid.Column="1" Grid.Row="1" Width="180" Height="30" HorizontalAlignment="Left" Margin="10,5,10,5" FontSize="18"/>
+						<TextBox Style="{DynamicResource TextInput_UserStyle}" x:Name="Abs_TgtVel" Grid.Column="1" Grid.Row="1" Width="180" Height="30" HorizontalAlignment="Left" Margin="10,5,10,5" LostFocus="NumberInputTextbox_LostFocus" FontSize="18" HorizontalContentAlignment="Right"/>
 						<TextBlock Style="{DynamicResource LightText}" x:Name="Abs_VelUnit" Grid.Column="2" Grid.Row="1" Text="град./с" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="18"/>
 
 						<TextBlock Style="{DynamicResource LightText}" Text="Ускорение" Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="18"/>
-						<TextBox x:Name="Abs_TgtAcc" Grid.Column="1" Grid.Row="2" Width="180" Height="30" HorizontalAlignment="Left" Margin="10,5,10,5" FontSize="18"/>
+						<TextBox Style="{DynamicResource TextInput_UserStyle}" x:Name="Abs_TgtAcc" Grid.Column="1" Grid.Row="2" Width="180" Height="30" HorizontalAlignment="Left" Margin="10,5,10,5" LostFocus="NumberInputTextbox_LostFocus" FontSize="18" HorizontalContentAlignment="Right"/>
 						<TextBlock Style="{DynamicResource LightText}" x:Name="Abs_AccUnit" Grid.Column="2" Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="18">
 							град./с<Run Typography.Variants="Superscript">2</Run>
 						</TextBlock>
@@ -503,25 +567,105 @@
 
 
 				</StackPanel>
-				<!--<Grid ClipToBounds="True">
-					<Grid.RowDefinitions>
-						<RowDefinition Height="1*"/>
-						<RowDefinition Height="1*"/>
-					</Grid.RowDefinitions>
-					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="1*"/>
-						<ColumnDefinition Width="1*"/>
-					</Grid.ColumnDefinitions>
-					<Canvas Grid.ColumnSpan="2" Grid.Row="0" Background="White" Margin="10,10,10,10" Width="600" HorizontalAlignment="Left" >
-						
-					</Canvas>
-					<Separator Grid.ColumnSpan="2" Grid.Row="0" VerticalAlignment="Bottom" Margin="0,5,0,0"/>
-				</Grid>-->
 			</TabItem>
-			<TabItem x:Name="SecondTab">
-				<Grid>
-					<Button Content="btn"/>
-				</Grid>
+			<TabItem x:Name="Incremental_Move">
+				<StackPanel>
+					<TextBlock Text="Инкрементальное позиционирование" Style="{DynamicResource LightText}" FontSize="30" Margin="10,5,0,0" />
+					<Canvas x:Name="Inc_Canvas" Background="White" Width="500" Height="250" HorizontalAlignment="Left" Margin="10,10,0,0" >
+						<Line X1="10" Y1="10" X2="10" Y2="240" Stroke="Black" StrokeEndLineCap="Square"/>
+						<Line X1="10" Y1="240" X2="490" Y2="240" Stroke="Black"/>
+					</Canvas>
+					<Separator Margin="0,5,0,5" Background="#FFD6D6D6"/>
+					<Grid Width="600" Height="120" HorizontalAlignment="Left" Margin="10,10,0,0" >
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="1*"/>
+							<ColumnDefinition Width="1*"/>
+							<ColumnDefinition Width="1*"/>
+						</Grid.ColumnDefinitions>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="1*"/>
+							<RowDefinition Height="1*"/>
+							<RowDefinition Height="1*"/>
+						</Grid.RowDefinitions>
+
+						<TextBlock Style="{DynamicResource LightText}" Text="Целевое Перемещение" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="18"/>
+						<TextBox Style="{DynamicResource TextInput_UserStyle}" x:Name="Inc_TgtPos" Grid.Column="1" Grid.Row="0" Width="180" Height="30" HorizontalAlignment="Left" Margin="10,5,10,5" LostFocus="NumberInputTextbox_LostFocus" FontSize="18" HorizontalContentAlignment="Right"/>
+						<TextBlock Style="{DynamicResource LightText}" x:Name="Inc_PosUnit" Grid.Column="2" Grid.Row="0" Text="град." VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="18"/>
+
+						<TextBlock Style="{DynamicResource LightText}" Text="Целевая Скорость" Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="18"/>
+						<TextBox Style="{DynamicResource TextInput_UserStyle}" x:Name="Inc_TgtVel" Grid.Column="1" Grid.Row="1" Width="180" Height="30" HorizontalAlignment="Left" Margin="10,5,10,5" LostFocus="NumberInputTextbox_LostFocus" FontSize="18"/>
+						<TextBlock Style="{DynamicResource LightText}" x:Name="Inc_VelUnit" Grid.Column="2" Grid.Row="1" Text="град./с" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="18"/>
+
+						<TextBlock Style="{DynamicResource LightText}" Text="Ускорение" Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="18"/>
+						<TextBox Style="{DynamicResource TextInput_UserStyle}" x:Name="Inc_TgtAcc" Grid.Column="1" Grid.Row="2" Width="180" Height="30" HorizontalAlignment="Left" Margin="10,5,10,5" LostFocus="NumberInputTextbox_LostFocus" FontSize="18"/>
+						<TextBlock Style="{DynamicResource LightText}" x:Name="Inc_AccUnit" Grid.Column="2" Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="18">
+							град./с<Run Typography.Variants="Superscript">2</Run>
+						</TextBlock>
+					</Grid>
+
+					<Grid Width="200" Height="50" HorizontalAlignment="Left" Margin="10,20,0,0" >
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="1*"/>
+							<ColumnDefinition Width="1*"/>
+						</Grid.ColumnDefinitions>
+						<Button Style="{DynamicResource DefBtn}" x:Name="Inc_StartMove" Content="Старт" Grid.Column="0" Width="80" Height="40" HorizontalAlignment="Left" FontSize="18" Click="Abs_StartMove_Click"/>
+						<Button Style="{DynamicResource DefBtn}" x:Name="Inc_StopMove" Content="Стоп" Grid.Column="1" Width="80" Height="40" HorizontalAlignment="Left" FontSize="18" Click="Abs_StopMove_Click"/>
+					</Grid>
+
+
+				</StackPanel>
+			</TabItem>
+			<TabItem x:Name="Step_Move">
+				<StackPanel>
+					<TextBlock Text="Шаговое позиционирование" Style="{DynamicResource LightText}" FontSize="30" Margin="10,5,0,0" />
+					<Canvas x:Name="Step_Canvas" Background="White" Width="500" Height="250" HorizontalAlignment="Left" Margin="10,10,0,0" >
+						<Line X1="10" Y1="10" X2="10" Y2="240" Stroke="Black" StrokeEndLineCap="Square"/>
+						<Line X1="10" Y1="240" X2="490" Y2="240" Stroke="Black"/>
+					</Canvas>
+					<Separator Margin="0,5,0,5" Background="#FFD6D6D6"/>
+					<Grid Width="600" Height="160" HorizontalAlignment="Left" Margin="10,10,0,0" >
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="1*"/>
+							<ColumnDefinition Width="1*"/>
+							<ColumnDefinition Width="1*"/>
+						</Grid.ColumnDefinitions>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="1*"/>
+							<RowDefinition Height="1*"/>
+							<RowDefinition Height="1*"/>
+							<RowDefinition Height="1*"/>
+						</Grid.RowDefinitions>
+
+						<TextBlock Style="{DynamicResource LightText}" Text="Целевой Шаг" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="18"/>
+						<TextBox Style="{DynamicResource TextInput_UserStyle}" x:Name="Step_TgtPos" Grid.Column="1" Grid.Row="0" Width="180" Height="30" HorizontalAlignment="Left" Margin="10,5,10,5" LostFocus="NumberInputTextbox_LostFocus" FontSize="18" HorizontalContentAlignment="Right"/>
+						<TextBlock Style="{DynamicResource LightText}" x:Name="Step_PosUnit" Grid.Column="2" Grid.Row="0" Text="град." VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="18"/>
+
+						<TextBlock Style="{DynamicResource LightText}" Text="Целевая Скорость" Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="18"/>
+						<TextBox Style="{DynamicResource TextInput_UserStyle}" x:Name="Step_TgtVel" Grid.Column="1" Grid.Row="1" Width="180" Height="30" HorizontalAlignment="Left" Margin="10,5,10,5" LostFocus="NumberInputTextbox_LostFocus" FontSize="18"/>
+						<TextBlock Style="{DynamicResource LightText}" x:Name="Step_VelUnit" Grid.Column="2" Grid.Row="1" Text="град./с." VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="18"/>
+
+						<TextBlock Style="{DynamicResource LightText}" Text="Ускорение" Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="18"/>
+						<TextBox Style="{DynamicResource TextInput_UserStyle}" x:Name="Step_TgtAcc" Grid.Column="1" Grid.Row="2" Width="180" Height="30" HorizontalAlignment="Left" Margin="10,5,10,5" LostFocus="NumberInputTextbox_LostFocus" FontSize="18"/>
+						<TextBlock Style="{DynamicResource LightText}" x:Name="Step_AccUnit" Grid.Column="2" Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="18">
+							град./с.<Run Typography.Variants="Superscript">2</Run>
+						</TextBlock>
+
+						<TextBlock Style="{DynamicResource LightText}" Text="Пауза" Grid.Column="0" Grid.Row="3" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="18"/>
+						<TextBox Style="{DynamicResource TextInput_UserStyle}" x:Name="Step_TgtPause" Grid.Column="1" Grid.Row="3" Width="180" Height="30" HorizontalAlignment="Left" Margin="10,5,10,5" LostFocus="NumberInputTextbox_LostFocus" FontSize="18"/>
+						<TextBlock Style="{DynamicResource LightText}" x:Name="Step_PauseUnit" Grid.Column="2" Grid.Row="3" Text="с." VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="18"/>
+					</Grid>
+
+					<Grid Width="200" Height="50" HorizontalAlignment="Left" Margin="10,20,0,0" >
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="1*"/>
+							<ColumnDefinition Width="1*"/>
+						</Grid.ColumnDefinitions>
+						<Button Style="{DynamicResource DefBtn}" x:Name="Step_StartMove" Content="Старт" Grid.Column="0" Width="80" Height="40" HorizontalAlignment="Left" FontSize="18" Click="Abs_StartMove_Click"/>
+						<Button Style="{DynamicResource DefBtn}" x:Name="Step_StopMove" Content="Стоп" Grid.Column="1" Width="80" Height="40" HorizontalAlignment="Left" FontSize="18" Click="Abs_StopMove_Click"/>
+					</Grid>
+
+
+				</StackPanel>
 			</TabItem>
 		</TabControl>
 	</DockPanel>

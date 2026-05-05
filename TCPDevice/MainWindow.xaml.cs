@@ -21,6 +21,10 @@ using static System.Net.Mime.MediaTypeNames;
 using System.Windows.Threading;
 using System.Globalization;
 using System.Threading;
+using System.Text.RegularExpressions;
+using System.Drawing;
+using Color = System.Windows.Media.Color;
+using Point = System.Windows.Point;
 
 namespace TCPDevice
 {
@@ -48,6 +52,7 @@ namespace TCPDevice
 		public bool AllowNegative = false;
 
 		private int OPU1_IngoreLimit_Counter = 0;
+		private Regex ValidateRealNumber = new Regex(@"^-?[0-9]+(\\.[0-9]+)?$");
 
 		private RadialGradientBrush GreenBrush = new(Color.FromRgb(255, 255, 255), Color.FromRgb(0, 255, 0));
 		private RadialGradientBrush RedBrush = new(Color.FromRgb(255, 255, 255), Color.FromRgb(255, 0, 0));
@@ -67,7 +72,7 @@ namespace TCPDevice
 		private void OPU_PosTimer_Tick(object? sender, EventArgs e)
 		{
 			if (Client_OPU1 != null) {
-
+				SendCommand_OPU1("POS?");
 			}
 		}
 
@@ -86,7 +91,7 @@ namespace TCPDevice
 						OPU1_Status++;
 						break;
 					case 2:
-						SendCommand_OPU1("STAT?");
+						SendCommand_OPU1("INIT?");
 						OPU1_Status++;
 						break;
 					case 3:
@@ -155,20 +160,18 @@ namespace TCPDevice
 						switch (Data)
 						{
 							case "^EN?:1~":
-								OPU1_Enabled = true;
+								PowerCheck.IsChecked = true;
 								break;
 							case "^STOP?:1~":
-								OPU1_Stopped = true;
-								MoveStatus.Fill = Brushes.Green;
+								
 								break;
 							case "^FLT?:0~":
-								OPU1_InError = false;
 								InFaultCheck.IsChecked = false;
 								break;
 							default:
 								if (Data.Contains("EN?"))
 								{
-									OPU1_Enabled = false;
+									PowerCheck.IsChecked = false;
 								}
 								if (Data.Contains("STOP?"))
 								{
@@ -178,7 +181,6 @@ namespace TCPDevice
 								}
 								if (Data.Contains("FLT?"))
 								{
-									OPU1_InError = true;
 									InFaultCheck.IsChecked = true;
 								}
 								if (Data.Contains("POS?"))
@@ -271,11 +273,6 @@ namespace TCPDevice
 			Control.SelectedIndex = int.Parse((string)((TreeViewItem)sender).Tag);
 		}
 
-		private void Abs_TgtPos_TextChanged(object sender, TextChangedEventArgs e)
-		{
-
-		}
-
 		private void Power_Click(object sender, RoutedEventArgs e)
 		{
 			PowerCheck.IsChecked = !PowerCheck.IsChecked;
@@ -293,15 +290,43 @@ namespace TCPDevice
 
 		private void Abs_StartMove_Click(object sender, RoutedEventArgs e)
 		{
-			if (PowerCheck.IsChecked == false)
+			if (Client_OPU1 != null)
 			{
-				((ToolTip)Abs_StartMove.ToolTip).Visibility = Visibility.Visible;
+				if (PowerCheck.IsChecked == false)
+				{
+					MessageBox.Show("Нет Питания!", "Внимание!", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+				}
+				else
+				{
+					if (Abs_TgtPos.Text != string.Empty && Abs_TgtVel.Text != string.Empty && Abs_TgtAcc.Text != string.Empty)
+					{
+						
+					}
+				}
 			}
+			else
+			{
+				MessageBox.Show("Нет Подключения!", "Внимание!", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+			}
+			
         }
 
 		private void Abs_StopMove_Click(object sender, RoutedEventArgs e)
 		{
 
+		}
+
+		private void NumberInputTextbox_LostFocus(object sender, RoutedEventArgs e)
+		{
+			double Num;
+			if (!double.TryParse(((TextBox)sender).Text, DoubleFormat, out Num))
+			{
+				((TextBox)sender).BorderBrush = Brushes.Red;
+			}
+			else
+			{
+				((TextBox)sender).BorderBrush = new SolidColorBrush(Color.FromArgb(0xff, 0xAB, 0xAd, 0xB3));
+			}
 		}
 	}
 }
