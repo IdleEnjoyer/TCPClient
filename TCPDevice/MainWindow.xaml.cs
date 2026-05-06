@@ -388,6 +388,7 @@ namespace TCPDevice
 			{
 				if (!OPU1_Enabled)
 				{
+					SendCommand("CLR");
 					SendCommand("EN");
 					SendCommand("MH");
 				}
