@@ -33,8 +33,6 @@ namespace TCPDevice
 		private NetworkStream Stream_OPU1;
 		private float[] OPU1_LowerLimits = new float[4];
 		private float[] OPU1_UpperLimits = new float[4];
-		private float[] OPU1_LowerVelLimits = {3.0f, 3.0f, 3.0f, 25.0f };
-		private float[] OPU1_UpperVelLimits = {12.0f, 12.0f, 12.0f, 50.0f };
 		private bool OPU1_Enabled = false;
 		private double[] OPU1_Position = { 0.0, 0.0, 0.0, 0.0 };
 		private bool OPU1_Stopped = false;
@@ -44,12 +42,13 @@ namespace TCPDevice
 		private NetworkStream Stream_OPU2;
 		private float[] OPU2_LowerLimits = new float[5];
 		private float[] OPU2_UpperLimits = new float[5];
-		private float[] OPU2_LowerVelLimits = { 3.0f, 3.0f, 3.0f, 25.0f, 25.0f };
-		private float[] OPU2_UpperVelLimits = { 6.0f, 6.0f, 6.0f, 50.0f, 50.0f };
 		private bool OPU2_Enabled = false;
 		private double[] OPU2_Position = { 0.0, 0.0, 0.0, 0.0, 0.0 };
 		private bool OPU2_Stopped = false;
 		private bool OPU2_InError = false;
+
+		private DispatcherTimer OPU1_PosTimer;
+		private DispatcherTimer OPU2_PosTimer;
 
 		private DispatcherTimer OPU1_StatusTimer;
 		private DispatcherTimer OPU2_StatusTimer;
@@ -60,27 +59,9 @@ namespace TCPDevice
 		public string Axis_OPU2 = "";
 		public bool AllowNegative = false;
 
-		private bool Demo_Ongoing = false;
-		private DispatcherTimer Wait_Timer;
-		private int Demo_OPU1_State = 0;
-		private int Demo_OPU1_Az_State = -1;
-		private int Demo_OPU1_UM_State = -1;
-		private int Demo_OPU1_Y_State = 1;
-		private int Demo_OPU1_Pol_State = 0;
-		private int Demo_OPU2_State = 0;
-		private int Demo_OPU2_Az_State = -1;
-		private int Demo_OPU2_UM_State = -1;
-		private int Demo_OPU2_X_State = 1;
-		private int Demo_OPU2_Y_State = 1;
-		private int Demo_OPU2_Pol_State = 0;
-		private double[] Demo_OPU1_TargetPosition = { 0.0, 0.0, 0.0, 0.0 };
-		private double[] Demo_OPU2_TargetPosition = { 0.0, 0.0, 0.0, 0.0, 0.0 };
-
 		private int OPU1_IngoreLimit_Counter = 0;
 		private int OPU2_IngoreLimit_Counter = 0;
 
-		private DispatcherTimer RandomTimer = new DispatcherTimer();
-		Random r = new Random();
 
 		private RadialGradientBrush GreenBrush = new(Color.FromRgb(255, 255, 255), Color.FromRgb(0, 255, 0));
 		private RadialGradientBrush RedBrush = new(Color.FromRgb(255, 255, 255), Color.FromRgb(255, 0, 0));
@@ -91,37 +72,32 @@ namespace TCPDevice
 			GreenBrush.Center = new Point(0.25, 0.25);
 			RedBrush.Center = new Point(0.25, 0.25);
 			DoubleFormat.NumberDecimalSeparator = ".";
+
+			OPU1_PosTimer = new DispatcherTimer();
+			OPU1_PosTimer.Interval = TimeSpan.FromMilliseconds(100);
+			OPU1_PosTimer.Tick += OPU1_PosTimer_Tick;
+
+			OPU2_PosTimer = new DispatcherTimer();
+			OPU2_PosTimer.Interval = TimeSpan.FromMilliseconds(100);
+			OPU2_PosTimer.Tick += OPU2_PosTimer_Tick;
+
 			OPU1_StatusTimer = new DispatcherTimer();
 			OPU1_StatusTimer.Interval = TimeSpan.FromMilliseconds(100);
 			OPU1_StatusTimer.Tick += OPU1_StatusTimer_Tick;
+
 			OPU2_StatusTimer = new DispatcherTimer();
 			OPU2_StatusTimer.Interval = TimeSpan.FromMilliseconds(100);
 			OPU2_StatusTimer.Tick += OPU2_StatusTimer_Tick;
-
-			Wait_Timer = new DispatcherTimer();
-			Wait_Timer.Interval = TimeSpan.FromMilliseconds(3000);
-			Wait_Timer.Tick += Wait_Timer_Tick;
-
-			RandomTimer.Interval = TimeSpan.FromMilliseconds(50);
-			RandomTimer.Tick += RandomTimer_Tick;
-			RandomTimer.Stop();
 		}
 
-		
-
-		private void RandomTimer_Tick(object? sender, EventArgs e)
+		private void OPU1_PosTimer_Tick(object? sender, EventArgs e)
 		{
-			
-			if (OPU1_Stopped)
-			{
-				int Axis = r.Next(0, 4);
-				SendCommand_OPU1($"MOVE {"AEPY"[Axis]} {r.Next((int)OPU1_LowerLimits[Axis], (int)OPU1_UpperLimits[Axis])} {r.Next((int)OPU1_LowerVelLimits[Axis], (int)OPU1_UpperVelLimits[Axis])}");
-			}
-			if (OPU2_Stopped)
-			{
-				int Axis = r.Next(0, 5);
-				SendCommand_OPU1($"MOVE {"AEPXY"[Axis]} {r.Next((int)OPU2_LowerLimits[Axis], (int)OPU2_UpperLimits[Axis])} {r.Next((int)OPU2_LowerVelLimits[Axis], (int)OPU2_UpperVelLimits[Axis])}");
-			}
+			SendCommand_OPU1("POS?");
+		}
+
+		private void OPU2_PosTimer_Tick(object? sender, EventArgs e)
+		{
+			SendCommand_OPU2("POS?");
 		}
 
 		private void OPU1_StatusTimer_Tick(object? sender, EventArgs e)
@@ -137,30 +113,26 @@ namespace TCPDevice
 					OPU1_Status++;
 					break;
 				case 2:
-					SendCommand_OPU1("POS?");
-					OPU1_Status++;
-					break;
-				case 3:
 					SendCommand_OPU1("STOP?");
 					OPU1_Status++;
 					break;
-				case 4:
+				case 3:
 					SendCommand_OPU1("FLT?");
 					OPU1_Status++;
 					break;
-				case 5:
+				case 4:
 					SendCommand_OPU1("LIM? A");
 					OPU1_Status++;
 					break;
-				case 6:
+				case 5:
 					SendCommand_OPU1("LIM? E");
 					OPU1_Status++;
 					break;
-				case 7:
+				case 6:
 					SendCommand_OPU1("LIM? P");
 					OPU1_Status++;
 					break;
-				case 8:
+				case 7:
 					SendCommand_OPU1("LIM? Y");
 					OPU1_Status = 0;
 					break;
@@ -182,34 +154,30 @@ namespace TCPDevice
 					OPU2_Status++;
 					break;
 				case 2:
-					SendCommand_OPU2("POS?");
-					OPU2_Status++;
-					break;
-				case 3:
 					SendCommand_OPU2("STOP?");
 					OPU2_Status++;
 					break;
-				case 4:
+				case 3:
 					SendCommand_OPU2("FLT?");
 					OPU2_Status++;
 					break;
-				case 5:
+				case 4:
 					SendCommand_OPU2("LIM? A");
 					OPU2_Status++;
 					break;
-				case 6:
+				case 5:
 					SendCommand_OPU2("LIM? E");
 					OPU2_Status++;
 					break;
-				case 7:
+				case 6:
 					SendCommand_OPU2("LIM? P");
 					OPU2_Status++;
 					break;
-				case 8:
+				case 7:
 					SendCommand_OPU2("LIM? X");
 					OPU2_Status++;
 					break;
-				case 9:
+				case 8:
 					SendCommand_OPU2("LIM? Y");
 					OPU2_Status = 0;
 					break;
@@ -247,6 +215,7 @@ namespace TCPDevice
 					OPU1_ConnectStatus.Fill = GreenBrush;
 					Stream_OPU1 = Client_OPU1.GetStream();
 					OPU1_StatusTimer.Start();
+					OPU1_PosTimer.Start();
 					await StartReadingOPU1DataAsync();
 				}
 				else
@@ -272,6 +241,7 @@ namespace TCPDevice
 					OPU2_ConnectStatus.Fill = GreenBrush;
 					Stream_OPU2 = Client_OPU2.GetStream();
 					OPU2_StatusTimer.Start();
+					OPU2_PosTimer.Start();
 					await StartReadingOPU2DataAsync();
 				}
 				else
@@ -343,16 +313,12 @@ namespace TCPDevice
 										Index++;
 									}
 									OPU1_AzCurPos.Content = OPU1_Position[0].ToString("0.000°");
-									Demo_AzPos_OPU1.Content = OPU1_Position[0].ToString("0.000°");
 
 									OPU1_UmCurPos.Content = OPU1_Position[1].ToString("0.000°");
-									Demo_UMPos_OPU1.Content = OPU1_Position[1].ToString("0.000°");
 
 									OPU1_PolCurPos.Content = OPU1_Position[2].ToString("0.000°");
-									Demo_PolPos_OPU1.Content = OPU1_Position[2].ToString("0.000°");
 
 									OPU1_YCurPos.Content = OPU1_Position[3].ToString("0.000 мм");
-									Demo_YPos_OPU1.Content = OPU1_Position[3].ToString("0.000 мм");
 								}
 								if (Data.Contains("LIM?"))
 								{
@@ -383,6 +349,7 @@ namespace TCPDevice
 						MessageBox.Show("Connection error");
 						OPU1_ConnectStatus.Fill = RedBrush;
 						OPU1_StatusTimer.Stop();
+						OPU1_PosTimer.Stop();
 						break;
 					}
 				}
@@ -392,6 +359,7 @@ namespace TCPDevice
 				MessageBox.Show($"Connection Error: {ex.Message}");
 				OPU1_ConnectStatus.Fill = RedBrush;
 				OPU1_StatusTimer.Stop();
+				OPU1_PosTimer.Stop();
 			}
 		}
 
@@ -453,19 +421,14 @@ namespace TCPDevice
 										Index++;
 									}
 									OPU2_AzCurPos.Content = OPU2_Position[0].ToString("0.000°");
-									Demo_AzPos_OPU2.Content = OPU2_Position[0].ToString("0.000°");
 
 									OPU2_UmCurPos.Content = OPU2_Position[1].ToString("0.000°");
-									Demo_UMPos_OPU2.Content = OPU2_Position[1].ToString("0.000°");
 
 									OPU2_PolCurPos.Content = OPU2_Position[2].ToString("0.000°");
-									Demo_PolPos_OPU2.Content = OPU2_Position[2].ToString("0.000°");
 
 									OPU2_XCurPos.Content = OPU2_Position[3].ToString("0.000 мм");
-									Demo_XPos_OPU2.Content = OPU2_Position[3].ToString("0.000 мм");
 
 									OPU2_YCurPos.Content = OPU2_Position[4].ToString("0.000 мм");
-									Demo_YPos_OPU2.Content = OPU2_Position[4].ToString("0.000 мм");
 								}
 								if (Data.Contains("LIM?"))
 								{
@@ -500,6 +463,7 @@ namespace TCPDevice
 						MessageBox.Show("Connection error");
 						OPU2_ConnectStatus.Fill = RedBrush;
 						OPU2_StatusTimer.Stop();
+						OPU2_PosTimer.Stop();
 						break;
 					}
 				}
@@ -509,6 +473,7 @@ namespace TCPDevice
 				MessageBox.Show($"Connection Error: {ex.Message}");
 				OPU2_ConnectStatus.Fill = RedBrush;
 				OPU2_StatusTimer.Stop();
+				OPU2_PosTimer.Stop();
 			}
 		}
 
@@ -910,9 +875,9 @@ namespace TCPDevice
 
 		private void OPU2_AzMove_Click(object sender, RoutedEventArgs e)
 		{
-			if (double.TryParse(OPU2_AzTarPos.Text, out double Pos))
+			if (double.TryParse(OPU2_AzTarPos.Text, DoubleFormat, out double Pos))
 			{
-				if (double.TryParse(OPU2_AzTarSpd.Text, out double Spd))
+				if (double.TryParse(OPU2_AzTarSpd.Text, DoubleFormat, out double Spd))
 				{
 					SendCommand_OPU2("MOVE A " + Pos.ToString() + " " + Spd.ToString());
 				}
@@ -1166,356 +1131,6 @@ namespace TCPDevice
 			}
 		}
 
-		private void DemoProgress_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-		{
-			DemoProgress.Value = DemoProgress.Value == 100 ? 0 : DemoProgress.Value += 10;
-		}
-
-		private async void DemoInit_Click(object sender, RoutedEventArgs e)
-		{
-			if (OPU1_Demo.IsChecked == true)//AZ(-20;0;20) UM(-10; 0; 10) Y(1500; 1600; 1700; 1800; 1900; 2000) POL(0; 90)
-			{
-				Demo_OPU1_State = 0;
-				SendCommand_OPU1("FH");
-				Thread.Sleep(100);
-				SendCommand_OPU1("EN");
-				OPU1_Demo.IsEnabled = false;
-				OPU2_Demo.IsEnabled = false;
-				Demo_Ongoing = true;
-				await Task.Run(Demo_OPU1);
-			}
-			if (OPU2_Demo.IsChecked == true)//AZ(-20;0;20) UM(-10;0;10) X(0;100;200;300) Y(1500;1600;1700;1800;1900;2000) POL(0;90)
-			{
-				Demo_OPU2_State = 0;
-				SendCommand_OPU2("FH");
-				Thread.Sleep(100);
-				SendCommand_OPU2("EN");
-				Thread.Sleep(100);
-				OPU1_Demo.IsEnabled = false;
-				OPU2_Demo.IsEnabled = false;
-				Demo_Ongoing = true;
-				await Task.Run(Demo_OPU2);
-			}
-		}
-
-		private void Demo_OPU1()
-		{
-			Thread.Sleep(500);
-			if (!CheckAccess())
-			{
-				Dispatcher.Invoke(() => {
-					DemoProgress.Maximum = 180;
-					DemoProgress.Value = 0;
-				});
-			}
-			while (Demo_Ongoing)//0 - Move Az | 1 - Move UM | 2 - Move Y | 3 - Move Polarisation | def - Wait
-			{
-				
-				switch (Demo_OPU1_State)
-				{
-					case 0:
-						Demo_OPU1_State = -1;
-						if (Demo_OPU1_Az_State == 2)
-						{
-							Demo_OPU1_Az_State = -1;
-							Demo_OPU1_State = 1;
-						}
-						else
-						{
-							SendCommand_OPU1("MOVE A " + (10 * Demo_OPU1_Az_State).ToString() + " 3");
-							if (!CheckAccess())
-							{
-								Dispatcher.Invoke(() => { 
-									Demo_AzProg_OPU1.IsIndeterminate = true;
-									DemoProgress.Value += 1;
-								});
-							}
-							
-							Demo_OPU1_Az_State += 1;
-						}
-						break;
-					case 1:
-						Demo_OPU1_State = -1;
-						if (Demo_OPU1_UM_State == 2)
-						{
-							Demo_OPU1_UM_State = 0;
-							Demo_OPU1_State = 2;
-						}
-						else
-						{
-							SendCommand_OPU1("MOVE E " + (10 * Demo_OPU1_UM_State).ToString() + " 3");
-							if (!CheckAccess())
-							{
-								Dispatcher.Invoke(() => { 
-									Demo_UmProg_OPU1.IsIndeterminate = true;
-									DemoProgress.Value += 1;
-								});
-							}
-							Demo_OPU1_UM_State += 1;
-						}
-						
-						break;
-					case 2:
-						Demo_OPU1_State = -1;
-						if (Demo_OPU1_Y_State == 11)
-						{
-							Demo_OPU1_Y_State = 1;
-							Demo_OPU1_State = 3;
-						}
-						else
-						{
-							SendCommand_OPU1("MOVE Y " + (1500 + 100 * Demo_OPU1_Y_State).ToString() + " 25");
-							SendCommand_OPU1("MOVE E -10 6");
-							if (!CheckAccess())
-							{
-								Dispatcher.Invoke(() => { 
-									Demo_UmProg_OPU1.IsIndeterminate = true;
-									Demo_YProg_OPU1.IsIndeterminate = true;
-									DemoProgress.Value += 2;
-								});
-							}
-							Demo_OPU1_Y_State += 1;
-						}
-						break;
-					case 3:
-						Demo_OPU1_State = -1;
-						if (Demo_OPU1_Pol_State == 1)
-						{
-							Demo_Ongoing = false;
-						}
-						else
-						{
-							SendCommand_OPU1("MOVE P 90 6");
-							SendCommand_OPU1("MOVE E -10 6");
-							SendCommand_OPU1("MOVE Y 1500 25");
-							if (!CheckAccess())
-							{
-								Dispatcher.Invoke(() => { 
-									Demo_UmProg_OPU1.IsIndeterminate = true;
-									Demo_YProg_OPU1.IsIndeterminate = true;
-									Demo_PolProg_OPU1.IsIndeterminate = true;
-									DemoProgress.Value += 3;
-								});
-							}
-							Demo_OPU1_Pol_State += 1;
-						}
-						
-						break;
-					default:
-						if (!Wait_Timer.IsEnabled)
-						{
-							Wait_Timer.Start();
-						}
-						break;
-				}
-			}
-			SendCommand_OPU1("DIS");
-			if (!CheckAccess())
-			{
-				Dispatcher.Invoke(() =>
-				{
-					OPU1_Demo.IsEnabled = true;
-					OPU2_Demo.IsEnabled = true;
-				});
-			}
-
-			return;
-		}
-
-		private void Demo_OPU2()
-		{
-			Thread.Sleep(500);
-			if (!CheckAccess())
-			{
-				Dispatcher.Invoke(() => {
-					DemoProgress.Maximum = 180;
-					DemoProgress.Value = 0;
-				});
-			}
-			while (Demo_Ongoing)//0 - Move Az | 1 - Move UM | 2 - Move Y | 3 - Move Polarisation | def - Wait
-			{
-				switch (Demo_OPU2_State)
-				{
-					case 0:
-						Demo_OPU2_State = -1;
-						if (Demo_OPU2_Az_State == 2)
-						{
-							Demo_OPU2_Az_State = -1;
-							Demo_OPU2_State = 1;
-						}
-						else
-						{
-							SendCommand_OPU2("MOVE A " + (10 * Demo_OPU2_Az_State).ToString() + " 3");
-							if (!CheckAccess())
-							{
-								Dispatcher.Invoke(() => { 
-									Demo_AzProg_OPU2.IsIndeterminate = true;
-								});
-							}
-							Demo_OPU2_Az_State += 1;
-						}
-						break;
-					case 1:
-						Demo_OPU1_State = -1;
-						if (Demo_OPU2_UM_State == 2)
-						{
-							Demo_OPU2_UM_State = 0;
-							Demo_OPU2_State = 2;
-						}
-						else
-						{
-							SendCommand_OPU2("MOVE E " + (10 * Demo_OPU2_UM_State).ToString() + " 3");
-							if (!CheckAccess())
-							{
-								Dispatcher.Invoke(() => { Demo_UmProg_OPU2.IsIndeterminate = true; });
-							}
-							Demo_OPU2_UM_State += 1;
-						}
-
-						break;
-					case 2:
-						Demo_OPU1_State = -1;
-						if (Demo_OPU2_X_State == 4)
-						{
-							Demo_OPU2_X_State = 1;
-							Demo_OPU2_State = 3;
-						}
-						else
-						{
-							SendCommand_OPU2("MOVE X " + (100 * Demo_OPU2_X_State).ToString() + " 25");
-							SendCommand_OPU2("MOVE E -10 6");
-							if (!CheckAccess())
-							{
-								Dispatcher.Invoke(() => {
-									Demo_UmProg_OPU2.IsIndeterminate = true;
-									Demo_XProg_OPU2.IsIndeterminate = true;
-								});
-							}
-							Demo_OPU2_Y_State += 1;
-						}
-						break;
-					case 3:
-						Demo_OPU1_State = -1;
-						if (Demo_OPU2_Y_State == 11)
-						{
-							Demo_OPU2_Y_State = 1;
-							Demo_OPU2_State = 4;
-						}
-						else
-						{
-							SendCommand_OPU2("MOVE Y " + (1500 + 100 * Demo_OPU2_Y_State).ToString() + " 25");
-							SendCommand_OPU2("MOVE E -10 6");
-							SendCommand_OPU2("MOVE X 0 25");
-							if (!CheckAccess())
-							{
-								Dispatcher.Invoke(() => {
-									Demo_UmProg_OPU2.IsIndeterminate = true;
-									Demo_XProg_OPU2.IsIndeterminate = true;
-									Demo_YProg_OPU2.IsIndeterminate = true;
-								});
-							}
-							Demo_OPU2_Y_State += 1;
-						}
-						break;
-					case 4:
-						Demo_OPU2_State = -1;
-						if (Demo_OPU2_Pol_State == 1)
-						{
-							Demo_Ongoing = false;
-						}
-						else
-						{
-							SendCommand_OPU2("MOVE P 90 6");
-							SendCommand_OPU2("MOVE E -10 6");
-							SendCommand_OPU2("MOVE X 0 25");
-							SendCommand_OPU2("MOVE Y 1500 25");
-							if (!CheckAccess())
-							{
-								Dispatcher.Invoke(() => {
-									Demo_UmProg_OPU2.IsIndeterminate = true;
-									Demo_XProg_OPU2.IsIndeterminate = true;
-									Demo_YProg_OPU2.IsIndeterminate = true;
-									Demo_PolProg_OPU2.IsIndeterminate = true;
-								});
-							}
-							Demo_OPU2_Pol_State += 1;
-						}
-						
-						break;
-					default:
-						if (!Wait_Timer.IsEnabled)
-						{
-							Wait_Timer.Start();
-						}
-						break;
-				}
-			}
-			SendCommand_OPU2("DIS");
-			if (!CheckAccess())
-			{
-				Dispatcher.Invoke(() =>
-				{
-					OPU1_Demo.IsEnabled = true;
-					OPU2_Demo.IsEnabled = true;
-				});
-			}
-			return;
-		}
-
-		private void OPU1_Demo_Checked(object sender, RoutedEventArgs e)
-		{
-			if (Demo_Axis_Tab_Control != null)
-			{
-				Demo_Axis_Tab_Control.SelectedIndex = 0;
-			}
-			
-		}
-
-		private void OPU2_Demo_Checked(object sender, RoutedEventArgs e)
-		{
-			if (Demo_Axis_Tab_Control != null)
-			{
-				Demo_Axis_Tab_Control.SelectedIndex = 1;
-			}
-			
-		}
-
-		private void Wait_Timer_Tick(object? sender, EventArgs e)
-		{
-			if (OPU1_Demo.IsChecked == true)
-			{
-				if (OPU1_Stopped)
-				{
-					Demo_OPU1_State = 0;
-					Demo_AzProg_OPU1.IsIndeterminate = false;
-					Demo_UmProg_OPU1.IsIndeterminate = false;
-					Demo_YProg_OPU1.IsIndeterminate = false;
-					Demo_PolProg_OPU1.IsIndeterminate = false;
-					Wait_Timer.Stop();
-				}
-			}
-			if (OPU2_Demo.IsChecked == true)
-			{
-				if (OPU2_Stopped)
-				{
-					Demo_OPU2_State = 0;
-					Demo_AzProg_OPU2.IsIndeterminate = false;
-					Demo_UmProg_OPU2.IsIndeterminate = false;
-					Demo_XProg_OPU2.IsIndeterminate = false;
-					Demo_YProg_OPU2.IsIndeterminate = false;
-					Demo_PolProg_OPU2.IsIndeterminate = false;
-					Wait_Timer.Stop();
-				}
-			}
-		}
-
-		private void DemoStop_Click(object sender, RoutedEventArgs e)
-		{
-			Wait_Timer.Stop();
-			RandomTimer.Stop();
-			Demo_Ongoing = false;
-		}
-
 		private void OPU2_AzJogLeft_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
 		{
 			SendCommand_OPU2("STOP A");
@@ -1668,17 +1283,6 @@ namespace TCPDevice
 			{
 				SendCommand_OPU2("INGORELIMIT");
 
-			}
-		}
-
-		private void RandomBtn_Click(object sender, RoutedEventArgs e)
-		{
-			if (Client_OPU1 != null & Client_OPU2 != null)
-			{
-				if (OPU1_Enabled & OPU2_Enabled)
-				{
-					RandomTimer.Start();
-				}
 			}
 		}
 	}
