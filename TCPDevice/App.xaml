@@ -5,6 +5,7 @@
              StartupUri="MainWindow.xaml">
     <Application.Resources>
 		<ResourceDictionary>
+			
 			<Style x:Key="LightText" TargetType="TextBlock">
 				<Setter Property="Foreground" Value="White"/>
 				<!--Value="#1E1F29" -->
@@ -37,6 +38,9 @@
 					</Trigger>
 					<Trigger Property="IsPressed" Value="True">
 						<Setter Property="Background" Value="LightBlue"/>
+					</Trigger>
+					<Trigger Property="IsEnabled" Value="False">
+						<Setter Property="Background" Value="#60606C"/>
 					</Trigger>
 				</Style.Triggers>
 			</Style>
