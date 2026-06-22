@@ -1269,7 +1269,8 @@ namespace TCPDevice
 			}
 			else
 			{
-				SendCommand_OPU1("INGORELIMIT");
+				SendCommand_OPU1("IGNORELIMIT");
+				OPU1_IngoreLimit_Counter = 0;
 			}
 		}
 
@@ -1281,8 +1282,8 @@ namespace TCPDevice
 			}
 			else
 			{
-				SendCommand_OPU2("INGORELIMIT");
-
+				SendCommand_OPU2("IGNORELIMIT");
+				OPU1_IngoreLimit_Counter = 0;
 			}
 		}
 	}

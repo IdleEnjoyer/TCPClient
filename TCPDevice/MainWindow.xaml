@@ -180,7 +180,7 @@
 						<RowDefinition Height="1*"/>
 						<RowDefinition Height="1*"/>
 					</Grid.RowDefinitions>
-					<Button x:Name="OPU1_Connect" Content="Подключение" Grid.Row="1" FontSize="20" Click="OPU1_Connect_Click" Foreground="#FFCFCFCF" Style="{DynamicResource DefBtn}" MinWidth="150">
+					<Button x:Name="OPU1_Connect" Content="Подключение" Grid.Row="1" FontSize="24" Click="OPU1_Connect_Click" Foreground="#FFCFCFCF" Style="{DynamicResource DefBtn}" MinWidth="150">
 						<Button.Resources>
 							<Style TargetType="Border">
 								<Setter Property="CornerRadius" Value="10, 0, 0, 10"/>
@@ -202,7 +202,7 @@
 						<RowDefinition Height="1*"/>
 						<RowDefinition Height="1*"/>
 					</Grid.RowDefinitions>
-					<Button x:Name="OPU1_Power" Content="Питание" Grid.Row="1" FontSize="20" Click="OPU1_Power_Click" Foreground="#FFCFCFCF" Style="{DynamicResource DefBtn}" MinWidth="150"/>
+					<Button x:Name="OPU1_Power" Content="Питание" Grid.Row="1" FontSize="24" Click="OPU1_Power_Click" Foreground="#FFCFCFCF" Style="{DynamicResource DefBtn}" MinWidth="150"/>
 					<Ellipse x:Name="OPU1_PowerStatus" StrokeThickness="3" Grid.Row="0" Width="25" Height="25" Stroke="Black" VerticalAlignment="Center" HorizontalAlignment="Center">
 						<Ellipse.Fill>
 							<RadialGradientBrush Center="0.25,0.25">
@@ -218,7 +218,7 @@
 						<RowDefinition Height="1*"/>
 						<RowDefinition Height="1*"/>
 					</Grid.RowDefinitions>
-					<Button x:Name="OPU1_Stop" Content="СТОП" Grid.Row="1" FontSize="20" Click="OPU1_Stop_Click" Foreground="#FFCFCFCF" Style="{DynamicResource DefBtn}" MinWidth="150"/>
+					<Button x:Name="OPU1_Stop" Content="СТОП" Grid.Row="1" FontSize="24" Click="OPU1_Stop_Click" Foreground="#FFCFCFCF" Style="{DynamicResource DefBtn}" MinWidth="150"/>
 					<Ellipse x:Name="OPU1_StopStatus" StrokeThickness="3" Grid.Row="0" Width="25" Height="25" Stroke="Black" VerticalAlignment="Center" HorizontalAlignment="Center">
 						<Ellipse.Fill>
 							<RadialGradientBrush Center="0.25,0.25">
@@ -234,7 +234,7 @@
 						<RowDefinition Height="1*"/>
 						<RowDefinition Height="1*"/>
 					</Grid.RowDefinitions>
-					<Button x:Name="OPU1_Clear" Content="Сброс" Grid.Row="1" FontSize="20" Click="OPU1_Clear_Click" Foreground="#FFCFCFCF" Style="{DynamicResource DefBtn}" MinWidth="150">
+					<Button x:Name="OPU1_Clear" Content="Сброс" Grid.Row="1" FontSize="24" Click="OPU1_Clear_Click" Foreground="#FFCFCFCF" Style="{DynamicResource DefBtn}" MinWidth="150">
 						<Button.Resources>
 							<Style TargetType="Border">
 								<Setter Property="CornerRadius" Value="0, 10, 10, 0"/>
