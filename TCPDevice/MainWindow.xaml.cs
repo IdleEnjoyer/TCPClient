@@ -186,19 +186,25 @@ namespace TCPDevice
 
 		public void SendCommand_OPU1(string Com)
 		{
-			if (Client_OPU1.Connected)
+			if (Client_OPU1 != null)
 			{
-				WriteByteData = Encoding.UTF8.GetBytes("^" + Com.Replace(',','.') + "~\r\n");
-				Stream_OPU1.Write(WriteByteData, 0, WriteByteData.Length);
+				if (Client_OPU1.Connected)
+				{
+					WriteByteData = Encoding.UTF8.GetBytes("^" + Com.Replace(',', '.') + "~\r\n");
+					Stream_OPU1.Write(WriteByteData, 0, WriteByteData.Length);
+				}
 			}
 		}
 
 		public void SendCommand_OPU2(string Com)
 		{
-			if (Client_OPU2.Connected)
+			if (Client_OPU2 != null)
 			{
-				WriteByteData = Encoding.UTF8.GetBytes("^" + Com.Replace(',', '.') + "~\r\n");
-				Stream_OPU2.Write(WriteByteData, 0, WriteByteData.Length);
+				if (Client_OPU2.Connected)
+				{
+					WriteByteData = Encoding.UTF8.GetBytes("^" + Com.Replace(',', '.') + "~\r\n");
+					Stream_OPU2.Write(WriteByteData, 0, WriteByteData.Length);
+				}
 			}
 		}
 
@@ -312,13 +318,13 @@ namespace TCPDevice
 										OPU1_Position[Index] = double.Parse(Position.Replace('.',',').Replace("~",string.Empty));
 										Index++;
 									}
-									OPU1_AzCurPos.Content = OPU1_Position[0].ToString("0.000°");
+									OPU1_AzCurPos.Content = OPU1_Position[0].ToString("0.00°");
 
-									OPU1_UmCurPos.Content = OPU1_Position[1].ToString("0.000°");
+									OPU1_UmCurPos.Content = OPU1_Position[1].ToString("0.00°");
 
-									OPU1_PolCurPos.Content = OPU1_Position[2].ToString("0.000°");
+									OPU1_PolCurPos.Content = OPU1_Position[2].ToString("0.00°");
 
-									OPU1_YCurPos.Content = OPU1_Position[3].ToString("0.000 мм");
+									OPU1_YCurPos.Content = OPU1_Position[3].ToString("0.00 мм");
 								}
 								if (Data.Contains("LIM?"))
 								{
@@ -420,15 +426,15 @@ namespace TCPDevice
 										OPU2_Position[Index] = double.Parse(Position.Replace('.', ',').Replace("~", string.Empty));
 										Index++;
 									}
-									OPU2_AzCurPos.Content = OPU2_Position[0].ToString("0.000°");
+									OPU2_AzCurPos.Content = OPU2_Position[0].ToString("0.00°");
 
-									OPU2_UmCurPos.Content = OPU2_Position[1].ToString("0.000°");
+									OPU2_UmCurPos.Content = OPU2_Position[1].ToString("0.00°");
 
-									OPU2_PolCurPos.Content = OPU2_Position[2].ToString("0.000°");
+									OPU2_PolCurPos.Content = OPU2_Position[2].ToString("0.00°");
 
-									OPU2_XCurPos.Content = OPU2_Position[3].ToString("0.000 мм");
+									OPU2_XCurPos.Content = OPU2_Position[3].ToString("0.00 мм");
 
-									OPU2_YCurPos.Content = OPU2_Position[4].ToString("0.000 мм");
+									OPU2_YCurPos.Content = OPU2_Position[4].ToString("0.00 мм");
 								}
 								if (Data.Contains("LIM?"))
 								{
@@ -479,7 +485,14 @@ namespace TCPDevice
 
 		private void OPU1_Connect_Click(object sender, RoutedEventArgs e)
 		{
-			ConnectOPU1();
+			if (Client_OPU1 != null)
+			{
+				Client_OPU1.Close();
+			}
+			else
+			{
+				ConnectOPU1();
+			}
 		}
 
 		private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -834,7 +847,14 @@ namespace TCPDevice
 
 		private void OPU2_Connect_Click(object sender, RoutedEventArgs e)
 		{
-			ConnectOPU2();
+			if (Client_OPU2 != null)
+			{
+				Client_OPU2.Close();
+			}
+			else
+			{
+				ConnectOPU2();
+			}
 		}
 
 		private void OPU2_Power_Click(object sender, RoutedEventArgs e)

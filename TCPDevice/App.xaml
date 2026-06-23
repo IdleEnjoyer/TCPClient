@@ -20,22 +20,30 @@
 					<Trigger Property="IsMouseOver" Value="True">
 						<Setter Property="Background" Value="{DynamicResource PressedBtn}"/>
 					</Trigger>
+					<Trigger Property="IsPressed" Value="True">
+						<Setter Property="Background" Value="{DynamicResource MousePressedBtn}"/>
+					</Trigger>
 				</Style.Triggers>
 			</Style>
 
 			<LinearGradientBrush x:Key="NotPressedBtn" EndPoint="0.5,1" StartPoint="0.5,0">
 				<GradientStop Color="Black" Offset="0.5"/>
-				<GradientStop Color="#FF7B7B7B" Offset="1"/>
-				<GradientStop Color="#FF7B7B7B" Offset="0"/>
+				<GradientStop Color="#7B7B7B" Offset="1"/>
+				<GradientStop Color="#7B7B7B" Offset="0"/>
 			</LinearGradientBrush>
 
 			<LinearGradientBrush x:Key="PressedBtn" EndPoint="0.5,1" StartPoint="0.5,0">
 				<GradientStop Color="Black" Offset="0.5"/>
-				<GradientStop Color="#FFA7A7A7" Offset="1"/>
-				<GradientStop Color="#FFA7A7A7" Offset="0"/>
+				<GradientStop Color="#A7A7A7" Offset="1"/>
+				<GradientStop Color="#A7A7A7" Offset="0"/>
 			</LinearGradientBrush>
-				
-			
+
+			<LinearGradientBrush x:Key="MousePressedBtn" EndPoint="0.5,1" StartPoint="0.5,0">
+				<GradientStop Color="Black" Offset="0.5"/>
+				<GradientStop Color="#E7E7E7" Offset="1"/>
+				<GradientStop Color="#E7E7E7" Offset="0"/>
+			</LinearGradientBrush>
+
 		</ResourceDictionary>
     </Application.Resources>
 </Application>
