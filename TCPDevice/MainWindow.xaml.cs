@@ -1306,5 +1306,22 @@ namespace TCPDevice
 				OPU1_IngoreLimit_Counter = 0;
 			}
 		}
+
+		private void OPU1_Home_Click(object sender, RoutedEventArgs e)
+		{
+			SendCommand_OPU1("MOVE A 0 6");
+			SendCommand_OPU1("MOVE E 0 6");
+			SendCommand_OPU1("MOVE P 0 6");
+			SendCommand_OPU1("MOVE Y 1500 50");
+		}
+
+		private void OPU2_Home_Click(object sender, RoutedEventArgs e)
+		{
+			SendCommand_OPU2("MOVE A 0 3");
+			SendCommand_OPU2("MOVE E 0 3");
+			SendCommand_OPU2("MOVE P 0 3");
+			SendCommand_OPU2("MOVE X 0 25");
+			SendCommand_OPU2("MOVE Y 1500 25");
+		}
 	}
 }

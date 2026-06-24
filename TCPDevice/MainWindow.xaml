@@ -234,13 +234,7 @@
 						<RowDefinition Height="1*"/>
 						<RowDefinition Height="1*"/>
 					</Grid.RowDefinitions>
-					<Button x:Name="OPU1_Clear" Content="Сброс" Grid.Row="1" FontSize="24" Click="OPU1_Clear_Click" Foreground="#FFCFCFCF" Style="{DynamicResource DefBtn}" MinWidth="150">
-						<Button.Resources>
-							<Style TargetType="Border">
-								<Setter Property="CornerRadius" Value="0, 10, 10, 0"/>
-							</Style>
-						</Button.Resources>
-					</Button>
+					<Button x:Name="OPU1_Clear" Content="Сброс" Grid.Row="1" FontSize="24" Click="OPU1_Clear_Click" Foreground="#FFCFCFCF" Style="{DynamicResource DefBtn}" MinWidth="150"/>
 					<Ellipse x:Name="OPU1_ClearStatus" StrokeThickness="3" Grid.Row="0" Width="25" Height="25" Stroke="Black" VerticalAlignment="Center" HorizontalAlignment="Center" >
 						<Ellipse.Fill>
 							<RadialGradientBrush Center="0.25,0.25">
@@ -249,6 +243,20 @@
 							</RadialGradientBrush>
 						</Ellipse.Fill>
 					</Ellipse>
+				</Grid>
+
+				<Grid Grid.Row="0" Grid.Column="4">
+					<Grid.RowDefinitions>
+						<RowDefinition Height="1*"/>
+						<RowDefinition Height="1*"/>
+					</Grid.RowDefinitions>
+					<Button x:Name="OPU1_Home" Content="В ноль" Grid.Row="1" FontSize="24" Click="OPU1_Home_Click" Foreground="#FFCFCFCF" Style="{DynamicResource DefBtn}" MinWidth="150">
+						<Button.Resources>
+							<Style TargetType="Border">
+								<Setter Property="CornerRadius" Value="0, 10, 10, 0"/>
+							</Style>
+						</Button.Resources>
+					</Button>
 				</Grid>
 
 				<Image x:Name="OPU1_ServiceImage" Grid.Row="0" Grid.Column="5" Source="/TESART.png" PreviewMouseLeftButtonUp="OPU1_ServiceImage_PreviewMouseLeftButtonUp"/>
@@ -272,20 +280,15 @@
 						</Grid.ColumnDefinitions>
 						<Label x:Name="AzimuthLabel" Content="Азимут" Grid.Column="0" FontSize="28" VerticalAlignment="Center" Margin="5,0,0,0"/>
 						<Label x:Name="OPU1_AzCurPos" Content="0.0°" Grid.Column="1" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-						<TextBox x:Name="OPU1_AzTarPos" Text="0.0" Grid.Column="2" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="10,0,0,0" ToolTip="Позиция" TouchDown="OPU1_TextBox_TouchDown" >
-							<TextBox.Resources>
-								<Style TargetType="Border">
-									<Setter Property="CornerRadius" Value="10, 0, 0, 10"/>
-								</Style>
-							</TextBox.Resources>
-						</TextBox>
-						<TextBox x:Name="OPU1_AzTarSpd" Text="1.0" Grid.Column="3" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="0,0,10,0" ToolTip="Скорость" TouchDown="OPU1_TextBox_TouchDown" TextChanged="OPU1_Speed_TextChanged">
-							<TextBox.Resources>
-								<Style TargetType="Border">
-									<Setter Property="CornerRadius" Value="0, 10, 10, 0"/>
-								</Style>
-							</TextBox.Resources>
-						</TextBox>
+						<StackPanel Orientation="Horizontal" Grid.Column="2">
+							<TextBox x:Name="OPU1_AzTarPos" Width="140" Text="0.0" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" ToolTip="Позиция" TouchDown="OPU1_TextBox_TouchDown" HorizontalAlignment="Left"/>
+							<TextBlock Text="°" VerticalAlignment="Center" FontSize="28" HorizontalAlignment="Left" Margin="5,0,0,0" />
+						</StackPanel>
+						<StackPanel Orientation="Horizontal" Grid.Column="3">
+							<TextBox x:Name="OPU1_AzTarSpd" Width="140"  Text="6.0" Grid.Column="3" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" ToolTip="Скорость" TouchDown="OPU1_TextBox_TouchDown" TextChanged="OPU1_Speed_TextChanged"/>
+							<TextBlock Text="°/c" Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="28" Margin="5,0,0,0" />
+						</StackPanel>
+						
 						<Grid x:Name="AzPosControl" Grid.Row="2"  Grid.Column="4">
 							<Grid.RowDefinitions>
 								<RowDefinition Height="1*"/>
@@ -355,20 +358,16 @@
 						</Grid.ColumnDefinitions>
 						<Label x:Name="UgolMestaLabel" Content="Угол места" Grid.Column="0" FontSize="28" VerticalAlignment="Center" Margin="5,0,0,0"/>
 						<Label x:Name="OPU1_UmCurPos" Content="0.0°" Grid.Column="1" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-						<TextBox x:Name="OPU1_UmTarPos" Text="0.0" Grid.Column="2" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="10,0,0,0" ToolTip="Позиция" TouchDown="OPU1_TextBox_TouchDown">
-							<TextBox.Resources>
-								<Style TargetType="Border">
-									<Setter Property="CornerRadius" Value="10, 0, 0, 10"/>
-								</Style>
-							</TextBox.Resources>
-						</TextBox>
-						<TextBox x:Name="OPU1_UmTarSpd" Text="1.0" Grid.Column="3" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="0,0,10,0" ToolTip="Скорость" TouchDown="OPU1_TextBox_TouchDown" TextChanged="OPU1_Speed_TextChanged">
-							<TextBox.Resources>
-								<Style TargetType="Border">
-									<Setter Property="CornerRadius" Value="0, 10, 10, 0"/>
-								</Style>
-							</TextBox.Resources>
-						</TextBox>
+						<StackPanel Orientation="Horizontal" Grid.Column="2">
+							<TextBox x:Name="OPU1_UmTarPos" Width="140" Text="0.0" Grid.Column="2" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" ToolTip="Позиция" TouchDown="OPU1_TextBox_TouchDown"/>
+							<TextBlock Text="°" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="28" Margin="5,0,0,0" />
+						</StackPanel>
+						
+						<StackPanel Orientation="Horizontal" Grid.Column="3">
+							<TextBox x:Name="OPU1_UmTarSpd" Width="140" Text="6.0" Grid.Column="3" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" ToolTip="Скорость" TouchDown="OPU1_TextBox_TouchDown" TextChanged="OPU1_Speed_TextChanged"/>
+							<TextBlock Text="°/c" Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="28" Margin="5,0,0,0" />
+						</StackPanel>
+						
 						<Grid x:Name="UmPosControl" Grid.Row="2"  Grid.Column="4">
 							<Grid.RowDefinitions>
 								<RowDefinition Height="1*"/>
@@ -432,20 +431,16 @@
 						</Grid.ColumnDefinitions>
 						<TextBlock x:Name="PolarizationLabel" Text="Поляризация" FontSize="28" VerticalAlignment="Center" Margin="5,0,0,0"/>
 						<Label x:Name="OPU1_PolCurPos" Content="0.0°" Grid.Column="1" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-						<TextBox x:Name="OPU1_PolTarPos" Text="0.0" Grid.Column="2" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="10,0,0,0" ToolTip="Позиция" TouchDown="OPU1_TextBox_TouchDown">
-							<TextBox.Resources>
-								<Style TargetType="Border">
-									<Setter Property="CornerRadius" Value="10, 0, 0, 10"/>
-								</Style>
-							</TextBox.Resources>
-						</TextBox>
-						<TextBox x:Name="OPU1_PolTarSpd" Text="1.0" Grid.Column="3" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="0,0,10,0" ToolTip="Скорость" TouchDown="OPU1_TextBox_TouchDown" TextChanged="OPU1_Speed_TextChanged">
-							<TextBox.Resources>
-								<Style TargetType="Border">
-									<Setter Property="CornerRadius" Value="0, 10, 10, 0"/>
-								</Style>
-							</TextBox.Resources>
-						</TextBox>
+						<StackPanel Orientation="Horizontal" Grid.Column="2">
+							<TextBox x:Name="OPU1_PolTarPos" Width="140" Text="0.0" Grid.Column="2" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" ToolTip="Позиция" TouchDown="OPU1_TextBox_TouchDown"/>
+							<TextBlock Text="°" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="28" Margin="5,0,0,0" />
+						</StackPanel>
+						
+						<StackPanel Orientation="Horizontal" Grid.Column="3">
+							<TextBox x:Name="OPU1_PolTarSpd" Width="140" Text="6.0" Grid.Column="3" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" ToolTip="Скорость" TouchDown="OPU1_TextBox_TouchDown" TextChanged="OPU1_Speed_TextChanged"/>
+							<TextBlock Text="°/c" Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="28" Margin="5,0,0,0" />
+						</StackPanel>
+						
 						<Grid x:Name="PolPosControl" Grid.Row="2"  Grid.Column="4">
 							<Grid.RowDefinitions>
 								<RowDefinition Height="1*"/>
@@ -509,20 +504,16 @@
 						</Grid.ColumnDefinitions>
 						<Label x:Name="YLabel" Content="Ось Y" Grid.Column="0" FontSize="28" VerticalAlignment="Center" Margin="5,0,0,0"/>
 						<Label x:Name="OPU1_YCurPos" Content="0.0 мм" Grid.Column="1" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-						<TextBox x:Name="OPU1_YTarPos" Text="0.0" Grid.Column="2" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="10,0,0,0" ToolTip="Позиция" TouchDown="OPU1_TextBox_TouchDown">
-							<TextBox.Resources>
-								<Style TargetType="Border">
-									<Setter Property="CornerRadius" Value="10, 0, 0, 10"/>
-								</Style>
-							</TextBox.Resources>
-						</TextBox>
-						<TextBox x:Name="OPU1_YTarSpd" Text="1.0" Grid.Column="3" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="0,0,10,0" ToolTip="Скорость" TouchDown="OPU1_TextBox_TouchDown" TextChanged="OPU1_Speed_TextChanged">
-							<TextBox.Resources>
-								<Style TargetType="Border">
-									<Setter Property="CornerRadius" Value="0, 10, 10, 0"/>
-								</Style>
-							</TextBox.Resources>
-						</TextBox>
+						<StackPanel Orientation="Horizontal" Grid.Column="2">
+							<TextBox x:Name="OPU1_YTarPos" Width="140" Text="0.0" Grid.Column="2" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" ToolTip="Позиция" TouchDown="OPU1_TextBox_TouchDown"/>
+							<TextBlock Text="мм." Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="24" Margin="5,0,0,0" />
+						</StackPanel>
+						
+						<StackPanel Orientation="Horizontal" Grid.Column="3">
+							<TextBox x:Name="OPU1_YTarSpd" Width="140" Text="50.0" Grid.Column="3" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" ToolTip="Скорость" TouchDown="OPU1_TextBox_TouchDown" TextChanged="OPU1_Speed_TextChanged"/>
+							<TextBlock Text="мм./с" Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="24" Margin="5,0,0,0" />
+						</StackPanel>
+						
 						<Grid x:Name="PosControl" Grid.Row="2"  Grid.Column="4">
 							<Grid.RowDefinitions>
 								<RowDefinition Height="1*"/>
@@ -655,13 +646,7 @@
 						<RowDefinition Height="1*"/>
 						<RowDefinition Height="1*"/>
 					</Grid.RowDefinitions>
-					<Button x:Name="OPU2_Clear" Content="Сброс" Grid.Row="1" FontSize="20" Click="OPU2_Clear_Click" Foreground="#FFCFCFCF" Style="{DynamicResource DefBtn}" MinWidth="150">
-						<Button.Resources>
-							<Style TargetType="Border">
-								<Setter Property="CornerRadius" Value="0, 10, 10, 0"/>
-							</Style>
-						</Button.Resources>
-					</Button>
+					<Button x:Name="OPU2_Clear" Content="Сброс" Grid.Row="1" FontSize="20" Click="OPU2_Clear_Click" Foreground="#FFCFCFCF" Style="{DynamicResource DefBtn}" MinWidth="150"/>
 					<Ellipse x:Name="OPU2_ClearStatus" StrokeThickness="3" Grid.Row="0" Width="25" Height="25" Stroke="Black" VerticalAlignment="Center" HorizontalAlignment="Center" >
 						<Ellipse.Fill>
 							<RadialGradientBrush Center="0.25,0.25">
@@ -670,6 +655,20 @@
 							</RadialGradientBrush>
 						</Ellipse.Fill>
 					</Ellipse>
+				</Grid>
+
+				<Grid Grid.Row="0" Grid.Column="4">
+					<Grid.RowDefinitions>
+						<RowDefinition Height="1*"/>
+						<RowDefinition Height="1*"/>
+					</Grid.RowDefinitions>
+					<Button x:Name="OPU2_Home" Content="В ноль" Grid.Row="1" FontSize="24" Click="OPU2_Home_Click" Foreground="#FFCFCFCF" Style="{DynamicResource DefBtn}" MinWidth="150">
+						<Button.Resources>
+							<Style TargetType="Border">
+								<Setter Property="CornerRadius" Value="0, 10, 10, 0"/>
+							</Style>
+						</Button.Resources>
+					</Button>
 				</Grid>
 
 				<Image x:Name="OPU2_ServiceImage" Grid.Row="0" Grid.Column="5" Source="/TESART.png" PreviewMouseLeftButtonUp="OPU2_ServiceImage_PreviewMouseLeftButtonUp"/>
@@ -693,20 +692,15 @@
 						</Grid.ColumnDefinitions>
 						<Label x:Name="OPU2_AzimuthLabel" Content="Азимут" Grid.Column="0" FontSize="28" VerticalAlignment="Center" Margin="5,0,0,0"/>
 						<Label x:Name="OPU2_AzCurPos" Content="0.0°" Grid.Column="1" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-						<TextBox x:Name="OPU2_AzTarPos" Text="0.0" Grid.Column="2" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="10,0,0,0" ToolTip="Позиция" TouchDown="OPU1_TextBox_TouchDown">
-							<TextBox.Resources>
-								<Style TargetType="Border">
-									<Setter Property="CornerRadius" Value="10, 0, 0, 10"/>
-								</Style>
-							</TextBox.Resources>
-						</TextBox>
-						<TextBox x:Name="OPU2_AzTarSpd" Text="1.0" Grid.Column="3" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="0,0,10,0" ToolTip="Скорость" TouchDown="OPU1_TextBox_TouchDown">
-							<TextBox.Resources>
-								<Style TargetType="Border">
-									<Setter Property="CornerRadius" Value="0, 10, 10, 0"/>
-								</Style>
-							</TextBox.Resources>
-						</TextBox>
+						<StackPanel Orientation="Horizontal" Grid.Column="2">
+							<TextBox x:Name="OPU2_AzTarPos" Width="140" Text="0.0" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" ToolTip="Позиция" TouchDown="OPU1_TextBox_TouchDown"/>
+							<TextBlock Text="°" VerticalAlignment="Center" FontSize="28" HorizontalAlignment="Left" Margin="5,0,0,0" />
+						</StackPanel>
+						<StackPanel Orientation="Horizontal" Grid.Column="3">
+							<TextBox x:Name="OPU2_AzTarSpd" Width="140" Text="3.0" Grid.Column="3" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" ToolTip="Скорость" TouchDown="OPU1_TextBox_TouchDown"/>
+							<TextBlock Text="°/c" VerticalAlignment="Center" FontSize="28" HorizontalAlignment="Left" Margin="5,0,0,0" />
+						</StackPanel>
+						
 						<Grid x:Name="OPU2_AzPosControl" Grid.Row="2"  Grid.Column="4">
 							<Grid.RowDefinitions>
 								<RowDefinition Height="1*"/>
@@ -776,20 +770,14 @@
 						</Grid.ColumnDefinitions>
 						<Label x:Name="OPU2_UgolMestaLabel" Content="Угол места" Grid.Column="0" FontSize="28" VerticalAlignment="Center" Margin="5,0,0,0"/>
 						<Label x:Name="OPU2_UmCurPos" Content="0.0°" Grid.Column="1" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-						<TextBox x:Name="OPU2_UmTarPos" Text="0.0" Grid.Column="2" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="10,0,0,0" ToolTip="Позиция" TouchDown="OPU1_TextBox_TouchDown">
-							<TextBox.Resources>
-								<Style TargetType="Border">
-									<Setter Property="CornerRadius" Value="10, 0, 0, 10"/>
-								</Style>
-							</TextBox.Resources>
-						</TextBox>
-						<TextBox x:Name="OPU2_UmTarSpd" Text="1.0" Grid.Column="3" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="0,0,10,0" ToolTip="Скорость" TouchDown="OPU1_TextBox_TouchDown">
-							<TextBox.Resources>
-								<Style TargetType="Border">
-									<Setter Property="CornerRadius" Value="0, 10, 10, 0"/>
-								</Style>
-							</TextBox.Resources>
-						</TextBox>
+						<StackPanel Orientation="Horizontal" Grid.Column="2">
+							<TextBox x:Name="OPU2_UmTarPos" Width="140" Text="0.0" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" ToolTip="Позиция" TouchDown="OPU1_TextBox_TouchDown"/>
+							<TextBlock Text="°" VerticalAlignment="Center" FontSize="28" HorizontalAlignment="Left" Margin="5,0,0,0" />
+						</StackPanel>
+						<StackPanel Orientation="Horizontal" Grid.Column="3">
+							<TextBox x:Name="OPU2_UmTarSpd" Width="140" Text="3.0" Grid.Column="3" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" ToolTip="Скорость" TouchDown="OPU1_TextBox_TouchDown"/>
+							<TextBlock Text="°/c" VerticalAlignment="Center" FontSize="28" HorizontalAlignment="Left" Margin="5,0,0,0" />
+						</StackPanel>
 						<Grid x:Name="OPU2_UmPosControl" Grid.Row="2"  Grid.Column="4">
 							<Grid.RowDefinitions>
 								<RowDefinition Height="1*"/>
@@ -853,20 +841,14 @@
 						</Grid.ColumnDefinitions>
 						<TextBlock x:Name="OPU2_PolarizationLabel" Text="Поляризация" FontSize="28" VerticalAlignment="Center" Margin="5,0,0,0"/>
 						<Label x:Name="OPU2_PolCurPos" Content="0.0°" Grid.Column="1" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-						<TextBox x:Name="OPU2_PolTarPos" Text="0.0" Grid.Column="2" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="10,0,0,0" ToolTip="Позиция" TouchDown="OPU1_TextBox_TouchDown">
-							<TextBox.Resources>
-								<Style TargetType="Border">
-									<Setter Property="CornerRadius" Value="10, 0, 0, 10"/>
-								</Style>
-							</TextBox.Resources>
-						</TextBox>
-						<TextBox x:Name="OPU2_PolTarSpd" Text="1.0" Grid.Column="3" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="0,0,10,0" ToolTip="Скорость" TouchDown="OPU1_TextBox_TouchDown">
-							<TextBox.Resources>
-								<Style TargetType="Border">
-									<Setter Property="CornerRadius" Value="0, 10, 10, 0"/>
-								</Style>
-							</TextBox.Resources>
-						</TextBox>
+						<StackPanel Orientation="Horizontal" Grid.Column="2">
+							<TextBox x:Name="OPU2_PolTarPos" Width="140" Text="0.0" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" ToolTip="Позиция" TouchDown="OPU1_TextBox_TouchDown"/>
+							<TextBlock Text="°" VerticalAlignment="Center" FontSize="28" HorizontalAlignment="Left" Margin="5,0,0,0" />
+						</StackPanel>
+						<StackPanel Orientation="Horizontal" Grid.Column="3">
+							<TextBox x:Name="OPU2_PolTarSpd" Width="140" Text="3.0" Grid.Column="3" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" ToolTip="Скорость" TouchDown="OPU1_TextBox_TouchDown"/>
+							<TextBlock Text="°/c" VerticalAlignment="Center" FontSize="28" HorizontalAlignment="Left" Margin="5,0,0,0" />
+						</StackPanel>
 						<Grid x:Name="OPU2_PolPosControl" Grid.Row="2"  Grid.Column="4">
 							<Grid.RowDefinitions>
 								<RowDefinition Height="1*"/>
@@ -930,20 +912,14 @@
 						</Grid.ColumnDefinitions>
 						<Label x:Name="OPU2_XLabel" Content="Ось X" Grid.Column="0" FontSize="28" VerticalAlignment="Center" Margin="5,0,0,0"/>
 						<Label x:Name="OPU2_XCurPos" Content="0.0 мм" Grid.Column="1" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-						<TextBox x:Name="OPU2_XTarPos" Text="0.0" Grid.Column="2" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="10,0,0,0" ToolTip="Позиция" TouchDown="OPU1_TextBox_TouchDown">
-							<TextBox.Resources>
-								<Style TargetType="Border">
-									<Setter Property="CornerRadius" Value="10, 0, 0, 10"/>
-								</Style>
-							</TextBox.Resources>
-						</TextBox>
-						<TextBox x:Name="OPU2_XTarSpd" Text="1.0" Grid.Column="3" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="0,0,10,0" ToolTip="Скорость" TouchDown="OPU1_TextBox_TouchDown">
-							<TextBox.Resources>
-								<Style TargetType="Border">
-									<Setter Property="CornerRadius" Value="0, 10, 10, 0"/>
-								</Style>
-							</TextBox.Resources>
-						</TextBox>
+						<StackPanel Orientation="Horizontal" Grid.Column="2">
+							<TextBox x:Name="OPU2_XTarPos" Width="140" Text="0.0" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" ToolTip="Позиция" TouchDown="OPU1_TextBox_TouchDown"/>
+							<TextBlock Text="мм." VerticalAlignment="Center" FontSize="24" HorizontalAlignment="Left" Margin="5,0,0,0" />
+						</StackPanel>
+						<StackPanel Orientation="Horizontal" Grid.Column="3">
+							<TextBox x:Name="OPU2_XTarSpd" Width="140" Text="20.0" Grid.Column="3" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" ToolTip="Скорость" TouchDown="OPU1_TextBox_TouchDown"/>
+							<TextBlock Text="мм./c" VerticalAlignment="Center" FontSize="24" HorizontalAlignment="Left" Margin="5,0,0,0" />
+						</StackPanel>
 						<Grid x:Name="OPU2_XPosControl" Grid.Row="2"  Grid.Column="4">
 							<Grid.RowDefinitions>
 								<RowDefinition Height="1*"/>
@@ -1006,20 +982,14 @@
 						</Grid.ColumnDefinitions>
 						<Label x:Name="OPU2_YLabel" Content="Ось Y" Grid.Column="0" FontSize="28" VerticalAlignment="Center" Margin="5,0,0,0"/>
 						<Label x:Name="OPU2_YCurPos" Content="0.0 мм" Grid.Column="1" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-						<TextBox x:Name="OPU2_YTarPos" Text="0.0" Grid.Column="2" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="10,0,0,0" ToolTip="Позиция" TouchDown="OPU1_TextBox_TouchDown">
-							<TextBox.Resources>
-								<Style TargetType="Border">
-									<Setter Property="CornerRadius" Value="10, 0, 0, 10"/>
-								</Style>
-							</TextBox.Resources>
-						</TextBox>
-						<TextBox x:Name="OPU2_YTarSpd" Text="1.0" Grid.Column="3" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" Margin="0,0,10,0" ToolTip="Скорость" TouchDown="OPU1_TextBox_TouchDown">
-							<TextBox.Resources>
-								<Style TargetType="Border">
-									<Setter Property="CornerRadius" Value="0, 10, 10, 0"/>
-								</Style>
-							</TextBox.Resources>
-						</TextBox>
+						<StackPanel Orientation="Horizontal" Grid.Column="2">
+							<TextBox x:Name="OPU2_YTarPos" Width="140" Text="0.0" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" ToolTip="Позиция" TouchDown="OPU1_TextBox_TouchDown"/>
+							<TextBlock Text="мм." VerticalAlignment="Center" FontSize="24" HorizontalAlignment="Left" Margin="5,0,0,0" />
+						</StackPanel>
+						<StackPanel Orientation="Horizontal" Grid.Column="3">
+							<TextBox x:Name="OPU2_YTarSpd" Width="140" Text="20.0" Grid.Column="3" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" ToolTip="Скорость" TouchDown="OPU1_TextBox_TouchDown"/>
+							<TextBlock Text="мм./c" VerticalAlignment="Center" FontSize="24" HorizontalAlignment="Left" Margin="5,0,0,0" />
+						</StackPanel>
 						<Grid x:Name="OPU2_YPosControl" Grid.Row="2"  Grid.Column="4">
 							<Grid.RowDefinitions>
 								<RowDefinition Height="1*"/>
