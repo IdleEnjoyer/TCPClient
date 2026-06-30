@@ -21,31 +21,89 @@ using static System.Net.Mime.MediaTypeNames;
 using System.Windows.Threading;
 using System.Globalization;
 using System.Threading;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace TCPDevice
 {
 	/// <summary>
 	/// Interaction logic for MainWindow.xaml
 	/// </summary>
+	/// 
+
+	public class AnimationChange : INotifyPropertyChanged
+	{
+		private bool _OPU_Enabled { get; set; } = false;
+		private bool _OPU_InError { get; set; } = false;
+		private bool _OPU_Connected { get; set; } = false;
+
+		public bool OPU_Enabled
+		{
+			get => _OPU_Enabled;
+			set
+			{
+				if (_OPU_Enabled != value)
+				{
+					_OPU_Enabled = value;
+					OnPropertyChanged();
+				}
+			}
+		}
+
+		public bool OPU_InError
+		{
+			get => _OPU_InError;
+			set
+			{
+				if (_OPU_InError != value)
+				{
+					_OPU_InError = value;
+					OnPropertyChanged();
+				}
+			}
+		}
+
+		public bool OPU_Connected
+		{
+			get => _OPU_Connected;
+			set
+			{
+				if (_OPU_Connected != value)
+				{
+					_OPU_Connected = value;
+					OnPropertyChanged();
+				}
+			}
+		}
+
+		public event PropertyChangedEventHandler PropertyChanged;
+
+		protected void OnPropertyChanged([CallerMemberName] string propertyName = "")
+		{
+			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+		}
+	}
 	public partial class MainWindow : Window
 	{
-		private TcpClient Client_OPU1;
+		public TcpClient Client_OPU1;
 		private NetworkStream Stream_OPU1;
 		private float[] OPU1_LowerLimits = new float[4];
 		private float[] OPU1_UpperLimits = new float[4];
-		private bool OPU1_Enabled = false;
+		public bool OPU1_Enabled { get; set; } = false;
 		private double[] OPU1_Position = { 0.0, 0.0, 0.0, 0.0 };
-		private bool OPU1_Stopped = false;
-		private bool OPU1_InError = false;
+		public bool OPU1_Stopped = false;
+		public bool OPU1_InError { get; set; } = false;
+		private bool OPU1_Zeroing = false;
 
 		private TcpClient Client_OPU2;
 		private NetworkStream Stream_OPU2;
 		private float[] OPU2_LowerLimits = new float[5];
 		private float[] OPU2_UpperLimits = new float[5];
-		private bool OPU2_Enabled = false;
+		public bool OPU2_Enabled { get; set; } = false;
 		private double[] OPU2_Position = { 0.0, 0.0, 0.0, 0.0, 0.0 };
-		private bool OPU2_Stopped = false;
-		private bool OPU2_InError = false;
+		public bool OPU2_Stopped = false;
+		public bool OPU2_InError { get; set; } = false;
+		private bool OPU2_Zeroing = false;
 
 		private DispatcherTimer OPU1_PosTimer;
 		private DispatcherTimer OPU2_PosTimer;
@@ -62,6 +120,9 @@ namespace TCPDevice
 		private int OPU1_IngoreLimit_Counter = 0;
 		private int OPU2_IngoreLimit_Counter = 0;
 
+		public AnimationChange AC1 = new AnimationChange();
+		public AnimationChange AC2 = new AnimationChange();
+
 
 		private RadialGradientBrush GreenBrush = new(Color.FromRgb(255, 255, 255), Color.FromRgb(0, 255, 0));
 		private RadialGradientBrush RedBrush = new(Color.FromRgb(255, 255, 255), Color.FromRgb(255, 0, 0));
@@ -69,6 +130,14 @@ namespace TCPDevice
 		public MainWindow()
         {
             InitializeComponent();
+
+			OPU1_Power.DataContext = AC1;
+			OPU1_Connect.DataContext = AC1;
+			OPU1_Clear.DataContext = AC1;
+			OPU2_Power.DataContext = AC2;
+			OPU2_Connect.DataContext = AC2;
+			OPU2_Clear.DataContext = AC2;
+
 			GreenBrush.Center = new Point(0.25, 0.25);
 			RedBrush.Center = new Point(0.25, 0.25);
 			DoubleFormat.NumberDecimalSeparator = ".";
@@ -84,10 +153,12 @@ namespace TCPDevice
 			OPU1_StatusTimer = new DispatcherTimer();
 			OPU1_StatusTimer.Interval = TimeSpan.FromMilliseconds(100);
 			OPU1_StatusTimer.Tick += OPU1_StatusTimer_Tick;
+			OPU1_StatusTimer.Start();
 
 			OPU2_StatusTimer = new DispatcherTimer();
 			OPU2_StatusTimer.Interval = TimeSpan.FromMilliseconds(100);
 			OPU2_StatusTimer.Tick += OPU2_StatusTimer_Tick;
+			OPU2_StatusTimer.Start();
 		}
 
 		private void OPU1_PosTimer_Tick(object? sender, EventArgs e)
@@ -102,85 +173,103 @@ namespace TCPDevice
 
 		private void OPU1_StatusTimer_Tick(object? sender, EventArgs e)
 		{
-			switch (OPU1_Status)
+			if (Client_OPU1 != null)
 			{
-				case 0:
-					SendCommand_OPU1("EN?");
-					OPU1_Status++;
-					break;
-				case 1:
-					SendCommand_OPU1("FH?");
-					OPU1_Status++;
-					break;
-				case 2:
-					SendCommand_OPU1("STOP?");
-					OPU1_Status++;
-					break;
-				case 3:
-					SendCommand_OPU1("FLT?");
-					OPU1_Status++;
-					break;
-				case 4:
-					SendCommand_OPU1("LIM? A");
-					OPU1_Status++;
-					break;
-				case 5:
-					SendCommand_OPU1("LIM? E");
-					OPU1_Status++;
-					break;
-				case 6:
-					SendCommand_OPU1("LIM? P");
-					OPU1_Status++;
-					break;
-				case 7:
-					SendCommand_OPU1("LIM? Y");
-					OPU1_Status = 0;
-					break;
+				if (Client_OPU1.Connected)
+				{
+					switch (OPU1_Status)
+					{
+						case 0:
+							SendCommand_OPU1("EN?");
+							OPU1_Status++;
+							break;
+						case 1:
+							SendCommand_OPU1("FH?");
+							OPU1_Status++;
+							break;
+						case 2:
+							SendCommand_OPU1("STOP?");
+							OPU1_Status++;
+							break;
+						case 3:
+							SendCommand_OPU1("FLT?");
+							OPU1_Status++;
+							break;
+						case 4:
+							SendCommand_OPU1("LIM? A");
+							OPU1_Status++;
+							break;
+						case 5:
+							SendCommand_OPU1("LIM? E");
+							OPU1_Status++;
+							break;
+						case 6:
+							SendCommand_OPU1("LIM? P");
+							OPU1_Status++;
+							break;
+						case 7:
+							SendCommand_OPU1("LIM? Y");
+							OPU1_Status = 0;
+							break;
+					}
+				}
+				else
+				{
+					AC1.OPU_Connected = false;
+				}
 			}
-			
 		}
 
 		private void OPU2_StatusTimer_Tick(object? sender, EventArgs e)
 		{
-			
-			switch (OPU2_Status)
+			if (Client_OPU2 != null)
 			{
-				case 0:
-					SendCommand_OPU2("EN?");
-					OPU2_Status++;
-					break;
-				case 1:
-					SendCommand_OPU2("FH?");
-					OPU2_Status++;
-					break;
-				case 2:
-					SendCommand_OPU2("STOP?");
-					OPU2_Status++;
-					break;
-				case 3:
-					SendCommand_OPU2("FLT?");
-					OPU2_Status++;
-					break;
-				case 4:
-					SendCommand_OPU2("LIM? A");
-					OPU2_Status++;
-					break;
-				case 5:
-					SendCommand_OPU2("LIM? E");
-					OPU2_Status++;
-					break;
-				case 6:
-					SendCommand_OPU2("LIM? P");
-					OPU2_Status++;
-					break;
-				case 7:
-					SendCommand_OPU2("LIM? X");
-					OPU2_Status++;
-					break;
-				case 8:
-					SendCommand_OPU2("LIM? Y");
-					OPU2_Status = 0;
-					break;
+				if (Client_OPU2.Connected)
+				{
+					switch (OPU2_Status)
+					{
+						case 0:
+							SendCommand_OPU2("EN?");
+							OPU2_Status++;
+							break;
+						case 1:
+							SendCommand_OPU2("FH?");
+							OPU2_Status++;
+							break;
+						case 2:
+							SendCommand_OPU2("STOP?");
+							OPU2_Status++;
+							break;
+						case 3:
+							SendCommand_OPU2("FLT?");
+							OPU2_Status++;
+							break;
+						case 4:
+							SendCommand_OPU2("LIM? A");
+							OPU2_Status++;
+							break;
+						case 5:
+							SendCommand_OPU2("LIM? E");
+							OPU2_Status++;
+							break;
+						case 6:
+							SendCommand_OPU2("LIM? P");
+							OPU2_Status++;
+							break;
+						case 7:
+							SendCommand_OPU2("LIM? X");
+							OPU2_Status++;
+							break;
+						case 8:
+							SendCommand_OPU2("LIM? Y");
+							OPU2_Status = 0;
+							break;
+					}
+				}
+				else
+				{
+					AC2.OPU_Connected = false;
+				}
 			}
 		}
 
@@ -218,18 +307,19 @@ namespace TCPDevice
 
 				if (Client_OPU1.Connected)
 				{
-					OPU1_ConnectStatus.Fill = GreenBrush;
+					AC1.OPU_Connected = true;
+					//OPU1_ConnectStatus.Fill = GreenBrush;
 					Stream_OPU1 = Client_OPU1.GetStream();
-					OPU1_StatusTimer.Start();
 					OPU1_PosTimer.Start();
 					await StartReadingOPU1DataAsync();
 				}
 				else
 				{
-					OPU1_ConnectStatus.Fill = RedBrush;
+					//OPU1_ConnectStatus.Fill = RedBrush;
 				}
 			}
-			catch(Exception ex) { 
+			catch(Exception ex) {
+				AC1.OPU_Connected = true;
 				MessageBox.Show(ex.Message);
 			}
 		}
@@ -244,15 +334,12 @@ namespace TCPDevice
 
 				if (Client_OPU2.Connected)
 				{
-					OPU2_ConnectStatus.Fill = GreenBrush;
 					Stream_OPU2 = Client_OPU2.GetStream();
-					OPU2_StatusTimer.Start();
 					OPU2_PosTimer.Start();
 					await StartReadingOPU2DataAsync();
 				}
 				else
 				{
-					OPU2_ConnectStatus.Fill = RedBrush;
 				}
 			}
 			catch (Exception ex)
@@ -282,32 +369,38 @@ namespace TCPDevice
 						{
 							case "^EN?:1~":
 								OPU1_Enabled = true;
-								OPU1_PowerStatus.Fill = GreenBrush;
+								AC1.OPU_Enabled = OPU1_Enabled;
+								//OPU1_PowerStatus.Fill = GreenBrush;
 								break;
 							case "^STOP?:1:1:1:1~":
 								OPU1_Stopped = true;
-								OPU1_StopStatus.Fill = GreenBrush;
+								if (OPU1_Zeroing)
+								{
+									SendCommand_OPU1("MOVE Y 1500 50");
+									OPU1_Zeroing = false;
+								}
 								break;
 							case "^FLT?:0:0:0:0~":
-								OPU1_InError = false;
-								OPU1_ClearStatus.Fill = GreenBrush;
+								AC1.OPU_InError = false;
+								//OPU1_ClearStatus.Fill = GreenBrush;
 								break;
 							default:
 								if (Data.Contains("EN?"))
 								{
 									OPU1_Enabled = false;
-									OPU1_PowerStatus.Fill = RedBrush;
+									AC1.OPU_Enabled = OPU1_Enabled;
+									//OPU1_PowerStatus.Fill = RedBrush;
 								}
 								if (Data.Contains("STOP?"))
 								{
 									OPU1_Stopped = false;
-									OPU1_StopStatus.Fill = RedBrush;
+									//OPU1_StopStatus.Fill = RedBrush;
 									
 								}
 								if (Data.Contains("FLT?"))
 								{
-									OPU1_InError = true;
-									OPU1_ClearStatus.Fill= RedBrush;
+									AC1.OPU_InError = true;
+									//OPU1_ClearStatus.Fill= RedBrush;
 								}
 								if (Data.Contains("POS?"))
 								{
@@ -353,7 +446,7 @@ namespace TCPDevice
 					catch (IOException)
 					{
 						MessageBox.Show("Connection error");
-						OPU1_ConnectStatus.Fill = RedBrush;
+						//OPU1_ConnectStatus.Fill = RedBrush;
 						OPU1_StatusTimer.Stop();
 						OPU1_PosTimer.Stop();
 						break;
@@ -363,7 +456,7 @@ namespace TCPDevice
 			catch (Exception ex)
 			{
 				MessageBox.Show($"Connection Error: {ex.Message}");
-				OPU1_ConnectStatus.Fill = RedBrush;
+				//OPU1_ConnectStatus.Fill = RedBrush;
 				OPU1_StatusTimer.Stop();
 				OPU1_PosTimer.Stop();
 			}
@@ -390,32 +483,33 @@ namespace TCPDevice
 						{
 							case "^EN?:1~":
 								OPU2_Enabled = true;
-								OPU2_PowerStatus.Fill = GreenBrush;
+								AC2.OPU_Enabled = OPU2_Enabled;
 								break;
 							case "^STOP?:1:1:1:1:1~":
 								OPU2_Stopped = true;
-								OPU2_StopStatus.Fill = GreenBrush;
+								if (OPU2_Zeroing)
+								{
+									SendCommand_OPU2("MOVE Y 1500 25");
+									SendCommand_OPU2("MOVE X 0 25");
+									OPU2_Zeroing = false;
+								}
 								break;
 							case "^FLT?:0:0:0:0:0~":
-								OPU2_InError = false;
-								OPU2_ClearStatus.Fill = GreenBrush;
+								AC2.OPU_InError = false;
 								break;
 							default:
 								if (Data.Contains("EN?"))
 								{
 									OPU2_Enabled = false;
-									OPU2_PowerStatus.Fill = RedBrush;
 								}
 								if (Data.Contains("STOP?"))
 								{
 									OPU2_Stopped = false;
-									OPU2_StopStatus.Fill = RedBrush;
 
 								}
 								if (Data.Contains("FLT?"))
 								{
-									OPU2_InError = true;
-									OPU2_ClearStatus.Fill = RedBrush;
+									AC2.OPU_InError = true;
 								}
 								if (Data.Contains("POS?"))
 								{
@@ -467,7 +561,6 @@ namespace TCPDevice
 					catch (IOException)
 					{
 						MessageBox.Show("Connection error");
-						OPU2_ConnectStatus.Fill = RedBrush;
 						OPU2_StatusTimer.Stop();
 						OPU2_PosTimer.Stop();
 						break;
@@ -477,7 +570,6 @@ namespace TCPDevice
 			catch (Exception ex)
 			{
 				MessageBox.Show($"Connection Error: {ex.Message}");
-				OPU2_ConnectStatus.Fill = RedBrush;
 				OPU2_StatusTimer.Stop();
 				OPU2_PosTimer.Stop();
 			}
@@ -1312,7 +1404,8 @@ namespace TCPDevice
 			SendCommand_OPU1("MOVE A 0 6");
 			SendCommand_OPU1("MOVE E 0 6");
 			SendCommand_OPU1("MOVE P 0 6");
-			SendCommand_OPU1("MOVE Y 1500 50");
+			AC1.OPU_Enabled = true;
+			OPU1_Zeroing = true;
 		}
 
 		private void OPU2_Home_Click(object sender, RoutedEventArgs e)
@@ -1320,8 +1413,7 @@ namespace TCPDevice
 			SendCommand_OPU2("MOVE A 0 3");
 			SendCommand_OPU2("MOVE E 0 3");
 			SendCommand_OPU2("MOVE P 0 3");
-			SendCommand_OPU2("MOVE X 0 25");
-			SendCommand_OPU2("MOVE Y 1500 25");
+			OPU2_Zeroing = true;
 		}
 	}
 }
