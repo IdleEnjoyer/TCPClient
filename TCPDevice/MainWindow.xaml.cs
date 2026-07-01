@@ -334,6 +334,7 @@ namespace TCPDevice
 
 				if (Client_OPU2.Connected)
 				{
+					AC2.OPU_Connected = true;
 					Stream_OPU2 = Client_OPU2.GetStream();
 					OPU2_PosTimer.Start();
 					await StartReadingOPU2DataAsync();
