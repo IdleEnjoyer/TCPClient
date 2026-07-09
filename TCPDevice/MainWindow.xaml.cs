@@ -490,6 +490,11 @@ namespace TCPDevice
 			}
 			
 		}
+
+		private void EmStop_Click(object sender, RoutedEventArgs e)
+		{
+
+		}
 	}
 }
 //TODO:
