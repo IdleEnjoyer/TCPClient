@@ -87,10 +87,10 @@ namespace TCPDevice
 	{
 		public TcpClient Client_OPU1;
 		private NetworkStream Stream_OPU1;
-		private float[] OPU1_LowerLimits = new float[4];
-		private float[] OPU1_UpperLimits = new float[4];
+		private float[] OPU1_LowerLimits = new float[2];
+		private float[] OPU1_UpperLimits = new float[2];
 		public bool OPU1_Enabled { get; set; } = false;
-		private double[] OPU1_Position = { 0.0, 0.0, 0.0, 0.0 };
+		private double[] OPU1_Position = { 0.0, 0.0 };
 		public bool OPU1_Stopped = false;
 		public bool OPU1_InError { get; set; } = false;
 		private bool OPU1_Zeroing = false;
@@ -108,6 +108,18 @@ namespace TCPDevice
 		private DispatcherTimer OPU1_PosTimer;
 		private DispatcherTimer OPU2_PosTimer;
 
+		private DispatcherTimer OPU1_DemoTimer_P;
+		private DispatcherTimer OPU1_DemoTimer_Y;
+
+		private DispatcherTimer OPU2_DemoTimer_A;
+		private DispatcherTimer OPU2_DemoTimer_E;
+		private DispatcherTimer OPU2_DemoTimer_P;
+		private DispatcherTimer OPU2_DemoTimer_X;
+		private DispatcherTimer OPU2_DemoTimer_Y;
+
+		private bool[] OPU1_DemoState = { false, false };
+		private bool[] OPU2_DemoState = { false, false, false, false, false };
+
 		private DispatcherTimer OPU1_StatusTimer;
 		private DispatcherTimer OPU2_StatusTimer;
 		private int OPU1_Status = 0;
@@ -123,9 +135,6 @@ namespace TCPDevice
 		public AnimationChange AC1 = new AnimationChange();
 		public AnimationChange AC2 = new AnimationChange();
 
-
-		private RadialGradientBrush GreenBrush = new(Color.FromRgb(255, 255, 255), Color.FromRgb(0, 255, 0));
-		private RadialGradientBrush RedBrush = new(Color.FromRgb(255, 255, 255), Color.FromRgb(255, 0, 0));
 		private NumberFormatInfo DoubleFormat = new NumberFormatInfo();
 		public MainWindow()
         {
@@ -138,8 +147,6 @@ namespace TCPDevice
 			OPU2_Connect.DataContext = AC2;
 			OPU2_Clear.DataContext = AC2;
 
-			GreenBrush.Center = new Point(0.25, 0.25);
-			RedBrush.Center = new Point(0.25, 0.25);
 			DoubleFormat.NumberDecimalSeparator = ".";
 
 			OPU1_PosTimer = new DispatcherTimer();
@@ -159,6 +166,148 @@ namespace TCPDevice
 			OPU2_StatusTimer.Interval = TimeSpan.FromMilliseconds(100);
 			OPU2_StatusTimer.Tick += OPU2_StatusTimer_Tick;
 			OPU2_StatusTimer.Start();
+
+			OPU1_DemoTimer_P = new DispatcherTimer();
+			OPU1_DemoTimer_P.Interval = TimeSpan.FromSeconds(70);
+			OPU1_DemoTimer_P.Tick += OPU1_DemoTimer_P_Tick;
+
+			OPU1_DemoTimer_Y = new DispatcherTimer();
+			OPU1_DemoTimer_Y.Interval = TimeSpan.FromSeconds(70);
+			OPU1_DemoTimer_Y.Tick += OPU1_DemoTimer_Y_Tick;
+
+			OPU2_DemoTimer_A = new DispatcherTimer();
+			OPU2_DemoTimer_A.Interval = TimeSpan.FromSeconds(14);
+			OPU2_DemoTimer_A.Tick += OPU2_DemoTimer_A_Tick;
+
+			OPU2_DemoTimer_E = new DispatcherTimer();
+			OPU2_DemoTimer_E.Interval = TimeSpan.FromSeconds(14);
+			OPU2_DemoTimer_E.Tick += OPU2_DemoTimer_E_Tick;
+
+			OPU2_DemoTimer_P = new DispatcherTimer();
+			OPU2_DemoTimer_P.Interval = TimeSpan.FromSeconds(70);
+			OPU2_DemoTimer_P.Tick += OPU2_DemoTimer_P_Tick;
+
+			OPU2_DemoTimer_X = new DispatcherTimer();
+			OPU2_DemoTimer_X.Interval = TimeSpan.FromSeconds(30);
+			OPU2_DemoTimer_X.Tick += OPU2_DemoTimer_X_Tick;
+
+			OPU2_DemoTimer_Y = new DispatcherTimer();
+			OPU2_DemoTimer_Y.Interval = TimeSpan.FromSeconds(70);
+			OPU2_DemoTimer_Y.Tick += OPU2_DemoTimer_Y_Tick;
+		}
+		private void OPU2_DemoTimer_A_Tick(object? sender, EventArgs e)
+		{
+			if (Client_OPU2 != null)
+			{
+				if (OPU2_DemoState[0])
+				{
+					SendCommand_OPU2("MOVE A -5 1");
+					OPU2_DemoState[0] = false;
+				}
+				else
+				{
+					SendCommand_OPU2("MOVE A 5 1");
+					OPU2_DemoState[0] = true;
+				}
+			}
+		}
+		private void OPU2_DemoTimer_E_Tick(object? sender, EventArgs e)
+		{
+			if (Client_OPU2 != null)
+			{
+				if (OPU2_DemoState[1])
+				{
+					SendCommand_OPU2("MOVE E -10 2");
+					OPU2_DemoState[1] = false;
+				}
+				else
+				{
+					SendCommand_OPU2("MOVE E 10 2");
+					OPU2_DemoState[1] = true;
+				}
+			}
+		}
+		private void OPU2_DemoTimer_P_Tick(object? sender, EventArgs e)
+		{
+			if (Client_OPU2 != null)
+			{
+				if (OPU2_DemoState[2])
+				{
+					SendCommand_OPU2("MOVE P -180 6");
+					OPU2_DemoState[2] = false;
+				}
+				else
+				{
+					SendCommand_OPU2("MOVE P 180 6");
+					OPU2_DemoState[2] = true;
+				}
+			}
+		}
+		private void OPU2_DemoTimer_X_Tick(object? sender, EventArgs e)
+		{
+			if (Client_OPU2 != null)
+			{
+				if (OPU2_DemoState[3])
+				{
+					SendCommand_OPU2("MOVE X 550 25");
+					OPU2_DemoState[3] = false;
+				}
+				else
+				{
+					SendCommand_OPU2("MOVE X 50 25");
+					OPU2_DemoState[3] = true;
+				}
+			}
+		}
+		private void OPU2_DemoTimer_Y_Tick(object? sender, EventArgs e)
+		{
+			if (Client_OPU2 != null)
+			{
+				if (OPU2_DemoState[4])
+				{
+					SendCommand_OPU2("MOVE Y 2700 25");
+					OPU2_DemoState[4] = false;
+				}
+				else
+				{
+					SendCommand_OPU2("MOVE Y 1200 25");
+					OPU2_DemoState[4] = true;
+				}
+			}
+		}
+
+		private void OPU1_DemoTimer_Y_Tick(object? sender, EventArgs e)
+		{
+			if (Client_OPU1 != null)
+			{
+				if (OPU1_DemoState[0])
+				{
+					SendCommand_OPU1("MOVE P -180 6");
+					OPU1_DemoState[0] = false;
+				}
+				else
+				{
+					SendCommand_OPU1("MOVE P 180 6");
+					OPU1_DemoState[0] = true;
+				}
+			}
+		}
+
+		private void OPU1_DemoTimer_P_Tick(object? sender, EventArgs e)
+		{
+			if (Client_OPU1 != null)
+			{
+				if (OPU1_DemoState[1])
+				{
+					SendCommand_OPU1("MOVE Y 2500 16.66");
+					OPU1_DemoState[1] = false;
+				}
+				else
+				{
+					SendCommand_OPU1("MOVE Y 1500 16.66");
+					OPU1_DemoState[1] = true;
+				}
+			}
 		}
 
 		private void OPU1_PosTimer_Tick(object? sender, EventArgs e)
@@ -196,18 +345,10 @@ namespace TCPDevice
 							OPU1_Status++;
 							break;
 						case 4:
-							SendCommand_OPU1("LIM? A");
-							OPU1_Status++;
-							break;
-						case 5:
-							SendCommand_OPU1("LIM? E");
-							OPU1_Status++;
-							break;
-						case 6:
 							SendCommand_OPU1("LIM? P");
 							OPU1_Status++;
 							break;
-						case 7:
+						case 5:
 							SendCommand_OPU1("LIM? Y");
 							OPU1_Status = 0;
 							break;
@@ -373,7 +514,7 @@ namespace TCPDevice
 								AC1.OPU_Enabled = OPU1_Enabled;
 								//OPU1_PowerStatus.Fill = GreenBrush;
 								break;
-							case "^STOP?:1:1:1:1~":
+							case "^STOP?:1:1~":
 								OPU1_Stopped = true;
 								if (OPU1_Zeroing)
 								{
@@ -381,7 +522,7 @@ namespace TCPDevice
 									OPU1_Zeroing = false;
 								}
 								break;
-							case "^FLT?:0:0:0:0~":
+							case "^FLT?:0:0~":
 								AC1.OPU_InError = false;
 								//OPU1_ClearStatus.Fill = GreenBrush;
 								break;
@@ -412,32 +553,23 @@ namespace TCPDevice
 										OPU1_Position[Index] = double.Parse(Position.Replace('.',',').Replace("~",string.Empty));
 										Index++;
 									}
-									OPU1_AzCurPos.Content = OPU1_Position[0].ToString("0.00°");
 
-									OPU1_UmCurPos.Content = OPU1_Position[1].ToString("0.00°");
+									OPU1_PolCurPos.Content = OPU1_Position[0].ToString("0.00°");
 
-									OPU1_PolCurPos.Content = OPU1_Position[2].ToString("0.00°");
-
-									OPU1_YCurPos.Content = OPU1_Position[3].ToString("0.00 мм");
+									OPU1_YCurPos.Content = OPU1_Position[1].ToString("0.00 мм");
 								}
 								if (Data.Contains("LIM?"))
 								{
 									char Axis = Data[Data.IndexOf(":") - 1];
 									string[] Limits = Data.Substring(Data.IndexOf(":") + 1).Split(":");
-									OPU1_LowerLimits["AEPY".IndexOf(Axis)] = float.Parse(Limits[0].Replace('.', ',').Replace("~", string.Empty));
-									OPU1_UpperLimits["AEPY".IndexOf(Axis)] = float.Parse(Limits[1].Replace('.', ',').Replace("~", string.Empty));
-									switch("AEPY".IndexOf(Axis)){
+									OPU1_LowerLimits["PY".IndexOf(Axis)] = float.Parse(Limits[0].Replace('.', ',').Replace("~", string.Empty));
+									OPU1_UpperLimits["PY".IndexOf(Axis)] = float.Parse(Limits[1].Replace('.', ',').Replace("~", string.Empty));
+									switch("PY".IndexOf(Axis)){
 										case 0:
-											OPU1_AzLimitsLabel.Content = "[ " + OPU1_LowerLimits["AEPY".IndexOf(Axis)].ToString() + " ; " + OPU1_UpperLimits["AEPY".IndexOf(Axis)].ToString() + " ]";
+											OPU1_PolLimitsLabel.Content = "[ " + OPU1_LowerLimits["PY".IndexOf(Axis)].ToString() + " ; " + OPU1_UpperLimits["PY".IndexOf(Axis)].ToString() + " ]";
 											break;
 										case 1:
-											OPU1_UmLimitsLabel.Content = "[ " + OPU1_LowerLimits["AEPY".IndexOf(Axis)].ToString() + " ; " + OPU1_UpperLimits["AEPY".IndexOf(Axis)].ToString() + " ]";
-											break;
-										case 2:
-											OPU1_PolLimitsLabel.Content = "[ " + OPU1_LowerLimits["AEPY".IndexOf(Axis)].ToString() + " ; " + OPU1_UpperLimits["AEPY".IndexOf(Axis)].ToString() + " ]";
-											break;
-										case 3:
-											OPU1_YLimitsLabel.Content = "[ " + OPU1_LowerLimits["AEPY".IndexOf(Axis)].ToString() + " ; " + OPU1_UpperLimits["AEPY".IndexOf(Axis)].ToString() + " ]";
+											OPU1_YLimitsLabel.Content = "[ " + OPU1_LowerLimits["PY".IndexOf(Axis)].ToString() + " ; " + OPU1_UpperLimits["PY".IndexOf(Axis)].ToString() + " ]";
 											break;
 									}
 								}
@@ -456,7 +588,7 @@ namespace TCPDevice
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show($"Connection Error: {ex.Message}");
+				MessageBox.Show($"Connection Error: {ex.Message} {ex.StackTrace}");
 				//OPU1_ConnectStatus.Fill = RedBrush;
 				OPU1_StatusTimer.Stop();
 				OPU1_PosTimer.Stop();
@@ -502,6 +634,7 @@ namespace TCPDevice
 								if (Data.Contains("EN?"))
 								{
 									OPU2_Enabled = false;
+									AC2.OPU_Enabled = OPU2_Enabled;
 								}
 								if (Data.Contains("STOP?"))
 								{
@@ -613,10 +746,15 @@ namespace TCPDevice
 			{
 				SendCommand_OPU1("EN");
 				SendCommand_OPU1("FH");
+
+				OPU1_DemoTimer_P.Stop();
+				OPU1_DemoTimer_Y.Stop();
 			}
 			else
 			{
 				SendCommand_OPU1("DIS");
+				OPU1_DemoTimer_P.Stop();
+				OPU1_DemoTimer_Y.Stop();
 			}
 		}
 
@@ -654,90 +792,6 @@ namespace TCPDevice
 			Window LimPopup = new PopupLimits();
 			LimPopup.Owner = this;
 			LimPopup.ShowDialog();
-		}
-
-		private void OPU1_AzJogLeft_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-		{
-			if (double.TryParse(OPU1_AzTarSpd.Text, DoubleFormat, out double Spd))
-			{
-				SendCommand_OPU1("MOVE A " + OPU1_LowerLimits[0].ToString() + " " + Spd.ToString());
-			}
-		}
-
-		private void OPU1_AzJogLeft_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-		{
-			SendCommand_OPU1("STOP A");
-		}
-
-		private void OPU1_AzJogRight_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-		{
-			if (double.TryParse(OPU1_AzTarSpd.Text, DoubleFormat, out double Spd))
-			{
-				SendCommand_OPU1("MOVE A " + OPU1_UpperLimits[0].ToString() + " " + Spd.ToString());
-			}
-		}
-
-		private void OPU1_AzJogRight_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-		{
-			SendCommand_OPU1("STOP A");
-		}
-
-		private void OPU1_AzMove_Click(object sender, RoutedEventArgs e)
-		{
-			if (double.TryParse(OPU1_AzTarPos.Text, DoubleFormat, out double Pos))
-			{
-				if (double.TryParse(OPU1_AzTarSpd.Text, DoubleFormat, out double Spd))
-				{
-					SendCommand_OPU1("MOVE A " + Pos.ToString() + " " + Spd.ToString());
-				}
-			}
-		}
-
-		private void OPU1_AZStop_Click(object sender, RoutedEventArgs e)
-		{
-			SendCommand_OPU1("STOP A");
-		}
-
-		private void OPU1_UmJogLeft_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-		{
-			if (double.TryParse(OPU1_UmTarSpd.Text, DoubleFormat, out double Spd))
-			{
-				SendCommand_OPU1("MOVE E " + OPU1_LowerLimits[1].ToString() + " " + Spd.ToString());
-			}
-		}
-
-		private void OPU1_UmJogLeft_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-		{
-			SendCommand_OPU1("STOP E");
-		}
-
-		private void OPU1_UmMove_Click(object sender, RoutedEventArgs e)
-		{
-			if (double.TryParse(OPU1_UmTarPos.Text, DoubleFormat, out double Pos))
-			{
-				if (double.TryParse(OPU1_UmTarSpd.Text, DoubleFormat, out double Spd))
-				{
-					SendCommand_OPU1("MOVE E " + Pos.ToString() + " " + Spd.ToString());
-				}
-			}
-		}
-
-		private void OPU1_UmJogRight_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-		{
-			if (double.TryParse(OPU1_UmTarSpd.Text, DoubleFormat, out double Spd))
-			{
-				SendCommand_OPU1("MOVE E " + OPU1_UpperLimits[1].ToString() + " " + Spd.ToString());
-			}
-		}
-
-		private void OPU1_UmJogRight_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-		{
-			SendCommand_OPU1("STOP E");
-		}
-
-		private void OPU1_UmStop_Click(object sender, RoutedEventArgs e)
-		{
-			SendCommand_OPU1("STOP E");
 		}
 
 		private void OPU1_PolJogLeft_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -827,63 +881,14 @@ namespace TCPDevice
 		private void OPU1_Stop_Click(object sender, RoutedEventArgs e)
 		{
 			SendCommand_OPU1("STOP");
+
+			OPU1_DemoTimer_P.Stop();
+			OPU1_DemoTimer_Y.Stop();
 		}
 
 		private void OPU1_Clear_Click(object sender, RoutedEventArgs e)
 		{
 			SendCommand_OPU1("CLR");
-		}
-
-		private void OPU1_AzJogLeft_TouchDown(object sender, TouchEventArgs e)
-		{
-			if (double.TryParse(OPU1_AzTarSpd.Text, DoubleFormat, out double Spd))
-			{
-				SendCommand_OPU1("MOVE A " + OPU1_LowerLimits[0].ToString() + " " + Spd.ToString());
-			}
-		}
-
-		private void OPU1_AzJogLeft_TouchLeave(object sender, TouchEventArgs e)
-		{
-			SendCommand_OPU1("STOP A");
-		}
-
-		private void OPU1_AzJogRight_TouchDown(object sender, TouchEventArgs e)
-		{
-			if (double.TryParse(OPU1_AzTarSpd.Text, DoubleFormat, out double Spd))
-			{
-				SendCommand_OPU1("MOVE A " + OPU1_UpperLimits[0].ToString() + " " + Spd.ToString());
-			}
-		}
-
-		private void OPU1_AzJogRight_TouchLeave(object sender, TouchEventArgs e)
-		{
-			SendCommand_OPU1("STOP A");
-		}
-
-		private void OPU1_UmJogLeft_TouchDown(object sender, TouchEventArgs e)
-		{
-			if (double.TryParse(OPU1_UmTarSpd.Text, DoubleFormat, out double Spd))
-			{
-				SendCommand_OPU1("MOVE E " + OPU1_LowerLimits[1].ToString() + " " + Spd.ToString());
-			}
-		}
-
-		private void OPU1_UmJogRight_TouchDown(object sender, TouchEventArgs e)
-		{
-			if (double.TryParse(OPU1_UmTarSpd.Text, DoubleFormat, out double Spd))
-			{
-				SendCommand_OPU1("MOVE E " + OPU1_UpperLimits[1].ToString() + " " + Spd.ToString());
-			}
-		}
-
-		private void OPU1_UmJogLeft_TouchLeave(object sender, TouchEventArgs e)
-		{
-			SendCommand_OPU1("STOP E");
-		}
-
-		private void OPU1_UmJogRight_TouchLeave(object sender, TouchEventArgs e)
-		{
-			SendCommand_OPU1("STOP E");
 		}
 
 		private void OPU1_PolJogLeft_TouchDown(object sender, TouchEventArgs e)
@@ -956,16 +961,34 @@ namespace TCPDevice
 			{
 				SendCommand_OPU2("EN");
 				SendCommand_OPU2("FH");
+
+				OPU2_DemoTimer_A.Stop();
+				OPU2_DemoTimer_E.Stop();
+				OPU2_DemoTimer_P.Stop();
+				OPU2_DemoTimer_X.Stop();
+				OPU2_DemoTimer_Y.Stop();
 			}
 			else
 			{
 				SendCommand_OPU2("DIS");
+
+				OPU2_DemoTimer_A.Stop();
+				OPU2_DemoTimer_E.Stop();
+				OPU2_DemoTimer_P.Stop();
+				OPU2_DemoTimer_X.Stop();
+				OPU2_DemoTimer_Y.Stop();
 			}
 		}
 
 		private void OPU2_Stop_Click(object sender, RoutedEventArgs e)
 		{
 			SendCommand_OPU2("STOP");
+
+			OPU2_DemoTimer_A.Stop();
+			OPU2_DemoTimer_E.Stop();
+			OPU2_DemoTimer_P.Stop();
+			OPU2_DemoTimer_X.Stop();
+			OPU2_DemoTimer_Y.Stop();
 		}
 
 		private void OPU2_Clear_Click(object sender, RoutedEventArgs e)
@@ -1026,7 +1049,7 @@ namespace TCPDevice
 
 		private void OPU2_UmJogLeft_TouchDown(object sender, TouchEventArgs e)
 		{
-			if (double.TryParse(OPU1_UmTarSpd.Text, DoubleFormat, out double Spd))
+			if (double.TryParse(OPU2_UmTarSpd.Text, DoubleFormat, out double Spd))
 			{
 				SendCommand_OPU2("MOVE E " + OPU2_LowerLimits[1].ToString() + " " + Spd.ToString());
 			}
@@ -1402,8 +1425,6 @@ namespace TCPDevice
 
 		private void OPU1_Home_Click(object sender, RoutedEventArgs e)
 		{
-			SendCommand_OPU1("MOVE A 0 6");
-			SendCommand_OPU1("MOVE E 0 6");
 			SendCommand_OPU1("MOVE P 0 6");
 			AC1.OPU_Enabled = true;
 			OPU1_Zeroing = true;
@@ -1415,6 +1436,37 @@ namespace TCPDevice
 			SendCommand_OPU2("MOVE E 0 3");
 			SendCommand_OPU2("MOVE P 0 3");
 			OPU2_Zeroing = true;
+		}
+
+		private void OPU1_DemoStart_Click(object sender, RoutedEventArgs e)
+		{
+			if (Client_OPU1 != null)
+			{
+				if (OPU1_Enabled)
+				{
+					SendCommand_OPU1("MOVE P -180 6");
+					SendCommand_OPU1("MOVE Y 2500 16.66");
+
+					OPU1_DemoTimer_P.Start();
+					OPU1_DemoTimer_Y.Start();
+				}
+			}
+		}
+
+		private void OPU2_DemoStart_Click(object sender, RoutedEventArgs e)
+		{
+			if (Client_OPU2 != null)
+			{
+				if (OPU2_Enabled)
+				{
+					OPU2_DemoTimer_A.Start();
+					OPU2_DemoTimer_E.Start();
+					OPU2_DemoTimer_P.Start();
+					OPU2_DemoTimer_X.Start();
+					OPU2_DemoTimer_Y.Start();
+
+				}
+			}
 		}
 	}
 }
