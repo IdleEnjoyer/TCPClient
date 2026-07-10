@@ -466,7 +466,7 @@ namespace TCPDevice
 
 		private void Attest_Variant_DigMeasSystErr_Start_Click(object sender, RoutedEventArgs e)
 		{
-
+			if(
 		}
 
 		private void MenuLogging_Click(object sender, RoutedEventArgs e)
