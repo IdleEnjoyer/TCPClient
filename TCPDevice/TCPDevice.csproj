@@ -5,11 +5,12 @@
     <TargetFramework>net7.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
-    <Authors></Authors>
+    <Authors>$(TESART)</Authors>
     <ApplicationIcon>TESART.ico</ApplicationIcon>
     <AssemblyName>SerPO</AssemblyName>
     <Description>TESART Service PO</Description>
     <Company>TESART</Company>
+    <AssemblyVersion></AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>

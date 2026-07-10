@@ -444,23 +444,23 @@ namespace TCPDevice
 			{
 				IPAddress Address = IPAddress.Parse("192.168.0.101");
 				int Port = 2000;
-				Client_OPU1 = new TcpClient(Address.ToString(), Port);
+				Client_OPU1 = new TcpClient();
 
-				if (Client_OPU1.Connected)
+				if (Client_OPU1.ConnectAsync(Address, Port).Wait(5000))
 				{
 					AC1.OPU_Connected = true;
-					//OPU1_ConnectStatus.Fill = GreenBrush;
 					Stream_OPU1 = Client_OPU1.GetStream();
 					OPU1_PosTimer.Start();
 					await StartReadingOPU1DataAsync();
 				}
 				else
 				{
-					//OPU1_ConnectStatus.Fill = RedBrush;
+					AC1.OPU_Connected = false;
+					MessageBox.Show($"Не удалось подключиться по адресу {Address}:{Port}");
 				}
 			}
 			catch(Exception ex) {
-				AC1.OPU_Connected = true;
+				AC1.OPU_Connected = false;
 				MessageBox.Show(ex.Message);
 			}
 		}
@@ -471,9 +471,9 @@ namespace TCPDevice
 			{
 				IPAddress Address = IPAddress.Parse("192.168.0.102");
 				int Port = 2000;
-				Client_OPU2 = new TcpClient(Address.ToString(), Port);
+				Client_OPU2 = new TcpClient();
 
-				if (Client_OPU2.Connected)
+				if (Client_OPU2.ConnectAsync(Address, Port).Wait(5000))
 				{
 					AC2.OPU_Connected = true;
 					Stream_OPU2 = Client_OPU2.GetStream();
@@ -482,11 +482,14 @@ namespace TCPDevice
 				}
 				else
 				{
+					AC2.OPU_Connected = false;
+					MessageBox.Show($"Не удалось подключиться по адресу {Address}:{Port}");
 				}
 			}
 			catch (Exception ex)
 			{
 				MessageBox.Show(ex.Message);
+				AC2.OPU_Connected = false;
 			}
 		}
 
@@ -711,9 +714,17 @@ namespace TCPDevice
 
 		private void OPU1_Connect_Click(object sender, RoutedEventArgs e)
 		{
+			
 			if (Client_OPU1 != null)
 			{
-				Client_OPU1.Close();
+				if (Client_OPU1.Connected)
+				{
+					Client_OPU1.Close();
+				}
+				else
+				{
+					ConnectOPU1();
+				}
 			}
 			else
 			{
@@ -947,7 +958,14 @@ namespace TCPDevice
 		{
 			if (Client_OPU2 != null)
 			{
-				Client_OPU2.Close();
+				if (Client_OPU2.Connected)
+				{
+					Client_OPU2.Close();
+				}
+				else
+				{
+					ConnectOPU2();
+				}
 			}
 			else
 			{
@@ -1426,7 +1444,6 @@ namespace TCPDevice
 		private void OPU1_Home_Click(object sender, RoutedEventArgs e)
 		{
 			SendCommand_OPU1("MOVE P 0 6");
-			AC1.OPU_Enabled = true;
 			OPU1_Zeroing = true;
 		}
 
