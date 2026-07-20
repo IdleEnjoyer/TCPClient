@@ -28,6 +28,8 @@ using Point = System.Windows.Point;
 using Microsoft.Win32;
 using WindowsAPICodePack.Dialogs;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Windows.Media.Animation;
+using System.Reflection.Metadata;
 
 
 namespace TCPDevice
@@ -49,24 +51,34 @@ namespace TCPDevice
 		private double OPU1_Position;
 		private double OPU1_Velocity;
 
+		private double MoveTask_StartPos;
+		private double MoveTask_CurPos;
+		private double MoveTask_EndPos;
+		private double MoveTask_Vel;
+		private double MoveTask_Step;
+		private EventHandler MoveTask_Handler; 
+
+		private bool _IsAnimating_TotalProgress = false;
+		private bool _IsAnimating_StepProgress = false;
+
+		private bool _AttestIsRunning = false;
+
 		private DispatcherTimer OPU1_StatusTimer = new DispatcherTimer();
 		private DispatcherTimer OPU_PosTimer = new DispatcherTimer();
+		private DispatcherTimer OPU_VelTimer = new DispatcherTimer();
 		private DispatcherTimer StepTimer = new DispatcherTimer();
+		private DispatcherTimer MoveTaskTimer = new DispatcherTimer();
 		private int OPU1_Status = 0;
 		private byte[] WriteByteData;
 		private int ValidationFlags = 0b_111111111111;
 		private bool IsStepping = false;
 
-		private RadialGradientBrush GreenBrush = new(Color.FromRgb(255, 255, 255), Color.FromRgb(0, 255, 0));
-		private RadialGradientBrush RedBrush = new(Color.FromRgb(255, 255, 255), Color.FromRgb(255, 0, 0));
 		private NumberFormatInfo DoubleFormat = new NumberFormatInfo();
 
 		private Logger DataLog = new Logger();
 		public MainWindow()
         {
             InitializeComponent();
-			GreenBrush.Center = new Point(0.25, 0.25);
-			RedBrush.Center = new Point(0.25, 0.25);
 			DoubleFormat.NumberDecimalSeparator = ".";
 
 			OPU1_StatusTimer.Interval = TimeSpan.FromMilliseconds(100);
@@ -75,7 +87,18 @@ namespace TCPDevice
 			OPU_PosTimer.Interval = TimeSpan.FromMilliseconds(50);
 			OPU_PosTimer.Tick += OPU_PosTimer_Tick;
 
+			OPU_VelTimer.Interval = TimeSpan.FromMilliseconds(100);
+			OPU_VelTimer.Tick += OPU_VelTimer_Tick;
+
 			StepTimer.Tick += StepTimer_Tick;
+		}
+
+		private void OPU_VelTimer_Tick(object? sender, EventArgs e)
+		{
+			if (Client_OPU1 != null)
+			{
+				SendCommand("VEL?");
+			}
 		}
 
 		private void StepTimer_Tick(object? sender, EventArgs e)
@@ -196,6 +219,10 @@ namespace TCPDevice
 								{
 									StepTimer.Stop();
 								}
+								if (_AttestIsRunning && MoveTaskTimer.IsEnabled)
+								{
+									MoveTaskTimer.Stop();
+								}
 								break;
 							case "^FLT?:0~":
 								InFaultCheck.IsChecked = false;
@@ -208,6 +235,9 @@ namespace TCPDevice
 								{
 									PowerCheck.IsChecked = false;
 									IsStepping = false;
+									_AttestIsRunning = false;
+									StepTimer.Stop();
+									MoveTaskTimer.Stop();
 								}
 								if (Data.Contains("STOP?"))
 								{
@@ -217,16 +247,26 @@ namespace TCPDevice
 									{
 										StepTimer.Start();
 									}
+									if (_AttestIsRunning)
+									{
+										MoveTaskTimer.Start();
+									}
 								}
 								if (Data.Contains("FLT?"))
 								{
 									InFaultCheck.IsChecked = true;
 									IsStepping = false;
+									_AttestIsRunning = false;
+									StepTimer.Stop();
+									MoveTaskTimer.Stop();
 								}
 								if (Data.Contains("INIT?"))
 								{
 									InitCheck.IsChecked = false;
 									IsStepping = false;
+									_AttestIsRunning = false;
+									StepTimer.Stop();
+									MoveTaskTimer.Stop();
 								}
 								if (Data.Contains("POS?"))
 								{
@@ -466,7 +506,145 @@ namespace TCPDevice
 
 		private void Attest_Variant_DigMeasSystErr_Start_Click(object sender, RoutedEventArgs e)
 		{
-			if(
+			if (Client_OPU1 != null)
+			{
+				if (Client_OPU1.Connected)
+				{
+					if (!_AttestIsRunning)
+					{
+						SendCommand("DIS");
+						_AttestIsRunning = true;
+						MessageBox.Show("Запущен режим аттестации!\nПодайте питание и совершите инициализацию для продолжения!","Внимание!",MessageBoxButton.OK, MessageBoxImage.Exclamation);
+					}
+				}
+			}
+		}
+		private void Attest_Variant_DigMeasSystErr_Next_Click(object sender, RoutedEventArgs e)
+		{
+			try
+			{
+				if (Client_OPU1 != null)
+				{
+					if (Client_OPU1.Connected)
+					{
+						if (_AttestIsRunning)
+						{
+							if (PowerCheck.IsChecked != true)
+							{
+								throw new Exception("Не подано питание при аттестации!");
+							}
+							if (InitCheck.IsChecked != true)
+							{
+								throw new Exception("Не проведена инициализация при аттестации!");
+							}
+							if (MoveTask_Handler != null)
+							{
+								MoveTaskTimer.Tick -= MoveTask_Handler;
+							}
+							switch (Attest_Variant_DigMeasSystErr_TotalProgress.Value){
+								case 0:
+								{
+									MoveTask_CurPos = 0;
+									MoveTask_EndPos = 360;
+									MoveTask_Step = 5;
+									MoveTask_Handler = (sender, e) =>
+									{
+										if (MoveTask_CurPos + MoveTask_Step <= MoveTask_EndPos)
+										{
+											MoveTask_CurPos += MoveTask_Step;
+											SendCommand($"MOVER {MoveTask_Step} 6 6");
+											MoveTaskTimer.Stop();
+										}
+										else
+										{
+											Attest_Variant_DigMeasSystErr_TotalProgress.Value++;
+										}
+									};
+									MoveTaskTimer.Tick += MoveTask_Handler;
+								} break;
+								case 1:
+								{
+									MoveTask_CurPos = 360;
+									MoveTask_EndPos = 0;
+									MoveTask_Step = -5;
+									MoveTask_Handler = (sender, e) =>
+									{
+										if (MoveTask_CurPos + MoveTask_Step <= MoveTask_EndPos)
+										{
+											MoveTask_CurPos += MoveTask_Step;
+											SendCommand($"MOVER {MoveTask_Step} 6 6");
+											MoveTaskTimer.Stop();
+										}
+										else
+										{
+											Attest_Variant_DigMeasSystErr_TotalProgress.Value++;
+										}
+									};
+									MoveTaskTimer.Tick += MoveTask_Handler;
+								}
+								break;
+								case 2:
+								{
+									MoveTask_CurPos = 0;
+									MoveTask_EndPos = -360;
+									MoveTask_Step = -5;
+									MoveTask_Handler = (sender, e) =>
+									{
+										if (MoveTask_CurPos + MoveTask_Step >= MoveTask_EndPos)
+										{
+											MoveTask_CurPos += MoveTask_Step;
+											SendCommand($"MOVER {MoveTask_Step} 6 6");
+											MoveTaskTimer.Stop();
+										}
+										else
+										{
+											Attest_Variant_DigMeasSystErr_TotalProgress.Value++;
+										}
+									};
+									MoveTaskTimer.Tick += MoveTask_Handler;
+								}
+								break;
+								case 3:
+								{
+									
+									MoveTask_CurPos = -360;
+									MoveTask_EndPos = 0;
+									MoveTask_Step = 5;
+									MoveTask_Handler = (sender, e) =>
+									{
+										if (MoveTask_CurPos + MoveTask_Step <= MoveTask_EndPos)
+										{
+											MoveTask_CurPos += MoveTask_Step;
+											SendCommand($"MOVER {MoveTask_Step} 6 6");
+											MoveTaskTimer.Stop();
+										}
+										else
+										{
+											Attest_Variant_DigMeasSystErr_TotalProgress.Value++;
+											_AttestIsRunning = false;
+										}
+									};
+									MoveTaskTimer.Tick += MoveTask_Handler;
+								}
+								break;
+							}
+						}
+						else
+						{
+							throw new Exception("Не запущена аттестация!");
+						}
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show(ex.Message,"Внимание",MessageBoxButton.OK, MessageBoxImage.Error);
+			}
+		}
+
+		private void Attest_Variant_DigMeasSystErr_Stop_Click(object sender, RoutedEventArgs e)
+		{
+			_AttestIsRunning = false;
 		}
 
 		private void MenuLogging_Click(object sender, RoutedEventArgs e)
@@ -495,6 +673,70 @@ namespace TCPDevice
 		{
 
 		}
+
+		private void TotalProgressBar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+		{
+			if (_IsAnimating_TotalProgress)
+			{
+				return;
+			}
+			_IsAnimating_TotalProgress = true;
+			DoubleAnimation DAT = new DoubleAnimation(e.OldValue, e.NewValue, new Duration(TimeSpan.FromMilliseconds(700)), FillBehavior.Stop);
+			ExponentialEase EF = new ExponentialEase();
+			EF.Exponent = 2;
+			EF.EasingMode = EasingMode.EaseOut;
+			DAT.EasingFunction = EF;
+			DAT.Completed += DAT_Completed;
+			((ProgressBar)sender).BeginAnimation(ProgressBar.ValueProperty, DAT);
+			
+
+			e.Handled = true;
+		}
+
+		private void StepProgressBar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+		{
+			if (_IsAnimating_StepProgress)
+			{
+				return;
+			}
+			_IsAnimating_StepProgress = true;
+			DoubleAnimation DAS = new DoubleAnimation(e.OldValue, e.NewValue, new Duration(TimeSpan.FromMilliseconds(700)),FillBehavior.Stop);
+			DAS.Completed += DAS_Completed;
+			ExponentialEase EF = new ExponentialEase();
+			EF.Exponent = 2;
+			EF.EasingMode = EasingMode.EaseOut;
+			DAS.EasingFunction = EF;
+			((ProgressBar)sender).BeginAnimation(ProgressBar.ValueProperty, DAS);
+			
+
+			e.Handled = true;
+		}
+
+		private void DAS_Completed(object? sender, EventArgs e)
+		{
+			_IsAnimating_StepProgress = false;
+		}
+
+		private void DAT_Completed(object? sender, EventArgs e)
+		{
+			_IsAnimating_TotalProgress = false;
+		}
+
+		private void window_KeyUp(object sender, KeyEventArgs e)
+		{
+			
+			switch (e.Key)
+			{
+				case Key.OemPlus:
+					Attest_Variant_DigMeasSystErr_TotalProgress.Value += 1;
+					break;
+				case Key.OemMinus:
+					Attest_Variant_DigMeasSystErr_TotalProgress.Value -= 1;
+					break;
+			}
+		}
+
+		
 	}
 }
 //TODO:
