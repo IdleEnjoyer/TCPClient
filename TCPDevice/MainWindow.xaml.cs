@@ -553,6 +553,7 @@ namespace TCPDevice
 										{
 											MoveTask_CurPos += MoveTask_Step;
 											SendCommand($"MOVER {MoveTask_Step} 6 6");
+											Attest_Variant_DigMeasSystErr_StepProgress.Value++;
 											MoveTaskTimer.Stop();
 										}
 										else
