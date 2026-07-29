@@ -30,6 +30,9 @@ using WindowsAPICodePack.Dialogs;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Windows.Media.Animation;
 using System.Reflection.Metadata;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Timers;
 
 
 namespace TCPDevice
@@ -51,17 +54,31 @@ namespace TCPDevice
 		private double OPU1_Position;
 		private double OPU1_Velocity;
 
-		private double MoveTask_StartPos;
 		private double MoveTask_CurPos;
 		private double MoveTask_EndPos;
-		private double MoveTask_Vel;
 		private double MoveTask_Step;
 		private EventHandler MoveTask_Handler; 
 
 		private bool _IsAnimating_TotalProgress = false;
 		private bool _IsAnimating_StepProgress = false;
-
+		private double _APFC_CanvasScale = 0.2;
+		private const double _APFC_CanvasZoomSpeed = 0.1;
+		private const double _APFC_CanvasMaxScale = 2.0;
+		private const double _APFC_CanvasMinScale = 0.2;
+		private double _APFC_HorScrollPos = 0.0;
+		private double _APFC_VerScrollPos = 0.0;
 		private bool _AttestIsRunning = false;
+		private bool _APFC_Running = false;
+
+		private bool _Demo_Running = false;
+		private int DemoType = -1;
+		private object PreviousDemo;
+
+		private List<double> APFC_VelList = new List<double>{ 1, 2, 3, 4, 5, 6, 7, 8, 9 };//new List<double>()
+		private Dictionary<int, double> APFC_Peaks;
+		private double APFC_MeasureCount = 1000;
+		private double APFC_TimeMeas = 4.0;
+		private List<double> APFC_XAxis = new List<double>();
 
 		private DispatcherTimer OPU1_StatusTimer = new DispatcherTimer();
 		private DispatcherTimer OPU_PosTimer = new DispatcherTimer();
@@ -80,6 +97,8 @@ namespace TCPDevice
         {
             InitializeComponent();
 			DoubleFormat.NumberDecimalSeparator = ".";
+
+			
 
 			OPU1_StatusTimer.Interval = TimeSpan.FromMilliseconds(100);
 			OPU1_StatusTimer.Tick += OPU1_StatusTimer_Tick;
@@ -141,6 +160,9 @@ namespace TCPDevice
 						break;
 					case 4:
 						SendCommand("FLT?");
+						OPU1_Status++;
+						break;
+					default:
 						OPU1_Status = 0;
 						break;
 				}
@@ -274,11 +296,20 @@ namespace TCPDevice
 									OPU1_Position = double.Parse(Position, DoubleFormat);
 									Info_CurPos.Text = OPU1_Position.ToString();
 								}
+								if (Data.Contains("APFCD?"))
+								{
+									string Velocity = Data.Substring(Data.IndexOf(":") + 1).Replace("~", string.Empty);
+									APFC_VelList.Add(double.Parse(Velocity,DoubleFormat));
+								}
 								if (Data.Contains("VEL?"))
 								{
 									string Velocity = Data.Substring(Data.IndexOf(":") + 1).Replace("~", string.Empty);
 									OPU1_Velocity = double.Parse(Velocity, DoubleFormat);
 									Info_CurVel.Text = OPU1_Velocity.ToString();
+								}
+								if (Data.Contains("APFCS?"))
+								{
+									string[] Replies = Data.Split(':');
 								}
 								break;
 						}
@@ -470,22 +501,10 @@ namespace TCPDevice
 				((TextBox)sender).BorderBrush = new SolidColorBrush(Color.FromArgb(0xff, 0xAB, 0xAd, 0xB3));
 				ValidationFlags &= (ABS_VALID | INC_VALID | STEP_VALID | VEL_VALID) - int.Parse((string)((TextBox)sender).Tag);
 			}
-            if ((ValidationFlags & ABS_VALID) != 0)
-            {
-				Abs_StartMove.IsEnabled = false;
-            }
-			if ((ValidationFlags & INC_VALID) != 0)
-			{
-				Inc_StartMove.IsEnabled = false;
-			}
-			if ((ValidationFlags & STEP_VALID) != 0)
-			{
-				Step_StartMove.IsEnabled = false;
-			}
-			if ((ValidationFlags & VEL_VALID) != 0)
-			{
-				Vel_StartMove.IsEnabled = false;
-			}
+			Abs_StartMove.IsEnabled = (ValidationFlags & ABS_VALID) != 0 ? false : true;
+			Inc_StartMove.IsEnabled = (ValidationFlags & INC_VALID) != 0 ? false : true;
+			Step_StartMove.IsEnabled = (ValidationFlags & STEP_VALID) != 0 ? false : true;
+			Vel_StartMove.IsEnabled = (ValidationFlags & VEL_VALID) != 0 ? false : true;
 		}
 
 		private void TreeViewItem_RequestBringIntoView(object sender, RequestBringIntoViewEventArgs e)
@@ -541,47 +560,40 @@ namespace TCPDevice
 							{
 								MoveTaskTimer.Tick -= MoveTask_Handler;
 							}
+							MoveTask_Handler = (sender, e) =>
+							{
+								if (MoveTask_CurPos + MoveTask_Step <= MoveTask_EndPos)
+								{
+									MoveTask_CurPos += MoveTask_Step;
+									SendCommand($"MOVER {MoveTask_Step} 6 6");
+									Attest_Variant_DigMeasSystErr_StepProgress.Value++;
+									MoveTaskTimer.Stop();
+								}
+								else
+								{
+									Attest_Variant_DigMeasSystErr_TotalProgress.Value++;
+									MoveTaskTimer.Stop();
+									MessageBox.Show("Этап закончен, наимте \"Далее\" для продолжения");
+									if (Attest_Variant_DigMeasSystErr_TotalProgress.Value == 4)
+									{
+										_AttestIsRunning = false;
+									}
+								}
+							};
 							switch (Attest_Variant_DigMeasSystErr_TotalProgress.Value){
 								case 0:
 								{
 									MoveTask_CurPos = 0;
 									MoveTask_EndPos = 360;
 									MoveTask_Step = 5;
-									MoveTask_Handler = (sender, e) =>
-									{
-										if (MoveTask_CurPos + MoveTask_Step <= MoveTask_EndPos)
-										{
-											MoveTask_CurPos += MoveTask_Step;
-											SendCommand($"MOVER {MoveTask_Step} 6 6");
-											Attest_Variant_DigMeasSystErr_StepProgress.Value++;
-											MoveTaskTimer.Stop();
-										}
-										else
-										{
-											Attest_Variant_DigMeasSystErr_TotalProgress.Value++;
-										}
-									};
-									MoveTaskTimer.Tick += MoveTask_Handler;
+									MoveTaskTimer.Start();
 								} break;
 								case 1:
 								{
 									MoveTask_CurPos = 360;
 									MoveTask_EndPos = 0;
 									MoveTask_Step = -5;
-									MoveTask_Handler = (sender, e) =>
-									{
-										if (MoveTask_CurPos + MoveTask_Step <= MoveTask_EndPos)
-										{
-											MoveTask_CurPos += MoveTask_Step;
-											SendCommand($"MOVER {MoveTask_Step} 6 6");
-											MoveTaskTimer.Stop();
-										}
-										else
-										{
-											Attest_Variant_DigMeasSystErr_TotalProgress.Value++;
-										}
-									};
-									MoveTaskTimer.Tick += MoveTask_Handler;
+									MoveTaskTimer.Start();
 								}
 								break;
 								case 2:
@@ -589,20 +601,7 @@ namespace TCPDevice
 									MoveTask_CurPos = 0;
 									MoveTask_EndPos = -360;
 									MoveTask_Step = -5;
-									MoveTask_Handler = (sender, e) =>
-									{
-										if (MoveTask_CurPos + MoveTask_Step >= MoveTask_EndPos)
-										{
-											MoveTask_CurPos += MoveTask_Step;
-											SendCommand($"MOVER {MoveTask_Step} 6 6");
-											MoveTaskTimer.Stop();
-										}
-										else
-										{
-											Attest_Variant_DigMeasSystErr_TotalProgress.Value++;
-										}
-									};
-									MoveTaskTimer.Tick += MoveTask_Handler;
+									MoveTaskTimer.Start();
 								}
 								break;
 								case 3:
@@ -611,21 +610,7 @@ namespace TCPDevice
 									MoveTask_CurPos = -360;
 									MoveTask_EndPos = 0;
 									MoveTask_Step = 5;
-									MoveTask_Handler = (sender, e) =>
-									{
-										if (MoveTask_CurPos + MoveTask_Step <= MoveTask_EndPos)
-										{
-											MoveTask_CurPos += MoveTask_Step;
-											SendCommand($"MOVER {MoveTask_Step} 6 6");
-											MoveTaskTimer.Stop();
-										}
-										else
-										{
-											Attest_Variant_DigMeasSystErr_TotalProgress.Value++;
-											_AttestIsRunning = false;
-										}
-									};
-									MoveTaskTimer.Tick += MoveTask_Handler;
+									MoveTaskTimer.Start();
 								}
 								break;
 							}
@@ -646,6 +631,8 @@ namespace TCPDevice
 		private void Attest_Variant_DigMeasSystErr_Stop_Click(object sender, RoutedEventArgs e)
 		{
 			_AttestIsRunning = false;
+			MoveTaskTimer.Stop();
+			MoveTaskTimer.Tick -= MoveTask_Handler;
 		}
 
 		private void MenuLogging_Click(object sender, RoutedEventArgs e)
@@ -734,10 +721,187 @@ namespace TCPDevice
 				case Key.OemMinus:
 					Attest_Variant_DigMeasSystErr_TotalProgress.Value -= 1;
 					break;
+				case Key.Return:
+					APFC_DrawCanvas(APFC_XAxis);
+					break;
 			}
 		}
 
-		
+		public static double Map(double value, double inputMin, double inputMax, double outputMin, double outputMax)
+		{
+			return ((value - inputMin) / (inputMax - inputMin)) * (outputMax - outputMin) + outputMin;
+		}
+
+		private void APFC_DrawCanvas(List<double> Points)
+		{
+			try
+			{
+				APFC_Canvas.Children.Clear();
+				Line YAxis = new Line();
+				YAxis.X1 = 50;
+				YAxis.Y1 = 50;
+				YAxis.X2 = 50;
+				YAxis.Y2 = 1450;
+
+				Line XAxis = new Line();
+				XAxis.X1 = 50;
+				XAxis.Y1 = 1450;
+				XAxis.X2 = 3450;
+				XAxis.Y2 = 1450;
+
+				Line Zero = new Line();
+				Zero.X1 = 50;
+				Zero.Y1 = 750;
+				Zero.X2 = 3450;
+				Zero.Y2 = 750;
+				Zero.Opacity = 0.2;
+				Zero.StrokeDashArray = new DoubleCollection { 6, 12 };
+
+				APFC_Canvas.Children.Add(YAxis);
+				APFC_Canvas.Children.Add(XAxis);
+				APFC_Canvas.Children.Add(Zero);
+				if (APFC_VelList.Count > 0)
+				{
+					APFC_XAxis.Clear();
+					double Frequency = double.Parse(APFC_TgtFreq.Text, DoubleFormat);
+					double Amplitude = double.Parse(APFC_TgtAmp.Text, DoubleFormat);
+					int numPeriods = int.Parse(APFC_Periods.Text);
+					double Period = 1.0 / Frequency;
+					double TotalTimePerf = numPeriods * Period;
+					//Measured graph
+					for (int Index = 0; Index < APFC_VelList.Count; Index++)
+					{
+						double X = Map(1 / (Index * APFC_TimeMeas / 1000), 0, APFC_TimeMeas * APFC_VelList.Count / 1000, 100, 3400);
+						double Y = Map(APFC_VelList[Index], APFC_VelList.Min(), APFC_VelList.Max(), 1400, 100);
+						Point P = new Point(X, Y);
+						Ellipse E = new Ellipse();
+						ToolTip TT = new ToolTip();
+						TT.Content = (APFC_VelList[Index]).ToString();
+						E.ToolTip = TT;
+						E.Width = 6;
+						E.Height = 6;
+						E.Fill = Brushes.Black;
+						Canvas.SetLeft(E, P.X - 3);
+						Canvas.SetTop(E, P.Y - 3);
+
+						APFC_Canvas.Children.Add(E);
+					}
+					//Perfect Sine graph
+					for (double Time = 0.0; Time < TotalTimePerf; Time += APFC_TimeMeas / 1000)
+					{
+						double X = Map(1 / Time, 0, APFC_TimeMeas * APFC_VelList.Count / 1000, 100, 3400);
+						double Y = Map(Amplitude * Math.Sin(2 * Math.PI * Frequency / Time), -Amplitude, Amplitude, 1400, 100);
+						Point P = new Point(X, Y);
+						Ellipse E = new Ellipse();
+						ToolTip TT = new ToolTip();
+						TT.Content = (Amplitude * Math.Sin(2 * Math.PI * Frequency * Time)).ToString();
+						E.ToolTip = TT;
+						E.Width = 6;
+						E.Height = 6;
+						E.Fill = Brushes.Blue;
+						Canvas.SetLeft(E, P.X - 3);
+						Canvas.SetTop(E, P.Y - 3);
+
+						APFC_Canvas.Children.Add(E);
+					}
+
+					//Mark Peaks
+				}
+
+				return;
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show(ex.Message);
+			}
+		}
+
+		private void APFC_Canvas_MouseWheel(object sender, MouseWheelEventArgs e)
+		{
+			_APFC_CanvasScale += e.Delta > 0 ? _APFC_CanvasZoomSpeed : -_APFC_CanvasZoomSpeed;
+			
+			_APFC_CanvasScale = Math.Min(_APFC_CanvasMaxScale, _APFC_CanvasScale);
+			_APFC_CanvasScale = Math.Max(_APFC_CanvasMinScale, _APFC_CanvasScale);
+			CanvasSize.Content = "%" + Math.Round(_APFC_CanvasScale * 500).ToString();
+			Point MousePoint = e.GetPosition(APFC_Canvas);
+			APFC_Canvas.RenderTransformOrigin = new Point(MousePoint.X / APFC_Canvas.ActualWidth, MousePoint.Y / APFC_Canvas.ActualHeight);
+			ScaleTransform ST = new ScaleTransform(_APFC_CanvasScale, _APFC_CanvasScale);
+			APFC_Canvas.LayoutTransform = ST;
+
+			APFC_ScrollView.ScrollToHorizontalOffset(_APFC_HorScrollPos);
+			APFC_ScrollView.ScrollToVerticalOffset(_APFC_VerScrollPos);
+		}
+
+		private void APFC_Canvas_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+		{
+			_APFC_HorScrollPos = APFC_ScrollView.HorizontalOffset;
+			_APFC_VerScrollPos = APFC_ScrollView.VerticalOffset;
+		}
+
+		private void APFC_Start_Click(object sender, RoutedEventArgs e)
+		{
+			if (APFC_TgtAmp.Text != string.Empty && APFC_TgtFreq.Text != string.Empty && APFC_Periods.Text != string.Empty)
+			{
+				double V = double.Parse(APFC_TgtAmp.Text, DoubleFormat);
+				double F = double.Parse(APFC_TgtFreq.Text, DoubleFormat);
+				int K = int.Parse(APFC_Periods.Text);
+
+				if (6.2831853 * V * F > 3000.0)
+				{
+					MessageBox.Show($"Введённые значения выходят за ограничение:\n2π * {V} * {F} ({Math.Round(6.2831853 * V * F, 2)}) ≤ 3000");
+					return;
+				}
+				else
+				{
+					SendCommand("DIS");
+					if (MessageBox.Show("ВНИМАНИЕ!\n\nПосле подачи питания начнётся плавное движение в позицию нуля!\n\nПродолжить?", "Внимание!", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+					{
+						SendCommand("EN");
+					}
+				}
+			}
+		}
+
+		private void APFC_Stop_Click(object sender, RoutedEventArgs e)
+		{
+
+		}
+
+		private void APFC_LostFocus(object sender, RoutedEventArgs e)
+		{
+			if (((TextBox)sender).Text != string.Empty)
+			{
+				if (double.TryParse(((TextBox)sender).Text, DoubleFormat, out double D))
+				{
+					((TextBox)sender).BorderBrush = new SolidColorBrush(Color.FromArgb(0xff, 0xAB, 0xAd, 0xB3));
+				}
+				else
+				{
+					((TextBox)sender).BorderBrush = Brushes.Red;
+				}
+			}
+			else
+			{
+				((TextBox)sender).BorderBrush = Brushes.Red;
+			}
+		}
+
+		private void Demo_Choice(object sender, RoutedEventArgs e)
+		{
+			if (PreviousDemo != null)
+			{
+				DemoType = int.Parse((string)((Button)sender).Tag);
+				((Button)PreviousDemo).Background = new SolidColorBrush(Color.FromRgb(0x40, 0x42, 0x58));
+				((Button)sender).Background = Brushes.LightBlue;
+				PreviousDemo = sender;
+			}
+			else
+			{
+				DemoType = int.Parse((string)((Button)sender).Tag);
+				((Button)sender).Background = Brushes.LightBlue;
+				PreviousDemo = sender;
+			}
+		}
 	}
 }
 //TODO:
