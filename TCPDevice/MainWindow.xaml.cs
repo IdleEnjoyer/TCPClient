@@ -505,6 +505,7 @@ namespace TCPDevice
 								if (Data.Contains("EN?"))
 								{
 									OPU2_Enabled = false;
+									AC2.OPU_Enabled = OPU2_Enabled;
 								}
 								if (Data.Contains("STOP?"))
 								{
