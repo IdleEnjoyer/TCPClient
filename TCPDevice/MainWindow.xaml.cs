@@ -74,7 +74,7 @@ namespace TCPDevice
 		private int DemoType = -1;
 		private object PreviousDemo;
 
-		private List<double> APFC_VelList = new List<double>{ 1, 2, 3, 4, 5, 6, 7, 8, 9 };//new List<double>()
+		private List<double> APFC_VelList = new List<double>();//new List<double>()
 		private Dictionary<int, double> APFC_Peaks;
 		private double APFC_MeasureCount = 1000;
 		private double APFC_TimeMeas = 4.0;
@@ -310,6 +310,15 @@ namespace TCPDevice
 								if (Data.Contains("APFCS?"))
 								{
 									string[] Replies = Data.Split(':');
+									if (Replies[1] == "0")
+									{
+										_APFC_Running = false;
+									}
+									if (int.Parse(Replies[2]) != APFC_VelList.Count)
+									{
+										DataLog.WriteLog(Logger.LogType.INFO_LOG, $"Количество принятых ответов не совпало с отправленными: отправлено {int.Parse(Replies[2])}, принято {APFC_VelList.Count}.");
+									}
+									APFC_TimeMeas = double.Parse(Replies[3].Replace("~",string.Empty), DoubleFormat);
 								}
 								break;
 						}
@@ -375,6 +384,8 @@ namespace TCPDevice
 			if (Client_OPU1 != null)
 			{
 				IsStepping = false;
+				_APFC_Running = false;
+				_AttestIsRunning = false;
 				if (PowerCheck.IsChecked == false)
 				{
 					if (MessageBox.Show("ВНИМАНИЕ!\n\nПосле подачи питания начнётся плавное движение в позицию нуля!\n\nПродолжить?", "Внимание!", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
@@ -418,6 +429,8 @@ namespace TCPDevice
 			if (Client_OPU1 != null)
 			{
 				IsStepping = false;
+				_APFC_Running = false;
+				_AttestIsRunning = false;
 				if (PowerCheck.IsChecked == true)
 				{
 					SendCommand($"MOVEA {Abs_TgtPos} {Abs_TgtVel} {Abs_TgtAcc}");
@@ -434,6 +447,8 @@ namespace TCPDevice
 			if (Client_OPU1 != null)
 			{
 				IsStepping = false;
+				_APFC_Running = false;
+				_AttestIsRunning = false;
 				if (PowerCheck.IsChecked == true)
 				{
 					SendCommand($"MOVER {Inc_TgtPos} {Inc_TgtVel} {Inc_TgtAcc}");
@@ -449,6 +464,8 @@ namespace TCPDevice
 		{
 			if (Client_OPU1 == null)
 			{
+				_APFC_Running = false;
+				_AttestIsRunning = false;
 				if (PowerCheck.IsChecked == true)
 				{
 					StepTimer.Interval = TimeSpan.FromMilliseconds(double.Parse(Step_TgtPause.Text) * 1000.0);
@@ -468,6 +485,8 @@ namespace TCPDevice
 			if (Client_OPU1 != null)
 			{
 				IsStepping = false;
+				_APFC_Running = false;
+				_AttestIsRunning = false;
 				if (PowerCheck.IsChecked == true)
 				{
 					SendCommand($"MOVEV {Vel_TgtVel} {Vel_TgtAcc}");
@@ -485,6 +504,8 @@ namespace TCPDevice
 			{
 				SendCommand("STOP");
 				IsStepping = false;
+				_APFC_Running = false;
+				_AttestIsRunning = false;
 			}
 		}
 
@@ -533,6 +554,8 @@ namespace TCPDevice
 					{
 						SendCommand("DIS");
 						_AttestIsRunning = true;
+						_APFC_Running = false;
+						IsStepping = false;
 						MessageBox.Show("Запущен режим аттестации!\nПодайте питание и совершите инициализацию для продолжения!","Внимание!",MessageBoxButton.OK, MessageBoxImage.Exclamation);
 					}
 				}
@@ -580,6 +603,7 @@ namespace TCPDevice
 									}
 								}
 							};
+							
 							switch (Attest_Variant_DigMeasSystErr_TotalProgress.Value){
 								case 0:
 								{
@@ -771,8 +795,8 @@ namespace TCPDevice
 					//Measured graph
 					for (int Index = 0; Index < APFC_VelList.Count; Index++)
 					{
-						double X = Map(1 / (Index * APFC_TimeMeas / 1000), 0, APFC_TimeMeas * APFC_VelList.Count / 1000, 100, 3400);
-						double Y = Map(APFC_VelList[Index], APFC_VelList.Min(), APFC_VelList.Max(), 1400, 100);
+						double X = Map(Index * APFC_TimeMeas / 1000, 0, APFC_TimeMeas * APFC_VelList.Count / 1000, 100, 3400);
+						double Y = Map(APFC_VelList[Index], -Amplitude * 1.5, Amplitude * 1.5, 1400, 100);
 						Point P = new Point(X, Y);
 						Ellipse E = new Ellipse();
 						ToolTip TT = new ToolTip();
@@ -789,8 +813,8 @@ namespace TCPDevice
 					//Perfect Sine graph
 					for (double Time = 0.0; Time < TotalTimePerf; Time += APFC_TimeMeas / 1000)
 					{
-						double X = Map(1 / Time, 0, APFC_TimeMeas * APFC_VelList.Count / 1000, 100, 3400);
-						double Y = Map(Amplitude * Math.Sin(2 * Math.PI * Frequency / Time), -Amplitude, Amplitude, 1400, 100);
+						double X = Map(Time, 0, APFC_TimeMeas * APFC_VelList.Count / 1000, 100, 3400);
+						double Y = Map(Amplitude * Math.Sin(2 * Math.PI * Frequency * Time), -Amplitude * 1.5, Amplitude * 1.5, 1400, 100);
 						Point P = new Point(X, Y);
 						Ellipse E = new Ellipse();
 						ToolTip TT = new ToolTip();
@@ -853,10 +877,30 @@ namespace TCPDevice
 				}
 				else
 				{
-					SendCommand("DIS");
-					if (MessageBox.Show("ВНИМАНИЕ!\n\nПосле подачи питания начнётся плавное движение в позицию нуля!\n\nПродолжить?", "Внимание!", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+					if (!_APFC_Running)
 					{
-						SendCommand("EN");
+						SendCommand("DIS");
+						_APFC_Running = true;
+						MessageBox.Show("Запущен режим снятия АФЧХ!\n1. Установите полезную нагрузку\n2. Подайте питание\n3. Проведите инициализацию\n4. Нажмите на кнопку \"Старт\"");
+					}
+					else
+					{
+						try
+						{
+							if (PowerCheck.IsChecked == false)
+							{
+								throw new Exception("Не подано питание при снятии АФЧХ!");
+							}
+							if (InitCheck.IsChecked == false)
+							{
+								throw new Exception("Не проведена инициализация при снятии АФЧХ!");
+							}
+							SendCommand($"APFC {V} {F} {K}");
+						}
+						catch (Exception ex)
+						{
+							MessageBox.Show(ex.Message);
+						}
 					}
 				}
 			}
@@ -864,7 +908,8 @@ namespace TCPDevice
 
 		private void APFC_Stop_Click(object sender, RoutedEventArgs e)
 		{
-
+			SendCommand("STOP");
+			_APFC_Running = false;
 		}
 
 		private void APFC_LostFocus(object sender, RoutedEventArgs e)
@@ -891,7 +936,7 @@ namespace TCPDevice
 			if (PreviousDemo != null)
 			{
 				DemoType = int.Parse((string)((Button)sender).Tag);
-				((Button)PreviousDemo).Background = new SolidColorBrush(Color.FromRgb(0x40, 0x42, 0x58));
+				((Button)PreviousDemo).Background = new SolidColorBrush(Color.FromRgb(0x02, 0x0c, 0x0b));
 				((Button)sender).Background = Brushes.LightBlue;
 				PreviousDemo = sender;
 			}

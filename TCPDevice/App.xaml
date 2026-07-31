@@ -10,19 +10,19 @@
 				<Setter Property="Foreground" Value="White"/>
 				<!--Value="#1E1F29" -->
 
-				<Setter Property="FontFamily" Value="Cascadia Code"/>
+				<Setter Property="FontFamily" Value="Cascadia code light"/>
 			</Style>
 			<Style x:Key="LeftPanel_TopText" TargetType="TextBlock">
 				<Setter Property="Foreground" Value="White"/>
 				<Setter Property="FontWeight" Value="Bold"/>
 				<!--Value="#1E1F29" -->
 
-				<Setter Property="FontFamily" Value="Cascadia Code"/>
+				<Setter Property="FontFamily" Value="Cascadia code light"/>
 			</Style>
 			<Style x:Key="DefBtn" TargetType="Button">
 				<Setter Property="Background" Value="#020c0b"/>
 				<Setter Property="Foreground" Value="White"/>
-				<Setter Property="FontFamily" Value="Cascadia Code"/>
+				<Setter Property="FontFamily" Value="Cascadia code light"/>
 				<Setter Property="Template">
 					<Setter.Value>
 						<ControlTemplate TargetType="Button">

@@ -8,7 +8,7 @@
 		Closing="Window_Closing"
 		KeyUp="window_KeyUp"
         Title="ТЕСАРТ Сервисное ПО" Height="720" Width="1024" Background="White" MinWidth="512" MinHeight="384"
-	xmlns:theme="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2" xmlns:richcanvas="clr-namespace:RichCanvas;assembly=RichCanvas">
+	xmlns:theme="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2">
 	<Window.Resources>
 		<Style x:Key="TabControl_UserStyle" TargetType="{x:Type TabControl}">
 			<Setter Property="Padding" Value="2"/>
@@ -134,8 +134,9 @@
 			<Setter Property="Background" Value="Transparent"/>
 			<Setter Property="HorizontalContentAlignment" Value="{Binding HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
 			<Setter Property="VerticalContentAlignment" Value="{Binding VerticalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
-			<Setter Property="Padding" Value="1,0,0,0"/>
+			<Setter Property="Padding" Value="1,5,0,0"/>
 			<Setter Property="Foreground" Value="White"/>
+			<Setter Property="FontFamily" Value="Cascadia code light"/>
 			<Setter Property="FocusVisualStyle" Value="{StaticResource TreeViewItemFocusVisual}"/>
 			<Setter Property="Template">
 				<Setter.Value>
@@ -667,12 +668,12 @@
 					</Style>
 				</Button.Resources>
 			</Button>
-			<TextBlock Text="ТЕСАРТ" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="36" Width="120" Margin="0,0,20,0" Foreground="White" />
+			<Image VerticalAlignment="Center" HorizontalAlignment="Right" Width="230" Margin="0,0,20,0" Source="TESARTLOGO.png"/>
 		</DockPanel>
 		<StatusBar x:Name="AppStatus" DockPanel.Dock="Bottom" HorizontalContentAlignment="Right" FlowDirection="RightToLeft" Height="21.96" Background="#0F171F">
 			<ProgressBar x:Name="StatusProgress" Width="75" Height="15" IsIndeterminate="True" Visibility="Hidden" HorizontalAlignment="Right"/>
 			<Separator/>
-			<StatusBarItem Content="Готов" Width="50"/>
+			<StatusBarItem Content="Готов" Foreground="White" Width="50"/>
 			<Separator/>
 			<Rectangle x:Name="MoveStatus" Width="15" Height="15" Fill="Red">
 				<Rectangle.Resources>
@@ -698,11 +699,11 @@
 					</Style>
 				</Rectangle.Resources>
 			</Rectangle>
-			<StatusBarItem Content="Движение"/>
+			<StatusBarItem Content="Движение" Foreground="White"/>
 			<Separator/>
-			<StatusBarItem x:Name="CanvasSize" Content="%100"/>
+			<StatusBarItem x:Name="CanvasSize" Content="%100" Foreground="White"/>
 		</StatusBar>
-		<TreeView x:Name="LeftPanel" Width="150" DockPanel.Dock="Left" Background="#011122" ScrollViewer.HorizontalScrollBarVisibility="Auto" BorderBrush="{x:Null}" FontSize="16" HorizontalAlignment="Left" ClipToBounds="True" Height="{Binding Height, ElementName=LeftPanel}" Padding="0,0,0,0" BorderThickness="0,0,0,0">
+		<TreeView x:Name="LeftPanel" Width="150" DockPanel.Dock="Left" Background="#0f171f" ScrollViewer.HorizontalScrollBarVisibility="Auto" BorderBrush="{x:Null}" FontSize="16" HorizontalAlignment="Left" ClipToBounds="True" Height="{Binding Height, ElementName=LeftPanel}" Padding="0,0,0,0" BorderThickness="0,0,0,0">
 			<TreeViewItem Style="{DynamicResource TreeViewItem_UserStyle}" Header="Ручное управление" FontWeight="Bold" Focusable="False" Margin="0,10,0,0" >
 				<TreeViewItem Style="{DynamicResource TreeViewItem_UserStyle}" Header="Абсолютное" Selected="Tool_Click" Tag="0" FontWeight="Normal" FontStyle="Italic" RequestBringIntoView="TreeViewItem_RequestBringIntoView"/>
 				<TreeViewItem Style="{DynamicResource TreeViewItem_UserStyle}" Header="Инкрементное" Selected="Tool_Click" Tag="1"  FontWeight="Normal" FontStyle="Italic" RequestBringIntoView="TreeViewItem_RequestBringIntoView"/>
@@ -712,8 +713,8 @@
 			<TreeViewItem Style="{DynamicResource TreeViewItem_UserStyle}" Header="Снятие АФЧХ" Selected="Tool_Click" Tag="4" FontWeight="Bold"/>
 			<TreeViewItem Style="{DynamicResource TreeViewItem_UserStyle}" Header="Демонстрация" FontWeight="Bold" Selected="Tool_Click" Tag="5"/>
 			<TreeViewItem Style="{DynamicResource TreeViewItem_UserStyle}" Header="Аттестация" FontWeight="Bold" Selected="Tool_Click" Tag="6"/>
-			<CheckBox x:Name="InFaultCheck" IsChecked="True" Visibility="Hidden"/>
-			<CheckBox x:Name="PowerCheck" IsChecked="True" Visibility="Hidden"/>
+			<CheckBox x:Name="InFaultCheck" IsChecked="False" Visibility="Hidden"/>
+			<CheckBox x:Name="PowerCheck" IsChecked="False" Visibility="Hidden"/>
 			<CheckBox x:Name="ConnectionCheck" IsChecked="False" Visibility="Hidden"/>
 			<CheckBox x:Name="MovingCheck" IsChecked="False" Visibility="Hidden"/>
 			<CheckBox x:Name="InitCheck" IsChecked="False" Visibility="Hidden"/>
@@ -726,17 +727,16 @@
 			<TextBlock Style="{DynamicResource LightText}" x:Name="Label_CurVel" Text="Скорость:" Margin="0,5,20,5" FontSize="16" Width="90" FlowDirection="LeftToRight" />
 		</StackPanel>
 		<!--Style="{DynamicResource TabControl_UserStyle}"-->
-		<TabControl x:Name="Control"  Background="#0f171f" SelectedIndex="0" >
+		<TabControl x:Name="Control" Style="{DynamicResource TabControl_UserStyle}" Background="#011122" SelectedIndex="0" >
 			<TabItem x:Name="Absolute_Move">
 				<StackPanel>
-					<TextBlock Text="Абсолютное позиционирование" Style="{DynamicResource LightText}" FontSize="40" Margin="10,5,0,0" />
+					<TextBlock Text="Абсолютное позиционирование" Style="{DynamicResource LightText}" FontSize="40" Margin="10,5,0,5" />
 					<!--<Canvas x:Name="Abs_Canvas" Background="White" Width="500" Height="250" HorizontalAlignment="Left" Margin="10,10,0,0" >
 						<Line X1="10" Y1="10" X2="10" Y2="240" Stroke="Black" StrokeEndLineCap="Square"/>
 						<Line X1="10" Y1="240" X2="490" Y2="240" Stroke="Black"/>
 					</Canvas>-->
-					<ScrollBar Template="{DynamicResource ScrollBar_UserStyle}"/>
 					<Separator Margin="0,5,0,5" Background="#FFD6D6D6"/>
-					<Grid Width="800" Height="150" HorizontalAlignment="Left" Margin="10,10,0,0" >
+					<Grid Width="800" Height="170" HorizontalAlignment="Left" Margin="10,10,0,0" >
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition Width="1*"/>
 							<ColumnDefinition Width="1*"/>
@@ -748,7 +748,7 @@
 							<RowDefinition Height="1*"/>
 						</Grid.RowDefinitions>
 
-						<TextBlock Style="{DynamicResource LightText}" Text="Целевая позиция" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="26"/>
+						<TextBlock Style="{DynamicResource LightText}" Text="Целевая позиция" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="26" FontFamily="Cascadia Code Light"/>
 						<TextBox Style="{DynamicResource TextInput_UserStyle}" x:Name="Abs_TgtPos" Grid.Column="1" Grid.Row="0" Width="240" Height="40" HorizontalAlignment="Left" Margin="10,5,10,5" LostFocus="NumberInputTextbox_LostFocus" FontSize="26" Tag="1"/>
 						<TextBlock Style="{DynamicResource LightText}" x:Name="Abs_PosUnit" Grid.Column="2" Grid.Row="0" Text="град" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="26"/>
 
@@ -777,9 +777,9 @@
 			</TabItem>
 			<TabItem x:Name="Incremental_Move">
 				<StackPanel>
-					<TextBlock Text="Инкрементальное позиционирование" Style="{DynamicResource LightText}" FontSize="40" Margin="10,5,0,0" />
+					<TextBlock Text="Инкрементное позиционирование" Style="{DynamicResource LightText}" FontSize="40" Margin="10,10,0,10" />
 					<Separator Margin="0,5,0,5" Background="#FFD6D6D6"/>
-					<Grid Width="800" Height="150" HorizontalAlignment="Left" Margin="10,10,0,0" >
+					<Grid Width="800" Height="170" HorizontalAlignment="Left" Margin="10,10,0,0" >
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition Width="1*"/>
 							<ColumnDefinition Width="1*"/>
@@ -820,9 +820,9 @@
 			</TabItem>
 			<TabItem x:Name="Step_Move">
 				<StackPanel>
-					<TextBlock Text="Шаговое позиционирование" Style="{DynamicResource LightText}" FontSize="40" Margin="10,5,0,0" />
+					<TextBlock Text="Шаговое позиционирование" Style="{DynamicResource LightText}" FontSize="40" Margin="10,10,0,10" />
 					<Separator Margin="0,5,0,5" Background="#FFD6D6D6"/>
-					<Grid Width="800" Height="200" HorizontalAlignment="Left" Margin="10,10,0,0" >
+					<Grid Width="800" Height="230" HorizontalAlignment="Left" Margin="10,10,0,0" >
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition Width="1*"/>
 							<ColumnDefinition Width="1*"/>
@@ -868,9 +868,9 @@
 			</TabItem>
 			<TabItem x:Name="Vel_Move">
 				<StackPanel>
-					<TextBlock Text="Скоростное позиционирование" Style="{DynamicResource LightText}" FontSize="40" Margin="10,5,0,0" />
+					<TextBlock Text="Скоростное позиционирование" Style="{DynamicResource LightText}" FontSize="40" Margin="10,10,0,10" />
 					<Separator Margin="0,5,0,5" Background="#FFD6D6D6"/>
-					<Grid Width="800" Height="100" HorizontalAlignment="Left" Margin="10,10,0,0" >
+					<Grid Width="800" Height="110" HorizontalAlignment="Left" Margin="10,10,0,0" >
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition Width="1*"/>
 							<ColumnDefinition Width="1*"/>
@@ -906,7 +906,7 @@
 			</TabItem>
 			<TabItem x:Name="APFC">
 				<StackPanel>
-					<TextBlock Text="Снятие АФЧХ" Style="{DynamicResource LightText}" FontSize="30" Margin="10,5,0,0" />
+					<TextBlock Text="Снятие АФЧХ" Style="{DynamicResource LightText}" FontSize="30" Margin="10,10,0,10" />
 					<ScrollViewer x:Name="APFC_ScrollView" Width="717" Height="317" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Visible">
 						<Canvas x:Name="APFC_Canvas" Background="White" Width="3500" Height="1500" MouseWheel="APFC_Canvas_MouseWheel" RenderTransformOrigin="0,0" HorizontalAlignment="Left" VerticalAlignment="Top" PreviewMouseWheel="APFC_Canvas_PreviewMouseWheel">
 							<Canvas.LayoutTransform>
@@ -1039,7 +1039,7 @@
 						<ComboBoxItem x:Name="Attestation_Variant_MaxAcc" Content="Проверка максимального ускорения ОМС"/>
 						<ComboBoxItem x:Name="Attestation_Variant_OpModeReq" Content="Проверка требований к режиму работы ОМС"/>
 					</ComboBox>
-					<TabControl Style="{DynamicResource TabControl_UserStyle}" Height="500" Background="#6B728E" BorderBrush="{x:Null}" SelectedIndex="{Binding ElementName=Attestation_Variants, Path=SelectedIndex}">
+					<TabControl Style="{DynamicResource TabControl_UserStyle}" Height="500" Background="#011122" BorderBrush="{x:Null}" SelectedIndex="{Binding ElementName=Attestation_Variants, Path=SelectedIndex}">
 						<TabItem x:Name="Attestation_Variant_DigMeasSystErr_Tab" BorderBrush="{x:Null}">
 							<StackPanel>
 								<TextBlock Style="{DynamicResource LightText}" Text="Определение погрешности системы цифровых измерений ОМС" FontSize="26" TextWrapping="Wrap"/>
