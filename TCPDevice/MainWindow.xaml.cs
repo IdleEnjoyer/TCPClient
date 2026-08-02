@@ -103,10 +103,10 @@ namespace TCPDevice
 			OPU1_StatusTimer.Interval = TimeSpan.FromMilliseconds(100);
 			OPU1_StatusTimer.Tick += OPU1_StatusTimer_Tick;
 
-			OPU_PosTimer.Interval = TimeSpan.FromMilliseconds(50);
+			OPU_PosTimer.Interval = TimeSpan.FromMilliseconds(75);
 			OPU_PosTimer.Tick += OPU_PosTimer_Tick;
 
-			OPU_VelTimer.Interval = TimeSpan.FromMilliseconds(100);
+			OPU_VelTimer.Interval = TimeSpan.FromMilliseconds(150);
 			OPU_VelTimer.Tick += OPU_VelTimer_Tick;
 
 			StepTimer.Tick += StepTimer_Tick;
@@ -124,7 +124,7 @@ namespace TCPDevice
 		{
 			if (Client_OPU1 != null)
 			{
-				SendCommand($"MOVER {Step_TgtStep} {Step_TgtVel} {Step_TgtAcc}");
+				SendCommand($"MOVER {Step_TgtStep.Text.Replace(',', '.')} {Step_TgtVel.Text.Replace(',', '.')} {Step_TgtAcc.Text.Replace(',', '.')}");
 				StepTimer.Stop();
 			}
 		}
@@ -183,7 +183,7 @@ namespace TCPDevice
 		{
 			try
 			{
-				IPAddress Address = IPAddress.Parse("192.168.0.101");
+				IPAddress Address = IPAddress.Parse("192.168.0.100");
 				int Port = 2000;
 				Client_OPU1 = new TcpClient(Address.ToString(), Port);
 				DataLog.WriteLog(Logger.LogType.INFO_LOG, "Подключение");
@@ -194,6 +194,7 @@ namespace TCPDevice
 					Stream_OPU1 = Client_OPU1.GetStream();
 					ConnectionCheck.IsChecked = true;
 					OPU_PosTimer.Start();
+					OPU_VelTimer.Start();
 					OPU1_StatusTimer.Start();
 					DataLog.WriteLog(Logger.LogType.INFO_LOG, "Подключено!");
 					await StartReadingDataAsync();
@@ -229,42 +230,16 @@ namespace TCPDevice
 						}
 						string Data = Encoding.UTF8.GetString(Buffer, 0, BytesRead);
 						DataLog.WriteLog(Logger.LogType.GET_LOG, Data);
-						switch (Data)
+						foreach (string SubData in Data.Split('^'))
 						{
-							case "^EN?:1~":
-								PowerCheck.IsChecked = true;
-								break;
-							case "^STOP?:1~":
-								MovingCheck.IsChecked = true;
-								MoveStatus.Fill = Brushes.Green;
-								if (IsStepping && StepTimer.IsEnabled)
-								{
-									StepTimer.Stop();
-								}
-								if (_AttestIsRunning && MoveTaskTimer.IsEnabled)
-								{
-									MoveTaskTimer.Stop();
-								}
-								break;
-							case "^FLT?:0~":
-								InFaultCheck.IsChecked = false;
-								break;
-							case "^INIT?:1~":
-								InitCheck.IsChecked = true;
-								break;
-							default:
-								if (Data.Contains("EN?"))
-								{
-									PowerCheck.IsChecked = false;
-									IsStepping = false;
-									_AttestIsRunning = false;
-									StepTimer.Stop();
-									MoveTaskTimer.Stop();
-								}
-								if (Data.Contains("STOP?"))
-								{
-									MovingCheck.IsChecked = false;
-									MoveStatus.Fill = Brushes.Red;
+							switch (SubData)
+							{
+								case "EN?:1~":
+									PowerCheck.IsChecked = true;
+									break;
+								case "STOP?:1~":
+									MovingCheck.IsChecked = true;
+									MoveStatus.Fill = Brushes.Green;
 									if (IsStepping)
 									{
 										StepTimer.Start();
@@ -273,54 +248,78 @@ namespace TCPDevice
 									{
 										MoveTaskTimer.Start();
 									}
-								}
-								if (Data.Contains("FLT?"))
-								{
-									InFaultCheck.IsChecked = true;
-									IsStepping = false;
-									_AttestIsRunning = false;
-									StepTimer.Stop();
-									MoveTaskTimer.Stop();
-								}
-								if (Data.Contains("INIT?"))
-								{
-									InitCheck.IsChecked = false;
-									IsStepping = false;
-									_AttestIsRunning = false;
-									StepTimer.Stop();
-									MoveTaskTimer.Stop();
-								}
-								if (Data.Contains("POS?"))
-								{
-									string Position = Data.Substring(Data.IndexOf(":") + 1).Replace("~", string.Empty);
-									OPU1_Position = double.Parse(Position, DoubleFormat);
-									Info_CurPos.Text = OPU1_Position.ToString();
-								}
-								if (Data.Contains("APFCD?"))
-								{
-									string Velocity = Data.Substring(Data.IndexOf(":") + 1).Replace("~", string.Empty);
-									APFC_VelList.Add(double.Parse(Velocity,DoubleFormat));
-								}
-								if (Data.Contains("VEL?"))
-								{
-									string Velocity = Data.Substring(Data.IndexOf(":") + 1).Replace("~", string.Empty);
-									OPU1_Velocity = double.Parse(Velocity, DoubleFormat);
-									Info_CurVel.Text = OPU1_Velocity.ToString();
-								}
-								if (Data.Contains("APFCS?"))
-								{
-									string[] Replies = Data.Split(':');
-									if (Replies[1] == "0")
+									break;
+								case "FLT?:0~":
+									InFaultCheck.IsChecked = false;
+									break;
+								case "INIT?:1~":
+									InitCheck.IsChecked = true;
+									break;
+								default:
+									if (SubData.Contains("EN?"))
 									{
-										_APFC_Running = false;
+										PowerCheck.IsChecked = false;
+										//IsStepping = false;
+										//_AttestIsRunning = false;
+										StepTimer.Stop();
+										MoveTaskTimer.Stop();
 									}
-									if (int.Parse(Replies[2]) != APFC_VelList.Count)
+									if (SubData.Contains("STOP?"))
 									{
-										DataLog.WriteLog(Logger.LogType.INFO_LOG, $"Количество принятых ответов не совпало с отправленными: отправлено {int.Parse(Replies[2])}, принято {APFC_VelList.Count}.");
+										MovingCheck.IsChecked = false;
+										MoveStatus.Fill = Brushes.Red;
 									}
-									APFC_TimeMeas = double.Parse(Replies[3].Replace("~",string.Empty), DoubleFormat);
-								}
-								break;
+									if (SubData.Contains("FLT?"))
+									{
+										InFaultCheck.IsChecked = true;
+										//IsStepping = false;
+										//_AttestIsRunning = false;
+										StepTimer.Stop();
+										MoveTaskTimer.Stop();
+									}
+									if (SubData.Contains("INIT?"))
+									{
+										InitCheck.IsChecked = false;
+										//IsStepping = false;
+										//_AttestIsRunning = false;
+										StepTimer.Stop();
+										MoveTaskTimer.Stop();
+									}
+									if (SubData.Contains("POS?"))
+									{
+										string Position = SubData.Substring(SubData.IndexOf(":") + 1, SubData.IndexOf('~') - SubData.IndexOf(':') - 1);
+										OPU1_Position = double.Parse(Position, DoubleFormat);
+										Info_CurPos.Text = OPU1_Position.ToString();
+									}
+									if (SubData.Contains("VEL?"))
+									{
+										string Velocity = SubData.Substring(SubData.IndexOf(":") + 1, SubData.IndexOf('~') - SubData.IndexOf(':') - 1);
+										OPU1_Velocity = double.Parse(Velocity, DoubleFormat);
+										Info_CurVel.Text = OPU1_Velocity.ToString();
+									}
+									if (SubData.Contains("APFCD?"))
+									{
+										string Velocity = SubData.Substring(SubData.IndexOf(":") + 1, SubData.IndexOf('~') - SubData.IndexOf(':') - 1);
+										APFC_VelList.Add(double.Parse(Velocity, DoubleFormat));
+									}
+									if (SubData.Contains("APFCS?"))
+									{
+										string[] Replies = SubData.Split(':');
+										if (Replies[1] == "0")
+										{
+											_APFC_Running = false;
+										}
+										if (int.Parse(Replies[2]) != APFC_VelList.Count)
+										{
+											DataLog.WriteLog(Logger.LogType.INFO_LOG, $"Количество принятых ответов не совпало с отправленными: отправлено {int.Parse(Replies[2])}, принято {APFC_VelList.Count}.");
+										}
+										APFC_TimeMeas = 0.004; /*double.Parse(Replies[3].Replace("~",string.Empty), DoubleFormat);*/
+										APFC_DrawCanvas(APFC_VelList);
+										OPU_PosTimer.Start();
+										OPU_VelTimer.Start();
+									}
+									break;
+							}
 						}
 					}
 					catch (IOException)
@@ -330,6 +329,7 @@ namespace TCPDevice
 						//ConnectStatus.Fill = RedBrush;
 						ConnectionCheck.IsChecked = false;
 						OPU_PosTimer.Stop();
+						OPU_VelTimer.Stop();
 						OPU1_StatusTimer.Stop();
 						break;
 					}
@@ -337,11 +337,12 @@ namespace TCPDevice
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show($"Connection Error: {ex.Message}");
+				MessageBox.Show($"Connection Error: {ex.Message}\n{ex.StackTrace}");
 				DataLog.WriteLog(Logger.LogType.ERR_LOG, "Ошибка подключения при чтении");
 				//ConnectStatus.Fill = RedBrush;
 				ConnectionCheck.IsChecked = false;
 				OPU_PosTimer.Stop();
+				OPU_VelTimer.Stop();
 				OPU1_StatusTimer.Stop();
 			}
 		}
@@ -353,6 +354,7 @@ namespace TCPDevice
 				if (Client_OPU1.Connected)
 				{
 					SendCommand("DIS");
+					Client_OPU1.Close();
 				}
 			}
 			DataLog.Dispose();
@@ -384,8 +386,6 @@ namespace TCPDevice
 			if (Client_OPU1 != null)
 			{
 				IsStepping = false;
-				_APFC_Running = false;
-				_AttestIsRunning = false;
 				if (PowerCheck.IsChecked == false)
 				{
 					if (MessageBox.Show("ВНИМАНИЕ!\n\nПосле подачи питания начнётся плавное движение в позицию нуля!\n\nПродолжить?", "Внимание!", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
@@ -433,7 +433,7 @@ namespace TCPDevice
 				_AttestIsRunning = false;
 				if (PowerCheck.IsChecked == true)
 				{
-					SendCommand($"MOVEA {Abs_TgtPos} {Abs_TgtVel} {Abs_TgtAcc}");
+					SendCommand($"MOVEA {Abs_TgtPos.Text.Replace(',','.')} {Abs_TgtVel.Text.Replace(',', '.')} {Abs_TgtAcc.Text.Replace(',', '.')}");
 				}
 				else
 				{
@@ -451,7 +451,7 @@ namespace TCPDevice
 				_AttestIsRunning = false;
 				if (PowerCheck.IsChecked == true)
 				{
-					SendCommand($"MOVER {Inc_TgtPos} {Inc_TgtVel} {Inc_TgtAcc}");
+					SendCommand($"MOVER {Inc_TgtPos.Text.Replace(',', '.')} {Inc_TgtVel.Text.Replace(',', '.')} {Inc_TgtAcc.Text.Replace(',', '.')}");
 				}
 				else
 				{
@@ -462,14 +462,15 @@ namespace TCPDevice
 
 		private void Step_StartMove_Click(object sender, RoutedEventArgs e)
 		{
-			if (Client_OPU1 == null)
+			if (Client_OPU1 != null)
 			{
+				IsStepping = false;
 				_APFC_Running = false;
 				_AttestIsRunning = false;
 				if (PowerCheck.IsChecked == true)
 				{
-					StepTimer.Interval = TimeSpan.FromMilliseconds(double.Parse(Step_TgtPause.Text) * 1000.0);
-					SendCommand($"MOVER {Step_TgtStep} {Step_TgtVel} {Step_TgtAcc}");
+					StepTimer.Interval = TimeSpan.FromMilliseconds(double.Parse(Step_TgtPause.Text, DoubleFormat) * 1000.0);
+					SendCommand($"MOVER {Step_TgtStep.Text.Replace(',', '.')} {Step_TgtVel.Text.Replace(',', '.')} {Step_TgtAcc.Text.Replace(',', '.')}");
 					IsStepping = true;
 				}
 				else
@@ -489,7 +490,7 @@ namespace TCPDevice
 				_AttestIsRunning = false;
 				if (PowerCheck.IsChecked == true)
 				{
-					SendCommand($"MOVEV {Vel_TgtVel} {Vel_TgtAcc}");
+					SendCommand($"MOVEV {Vel_TgtVel.Text.Replace(',', '.')} {Vel_TgtAcc.Text.Replace(',', '.')}");
 				}
 				else
 				{
@@ -791,40 +792,39 @@ namespace TCPDevice
 					double Amplitude = double.Parse(APFC_TgtAmp.Text, DoubleFormat);
 					int numPeriods = int.Parse(APFC_Periods.Text);
 					double Period = 1.0 / Frequency;
-					double TotalTimePerf = numPeriods * Period;
 					//Measured graph
-					for (int Index = 0; Index < APFC_VelList.Count; Index++)
+					for (int Index = 0; /*Convert.ToDouble(Index) * APFC_TimeMeas <= Period &&*/ Index < APFC_VelList.Count; Index++)
 					{
-						double X = Map(Index * APFC_TimeMeas / 1000, 0, APFC_TimeMeas * APFC_VelList.Count / 1000, 100, 3400);
-						double Y = Map(APFC_VelList[Index], -Amplitude * 1.5, Amplitude * 1.5, 1400, 100);
+						double X = Map(Index * APFC_TimeMeas, 0, Period * numPeriods, 100, 3400);
+						double Y = Map(APFC_VelList[Index], 0, Amplitude * 3, 1400, 100);
 						Point P = new Point(X, Y);
 						Ellipse E = new Ellipse();
 						ToolTip TT = new ToolTip();
-						TT.Content = (APFC_VelList[Index]).ToString();
+						TT.Content = (Index * APFC_TimeMeas).ToString() + " ; " + (APFC_VelList[Index]).ToString();
 						E.ToolTip = TT;
-						E.Width = 6;
-						E.Height = 6;
+						E.Width = 20;
+						E.Height = 20;
 						E.Fill = Brushes.Black;
-						Canvas.SetLeft(E, P.X - 3);
-						Canvas.SetTop(E, P.Y - 3);
+						Canvas.SetLeft(E, P.X - 10);
+						Canvas.SetTop(E, P.Y - 10);
 
 						APFC_Canvas.Children.Add(E);
 					}
-					//Perfect Sine graph
-					for (double Time = 0.0; Time < TotalTimePerf; Time += APFC_TimeMeas / 1000)
+					//Perfect graph
+					for (int Index = 0; Convert.ToDouble(Index) * APFC_TimeMeas <= Period * numPeriods; Index++)
 					{
-						double X = Map(Time, 0, APFC_TimeMeas * APFC_VelList.Count / 1000, 100, 3400);
-						double Y = Map(Amplitude * Math.Sin(2 * Math.PI * Frequency * Time), -Amplitude * 1.5, Amplitude * 1.5, 1400, 100);
+						double X = Map(Index * APFC_TimeMeas, 0, Period * numPeriods, 100, 3400);
+						double Y = Map(Amplitude - Amplitude * Math.Cos(2 * Math.PI * Frequency * Index * APFC_TimeMeas), 0, Amplitude * 3, 1400, 100);
 						Point P = new Point(X, Y);
 						Ellipse E = new Ellipse();
 						ToolTip TT = new ToolTip();
-						TT.Content = (Amplitude * Math.Sin(2 * Math.PI * Frequency * Time)).ToString();
+						TT.Content = (Index * APFC_TimeMeas).ToString() + " ; " + (Amplitude - Amplitude * Math.Cos(2 * Math.PI * Frequency * Index * APFC_TimeMeas)).ToString();
 						E.ToolTip = TT;
-						E.Width = 6;
-						E.Height = 6;
+						E.Width = 20;
+						E.Height = 20;
 						E.Fill = Brushes.Blue;
-						Canvas.SetLeft(E, P.X - 3);
-						Canvas.SetTop(E, P.Y - 3);
+						Canvas.SetLeft(E, P.X - 10);
+						Canvas.SetTop(E, P.Y - 10);
 
 						APFC_Canvas.Children.Add(E);
 					}
@@ -866,19 +866,23 @@ namespace TCPDevice
 		{
 			if (APFC_TgtAmp.Text != string.Empty && APFC_TgtFreq.Text != string.Empty && APFC_Periods.Text != string.Empty)
 			{
-				double V = double.Parse(APFC_TgtAmp.Text, DoubleFormat);
+				double D = double.Parse(APFC_TgtAmp.Text, DoubleFormat);
 				double F = double.Parse(APFC_TgtFreq.Text, DoubleFormat);
+				double V = D * 2 * Math.PI * F;
+				double A = 2 * Math.PI * F * V;
 				int K = int.Parse(APFC_Periods.Text);
 
-				if (6.2831853 * V * F > 3000.0)
+				if (V < 0.1 || V > 7200.0 || A < 0.1 || A> 3000.0)
 				{
-					MessageBox.Show($"Введённые значения выходят за ограничение:\n2π * {V} * {F} ({Math.Round(6.2831853 * V * F, 2)}) ≤ 3000");
+					MessageBox.Show($"Введённые значения не удовлетворяют условиям:\nV = 2 * π * F * D = {V} [0.1; 7200.0]\nA = 2 * π * F * V = {A} [0.1; 3000.0]");
 					return;
 				}
 				else
 				{
 					if (!_APFC_Running)
 					{
+						OPU_PosTimer.Stop();
+						OPU_VelTimer.Stop();
 						SendCommand("DIS");
 						_APFC_Running = true;
 						MessageBox.Show("Запущен режим снятия АФЧХ!\n1. Установите полезную нагрузку\n2. Подайте питание\n3. Проведите инициализацию\n4. Нажмите на кнопку \"Старт\"");

@@ -683,14 +683,14 @@
 								<DataTrigger.EnterActions>
 									<BeginStoryboard>
 										<Storyboard>
-											<ColorAnimation From="Red" To="Green" Storyboard.TargetProperty="Fill"/>
+											<ColorAnimation From="Red" To="Green" Storyboard.TargetProperty="Fill.Color"/>
 										</Storyboard>
 									</BeginStoryboard>
 								</DataTrigger.EnterActions>
 								<DataTrigger.ExitActions>
 									<BeginStoryboard>
 										<Storyboard>
-											<ColorAnimation To="Red" From="Green" Storyboard.TargetProperty="Fill"/>
+											<ColorAnimation To="Red" From="Green" Storyboard.TargetProperty="Fill.Color"/>
 										</Storyboard>
 									</BeginStoryboard>
 								</DataTrigger.ExitActions>
