@@ -350,6 +350,9 @@ namespace TCPDevice
 							break;
 						case 5:
 							SendCommand_OPU1("LIM? Y");
+							OPU1_Status++;
+							break;
+						default:
 							OPU1_Status = 0;
 							break;
 					}
@@ -403,6 +406,9 @@ namespace TCPDevice
 							break;
 						case 8:
 							SendCommand_OPU2("LIM? Y");
+							OPU2_Status++;
+							break;
+						default:
 							OPU2_Status = 0;
 							break;
 					}
@@ -442,21 +448,55 @@ namespace TCPDevice
 		{
 			try
 			{
-				IPAddress Address = IPAddress.Parse("192.168.0.101");
-				int Port = 2000;
-				Client_OPU1 = new TcpClient();
-
-				if (Client_OPU1.ConnectAsync(Address, Port).Wait(5000))
+				if (Client_OPU1 != null)
 				{
-					AC1.OPU_Connected = true;
-					Stream_OPU1 = Client_OPU1.GetStream();
-					OPU1_PosTimer.Start();
-					await StartReadingOPU1DataAsync();
+					if (Client_OPU1.Connected)
+					{
+						Stream_OPU1.Close();
+						Client_OPU1.Close();
+					}
+					else
+					{
+						IPAddress Address = IPAddress.Parse("192.168.0.101");
+						int Port = 2000;
+						Client_OPU1 = new TcpClient();
+
+						if (Client_OPU1.ConnectAsync(Address, Port).Wait(5000))
+						{
+							AC1.OPU_Connected = true;
+							Stream_OPU1 = Client_OPU1.GetStream();
+							if (!OPU1_StatusTimer.IsEnabled)
+							{
+								OPU1_StatusTimer.Start();
+							}
+							OPU1_PosTimer.Start();
+							await StartReadingOPU1DataAsync();
+						}
+						else
+						{
+							AC1.OPU_Connected = false;
+							MessageBox.Show($"Не удалось подключиться по адресу {Address}:{Port}");
+						}
+					}
 				}
 				else
 				{
-					AC1.OPU_Connected = false;
-					MessageBox.Show($"Не удалось подключиться по адресу {Address}:{Port}");
+					IPAddress Address = IPAddress.Parse("192.168.0.101");
+					int Port = 2000;
+					Client_OPU1 = new TcpClient();
+
+					if (Client_OPU1.ConnectAsync(Address, Port).Wait(5000))
+					{
+						AC1.OPU_Connected = true;
+						Stream_OPU1 = Client_OPU1.GetStream();
+						OPU1_PosTimer.Start();
+						await StartReadingOPU1DataAsync();
+					}
+					else
+					{
+						AC1.OPU_Connected = false;
+						MessageBox.Show($"Не удалось подключиться по адресу {Address}:{Port}");
+					}
 				}
 			}
 			catch(Exception ex) {
@@ -469,21 +509,56 @@ namespace TCPDevice
 		{
 			try
 			{
-				IPAddress Address = IPAddress.Parse("192.168.0.102");
-				int Port = 2000;
-				Client_OPU2 = new TcpClient();
-
-				if (Client_OPU2.ConnectAsync(Address, Port).Wait(5000))
+				if (Client_OPU2 != null)
 				{
-					AC2.OPU_Connected = true;
-					Stream_OPU2 = Client_OPU2.GetStream();
-					OPU2_PosTimer.Start();
-					await StartReadingOPU2DataAsync();
+					if (Client_OPU2.Connected)
+					{
+						Stream_OPU2.Close();
+						Client_OPU2.Close();
+						
+					}
+					else
+					{
+						IPAddress Address = IPAddress.Parse("192.168.0.102");
+						int Port = 2000;
+						Client_OPU2 = new TcpClient();
+
+						if (Client_OPU2.ConnectAsync(Address, Port).Wait(5000))
+						{
+							AC2.OPU_Connected = true;
+							Stream_OPU2 = Client_OPU2.GetStream();
+							if (!OPU2_StatusTimer.IsEnabled)
+							{
+								OPU2_StatusTimer.Start();
+							}
+							OPU2_PosTimer.Start();
+							await StartReadingOPU2DataAsync();
+						}
+						else
+						{
+							AC2.OPU_Connected = false;
+							MessageBox.Show($"Не удалось подключиться по адресу {Address}:{Port}");
+						}
+					}
 				}
 				else
 				{
-					AC2.OPU_Connected = false;
-					MessageBox.Show($"Не удалось подключиться по адресу {Address}:{Port}");
+					IPAddress Address = IPAddress.Parse("192.168.0.102");
+					int Port = 2000;
+					Client_OPU2 = new TcpClient();
+
+					if (Client_OPU2.ConnectAsync(Address, Port).Wait(5000))
+					{
+						AC2.OPU_Connected = true;
+						Stream_OPU2 = Client_OPU2.GetStream();
+						OPU2_PosTimer.Start();
+						await StartReadingOPU2DataAsync();
+					}
+					else
+					{
+						AC2.OPU_Connected = false;
+						MessageBox.Show($"Не удалось подключиться по адресу {Address}:{Port}");
+					}
 				}
 			}
 			catch (Exception ex)
@@ -498,100 +573,113 @@ namespace TCPDevice
 			try
 			{
 				byte[] Buffer = new byte[1024];
+				int BytesRead;
+				string Data;
 				while (Client_OPU1.Connected)
 				{
 					try
 					{
-						int BytesRead = await Stream_OPU1.ReadAsync(Buffer);
-						if (BytesRead == 0)
+						if (Stream_OPU1.CanRead)
 						{
-							Client_OPU1.Close();
-							break;
-						}
-						string Data = Encoding.UTF8.GetString(Buffer, 0, BytesRead);
+							BytesRead = await Stream_OPU1.ReadAsync(Buffer);
+							if (BytesRead == 0)
+							{
+								Client_OPU1.Close();
+								break;
+							}
+							Data = Encoding.UTF8.GetString(Buffer, 0, BytesRead);
 
-						switch (Data)
-						{
-							case "^EN?:1~":
-								OPU1_Enabled = true;
-								AC1.OPU_Enabled = OPU1_Enabled;
-								//OPU1_PowerStatus.Fill = GreenBrush;
-								break;
-							case "^STOP?:1:1~":
-								OPU1_Stopped = true;
-								if (OPU1_Zeroing)
-								{
-									SendCommand_OPU1("MOVE Y 1500 50");
-									OPU1_Zeroing = false;
-								}
-								break;
-							case "^FLT?:0:0~":
-								AC1.OPU_InError = false;
-								//OPU1_ClearStatus.Fill = GreenBrush;
-								break;
-							default:
-								if (Data.Contains("EN?"))
-								{
-									OPU1_Enabled = false;
+							switch (Data)
+							{
+								case "^EN?:1~":
+									OPU1_Enabled = true;
 									AC1.OPU_Enabled = OPU1_Enabled;
-									//OPU1_PowerStatus.Fill = RedBrush;
-								}
-								if (Data.Contains("STOP?"))
-								{
-									OPU1_Stopped = false;
-									//OPU1_StopStatus.Fill = RedBrush;
-									
-								}
-								if (Data.Contains("FLT?"))
-								{
-									AC1.OPU_InError = true;
-									//OPU1_ClearStatus.Fill= RedBrush;
-								}
-								if (Data.Contains("POS?"))
-								{
-									string[] Positions = Data.Substring(Data.IndexOf(":") + 1).Split(":");
-									int Index = 0;
-									foreach (string Position in Positions)
+									//OPU1_PowerStatus.Fill = GreenBrush;
+									break;
+								case "^STOP?:1:1~":
+									OPU1_Stopped = true;
+									if (OPU1_Zeroing)
 									{
-										OPU1_Position[Index] = double.Parse(Position.Replace('.',',').Replace("~",string.Empty));
-										Index++;
+										SendCommand_OPU1("MOVE Y 1000 50");
+										OPU1_Zeroing = false;
 									}
-
-									OPU1_PolCurPos.Content = OPU1_Position[0].ToString("0.00°");
-
-									OPU1_YCurPos.Content = OPU1_Position[1].ToString("0.00 мм");
-								}
-								if (Data.Contains("LIM?"))
-								{
-									char Axis = Data[Data.IndexOf(":") - 1];
-									string[] Limits = Data.Substring(Data.IndexOf(":") + 1).Split(":");
-									OPU1_LowerLimits["PY".IndexOf(Axis)] = float.Parse(Limits[0].Replace('.', ',').Replace("~", string.Empty));
-									OPU1_UpperLimits["PY".IndexOf(Axis)] = float.Parse(Limits[1].Replace('.', ',').Replace("~", string.Empty));
-									switch("PY".IndexOf(Axis)){
-										case 0:
-											OPU1_PolLimitsLabel.Content = "[ " + OPU1_LowerLimits["PY".IndexOf(Axis)].ToString() + " ; " + OPU1_UpperLimits["PY".IndexOf(Axis)].ToString() + " ]";
-											break;
-										case 1:
-											OPU1_YLimitsLabel.Content = "[ " + OPU1_LowerLimits["PY".IndexOf(Axis)].ToString() + " ; " + OPU1_UpperLimits["PY".IndexOf(Axis)].ToString() + " ]";
-											break;
+									break;
+								case "^FLT?:0:0~":
+									AC1.OPU_InError = false;
+									//OPU1_ClearStatus.Fill = GreenBrush;
+									break;
+								default:
+									if (Data.Contains("EN?"))
+									{
+										OPU1_Enabled = false;
+										AC1.OPU_Enabled = OPU1_Enabled;
+										//OPU1_PowerStatus.Fill = RedBrush;
 									}
-								}
-								break;
+									if (Data.Contains("STOP?"))
+									{
+										OPU1_Stopped = false;
+										//OPU1_StopStatus.Fill = RedBrush;
+
+									}
+									if (Data.Contains("FLT?"))
+									{
+										AC1.OPU_InError = true;
+										//OPU1_ClearStatus.Fill= RedBrush;
+									}
+									if (Data.Contains("POS?"))
+									{
+										string[] Positions = Data.Substring(Data.IndexOf(":") + 1).Split(":");
+										int Index = 0;
+										foreach (string Position in Positions)
+										{
+											OPU1_Position[Index] = double.Parse(Position.Replace('.', ',').Replace("~", string.Empty));
+											Index++;
+										}
+
+										OPU1_PolCurPos.Content = OPU1_Position[0].ToString("0.00°",DoubleFormat);
+
+										OPU1_YCurPos.Content = OPU1_Position[1].ToString("0.00 мм",DoubleFormat);
+									}
+									if (Data.Contains("LIM?"))
+									{
+										char Axis = Data[Data.IndexOf(":") - 1];
+										string[] Limits = Data.Substring(Data.IndexOf(":") + 1).Split(":");
+										OPU1_LowerLimits["PY".IndexOf(Axis)] = float.Parse(Limits[0].Replace('.', ',').Replace("~", string.Empty));
+										OPU1_UpperLimits["PY".IndexOf(Axis)] = float.Parse(Limits[1].Replace('.', ',').Replace("~", string.Empty));
+										switch ("PY".IndexOf(Axis))
+										{
+											case 0:
+												OPU1_PolLimitsLabel.Content = "[ " + OPU1_LowerLimits["PY".IndexOf(Axis)].ToString(DoubleFormat) + " ; " + OPU1_UpperLimits["PY".IndexOf(Axis)].ToString(DoubleFormat) + " ]";
+												break;
+											case 1:
+												OPU1_YLimitsLabel.Content = "[ " + OPU1_LowerLimits["PY".IndexOf(Axis)].ToString(DoubleFormat) + " ; " + OPU1_UpperLimits["PY".IndexOf(Axis)].ToString(DoubleFormat) + " ]";
+												break;
+										}
+									}
+									break;
+							}
 						}
+						
+						
+
 					}
-					catch (IOException)
+					catch (Exception ex)
 					{
-						MessageBox.Show("Connection error");
+						
+						MessageBox.Show($"Соединение прервано");
 						//OPU1_ConnectStatus.Fill = RedBrush;
 						OPU1_StatusTimer.Stop();
 						OPU1_PosTimer.Stop();
+						AC1.OPU_Connected = false;
 						break;
 					}
 				}
+				return;
 			}
 			catch (Exception ex)
 			{
 				MessageBox.Show($"Connection Error: {ex.Message} {ex.StackTrace}");
+				AC1.OPU_Connected = false;
 				//OPU1_ConnectStatus.Fill = RedBrush;
 				OPU1_StatusTimer.Stop();
 				OPU1_PosTimer.Stop();
@@ -625,7 +713,7 @@ namespace TCPDevice
 								OPU2_Stopped = true;
 								if (OPU2_Zeroing)
 								{
-									SendCommand_OPU2("MOVE Y 1500 25");
+									SendCommand_OPU2("MOVE Y 1000 25");
 									SendCommand_OPU2("MOVE X 0 25");
 									OPU2_Zeroing = false;
 								}
@@ -657,15 +745,15 @@ namespace TCPDevice
 										OPU2_Position[Index] = double.Parse(Position.Replace('.', ',').Replace("~", string.Empty));
 										Index++;
 									}
-									OPU2_AzCurPos.Content = OPU2_Position[0].ToString("0.00°");
+									OPU2_AzCurPos.Content = OPU2_Position[0].ToString("0.00°", DoubleFormat);
 
-									OPU2_UmCurPos.Content = OPU2_Position[1].ToString("0.00°");
+									OPU2_UmCurPos.Content = OPU2_Position[1].ToString("0.00°", DoubleFormat);
 
-									OPU2_PolCurPos.Content = OPU2_Position[2].ToString("0.00°");
+									OPU2_PolCurPos.Content = OPU2_Position[2].ToString("0.00°", DoubleFormat);
 
-									OPU2_XCurPos.Content = OPU2_Position[3].ToString("0.00 мм");
+									OPU2_XCurPos.Content = OPU2_Position[3].ToString("0.00 мм", DoubleFormat);
 
-									OPU2_YCurPos.Content = OPU2_Position[4].ToString("0.00 мм");
+									OPU2_YCurPos.Content = OPU2_Position[4].ToString("0.00 мм", DoubleFormat);
 								}
 								if (Data.Contains("LIM?"))
 								{
@@ -676,28 +764,29 @@ namespace TCPDevice
 									switch ("AEPXY".IndexOf(Axis))
 									{
 										case 0:
-											OPU2_AzLimitsLabel.Content = "[ " + OPU2_LowerLimits["AEPXY".IndexOf(Axis)].ToString() + " ; " + OPU2_UpperLimits["AEPXY".IndexOf(Axis)].ToString() + " ]";
+											OPU2_AzLimitsLabel.Content = "[ " + OPU2_LowerLimits["AEPXY".IndexOf(Axis)].ToString(DoubleFormat) + " ; " + OPU2_UpperLimits["AEPXY".IndexOf(Axis)].ToString(DoubleFormat) + " ]";
 											break;
 										case 1:
-											OPU2_UmLimitsLabel.Content = "[ " + OPU2_LowerLimits["AEPXY".IndexOf(Axis)].ToString() + " ; " + OPU2_UpperLimits["AEPXY".IndexOf(Axis)].ToString() + " ]";
+											OPU2_UmLimitsLabel.Content = "[ " + OPU2_LowerLimits["AEPXY".IndexOf(Axis)].ToString(DoubleFormat) + " ; " + OPU2_UpperLimits["AEPXY".IndexOf(Axis)].ToString(DoubleFormat) + " ]";
 											break;
 										case 2:
-											OPU2_PolLimitsLabel.Content = "[ " + OPU2_LowerLimits["AEPXY".IndexOf(Axis)].ToString() + " ; " + OPU2_UpperLimits["AEPXY".IndexOf(Axis)].ToString() + " ]";
+											OPU2_PolLimitsLabel.Content = "[ " + OPU2_LowerLimits["AEPXY".IndexOf(Axis)].ToString(DoubleFormat) + " ; " + OPU2_UpperLimits["AEPXY".IndexOf(Axis)].ToString(DoubleFormat) + " ]";
 											break;
 										case 3:
-											OPU2_XLimitsLabel.Content = "[ " + OPU2_LowerLimits["AEPXY".IndexOf(Axis)].ToString() + " ; " + OPU2_UpperLimits["AEPXY".IndexOf(Axis)].ToString() + " ]";
+											OPU2_XLimitsLabel.Content = "[ " + OPU2_LowerLimits["AEPXY".IndexOf(Axis)].ToString(DoubleFormat) + " ; " + OPU2_UpperLimits["AEPXY".IndexOf(Axis)].ToString(DoubleFormat) + " ]";
 											break;
 										case 4:
-											OPU2_YLimitsLabel.Content = "[ " + OPU2_LowerLimits["AEPXY".IndexOf(Axis)].ToString() + " ; " + OPU2_UpperLimits["AEPXY".IndexOf(Axis)].ToString() + " ]";
+											OPU2_YLimitsLabel.Content = "[ " + OPU2_LowerLimits["AEPXY".IndexOf(Axis)].ToString(DoubleFormat) + " ; " + OPU2_UpperLimits["AEPXY".IndexOf(Axis)].ToString(DoubleFormat) + " ]";
 											break;
 									}
 								}
 								break;
 						}
 					}
-					catch (IOException)
+					catch (Exception ex)
 					{
-						MessageBox.Show("Connection error");
+						MessageBox.Show($"Соединение прервано");
+						AC2.OPU_Connected = false;
 						OPU2_StatusTimer.Stop();
 						OPU2_PosTimer.Stop();
 						break;
@@ -706,7 +795,8 @@ namespace TCPDevice
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show($"Connection Error: {ex.Message}");
+				MessageBox.Show($"Connection Error: {ex.Message} {ex.StackTrace}");
+				AC2.OPU_Connected = false;
 				OPU2_StatusTimer.Stop();
 				OPU2_PosTimer.Stop();
 			}
@@ -769,24 +859,6 @@ namespace TCPDevice
 			}
 		}
 
-		private void OPU1_AzSetLim_Click(object sender, RoutedEventArgs e)
-		{
-			Axis_OPU1 = "A";
-			Axis_OPU2 = string.Empty;
-			Window LimPopup = new PopupLimits();
-			LimPopup.Owner = this;
-			LimPopup.ShowDialog();
-		}
-
-		private void OPU1_UmSetLim_Click(object sender, RoutedEventArgs e)
-		{
-			Axis_OPU1 = "E";
-			Axis_OPU2 = string.Empty;
-			Window LimPopup = new PopupLimits();
-			LimPopup.Owner = this;
-			LimPopup.ShowDialog();
-		}
-
 		private void OPU1_PolSetLim_Click(object sender, RoutedEventArgs e)
 		{
 			Axis_OPU1 = "P";
@@ -809,7 +881,7 @@ namespace TCPDevice
 		{
 			if (double.TryParse(OPU1_PolTarSpd.Text, DoubleFormat, out double Spd))
 			{
-				SendCommand_OPU1("MOVE P " + OPU1_LowerLimits[2].ToString() + " " + Spd.ToString());
+				SendCommand_OPU1("MOVE P " + OPU1_LowerLimits[0].ToString() + " " + Spd.ToString());
 			}
 		}
 
@@ -833,7 +905,7 @@ namespace TCPDevice
 		{
 			if (double.TryParse(OPU1_PolTarSpd.Text, DoubleFormat, out double Spd))
 			{
-				SendCommand_OPU1("MOVE P " + OPU1_UpperLimits[2].ToString() + " " + Spd.ToString());
+				SendCommand_OPU1("MOVE P " + OPU1_UpperLimits[0].ToString() + " " + Spd.ToString());
 			}
 		}
 
@@ -851,7 +923,7 @@ namespace TCPDevice
 		{
 			if (double.TryParse(OPU1_YTarSpd.Text, DoubleFormat, out double Spd))
 			{
-				SendCommand_OPU1("MOVE Y " + OPU1_LowerLimits[3].ToString() + " " + Spd.ToString());
+				SendCommand_OPU1("MOVE Y " + OPU1_LowerLimits[1].ToString() + " " + Spd.ToString());
 			}
 		}
 
@@ -875,7 +947,7 @@ namespace TCPDevice
 		{
 			if (double.TryParse(OPU1_YTarSpd.Text, DoubleFormat, out double Spd))
 			{
-				SendCommand_OPU1("MOVE Y " + OPU1_UpperLimits[3].ToString() + " " + Spd.ToString());
+				SendCommand_OPU1("MOVE Y " + OPU1_UpperLimits[1].ToString() + " " + Spd.ToString());
 			}
 		}
 
@@ -906,7 +978,7 @@ namespace TCPDevice
 		{
 			if (double.TryParse(OPU1_PolTarSpd.Text, DoubleFormat, out double Spd))
 			{
-				SendCommand_OPU1("MOVE P " + OPU1_LowerLimits[2].ToString() + " " + Spd.ToString());
+				SendCommand_OPU1("MOVE P " + OPU1_LowerLimits[0].ToString() + " " + Spd.ToString());
 			}
 		}
 
@@ -919,7 +991,7 @@ namespace TCPDevice
 		{
 			if (double.TryParse(OPU1_PolTarSpd.Text, DoubleFormat, out double Spd))
 			{
-				SendCommand_OPU1("MOVE P " + OPU1_UpperLimits[2].ToString() + " " + Spd.ToString());
+				SendCommand_OPU1("MOVE P " + OPU1_UpperLimits[0].ToString() + " " + Spd.ToString());
 			}
 		}
 
@@ -932,7 +1004,7 @@ namespace TCPDevice
 		{
 			if (double.TryParse(OPU1_YTarSpd.Text, DoubleFormat, out double Spd))
 			{
-				SendCommand_OPU1("MOVE Y " + OPU1_LowerLimits[3].ToString() + " " + Spd.ToString());
+				SendCommand_OPU1("MOVE Y " + OPU1_LowerLimits[1].ToString() + " " + Spd.ToString());
 			}
 		}
 
@@ -945,7 +1017,7 @@ namespace TCPDevice
 		{
 			if (double.TryParse(OPU1_YTarSpd.Text, DoubleFormat, out double Spd))
 			{
-				SendCommand_OPU1("MOVE Y " + OPU1_UpperLimits[3].ToString() + " " + Spd.ToString());
+				SendCommand_OPU1("MOVE Y " + OPU1_UpperLimits[1].ToString() + " " + Spd.ToString());
 			}
 		}
 
@@ -1484,6 +1556,11 @@ namespace TCPDevice
 
 				}
 			}
+		}
+
+		private void OPU2_PolTarSpd_TextChanged(object sender, TextChangedEventArgs e)
+		{
+
 		}
 	}
 }

@@ -156,11 +156,6 @@
 	</Window.Resources>
 	<TabControl x:Name="Control" Background="#6B728E">
 		<TabItem x:Name="OPU1_Tab" Header="ОПУ 1">
-			<TabItem.ContextMenu>
-				<ContextMenu>
-					<MenuItem x:Name="OPU1_DemoStart" Header="Demo Start" Click="OPU1_DemoStart_Click"/>
-				</ContextMenu>
-			</TabItem.ContextMenu>
 			<Grid x:Name="OPU1_Control" RenderTransformOrigin="0.5,0.5">
 				<Grid.RowDefinitions>
 					<RowDefinition Height="1*"/>
@@ -560,13 +555,7 @@
 								<RowDefinition Height="1*"/>
 							</Grid.RowDefinitions>
 							<Label x:Name="OPU1_PolLimitsLabel" Content="[ 0.0 ; 1.0 ]" FontSize="26" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-							<Button x:Name="OPU1_PolSetLim" Content="Изменить" FontSize="26" Margin="20,0,20,0" Click="OPU1_PolSetLim_Click" Style="{DynamicResource DefBtn}"  Grid.Row="80">
-								<Button.Resources>
-									<Style TargetType="Border">
-										<Setter Property="CornerRadius" Value="10"/>
-									</Style>
-								</Button.Resources>
-							</Button>
+							<Button x:Name="OPU1_PolSetLimit" Content="Изменить" Grid.Row="1" Style="{DynamicResource DefBtn}" FontSize="26" HorizontalAlignment="Center" Width="150" Click="OPU1_PolSetLim_Click"/>
 						</Grid>
 
 
@@ -633,13 +622,7 @@
 								<RowDefinition Height="1*"/>
 							</Grid.RowDefinitions>
 							<Label x:Name="OPU1_YLimitsLabel" Content="[ 0.0 ; 1.0 ]" FontSize="26" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-							<Button x:Name="OPU1_YSetLim" Content="Изменить" Grid.Row="1" FontSize="26" Margin="20,0,20,0" Click="OPU1_YSetLim_Click" Style="{DynamicResource DefBtn}" >
-								<Button.Resources>
-									<Style TargetType="Border">
-										<Setter Property="CornerRadius" Value="10"/>
-									</Style>
-								</Button.Resources>
-							</Button>
+							<Button x:Name="OPU1_YSetLimit" Content="Изменить" Grid.Row="1" Style="{DynamicResource DefBtn}" FontSize="26" HorizontalAlignment="Center" Width="150" Click="OPU1_YSetLim_Click"/>
 						</Grid>
 
 					</Grid>
@@ -647,11 +630,6 @@
 			</Grid>
 		</TabItem>
 		<TabItem x:Name="OPU2_Tab" Header="ОПУ 2">
-			<TabItem.ContextMenu>
-				<ContextMenu>
-					<MenuItem x:Name="OPU2_DemoStart" Header="Demo Start" Click="OPU2_DemoStart_Click"/>
-				</ContextMenu>
-			</TabItem.ContextMenu>
 			<Grid x:Name="OPU2_Control" RenderTransformOrigin="0.5,0.5">
 				<Grid.RowDefinitions>
 					<RowDefinition Height="6*"/>
@@ -1057,13 +1035,7 @@
 								<RowDefinition Height="1*"/>
 							</Grid.RowDefinitions>
 							<Label x:Name="OPU2_AzLimitsLabel" Content="[ 0.0 ; 1.0 ]" Grid.Row="0" FontSize="26" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-							<Button x:Name="OPU2_AzSetLim" Content="Изменить" Grid.Row="1" FontSize="26" Margin="20,0,20,0" Click="OPU2_AzSetLim_Click" Style="{DynamicResource DefBtn}" >
-								<Button.Resources>
-									<Style TargetType="Border">
-										<Setter Property="CornerRadius" Value="10"/>
-									</Style>
-								</Button.Resources>
-							</Button>
+							<Button x:Name="OPU2_AzSetLimit" Content="Изменить" Grid.Row="1" Style="{DynamicResource DefBtn}" FontSize="26" HorizontalAlignment="Center" Width="150" Click="OPU2_AzSetLim_Click"/>
 						</Grid>
 
 
@@ -1128,13 +1100,7 @@
 								<RowDefinition Height="1*"/>
 							</Grid.RowDefinitions>
 							<Label x:Name="OPU2_UmLimitsLabel" Content="[ 0.0 ; 1.0 ]" Grid.Row="0" FontSize="26" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-							<Button x:Name="OPU2_UmSetLim" Content="Изменить" Grid.Row="1" FontSize="26" Margin="20,0,20,0" Click="OPU2_UmSetLim_Click" Style="{DynamicResource DefBtn}" >
-								<Button.Resources>
-									<Style TargetType="Border">
-										<Setter Property="CornerRadius" Value="10"/>
-									</Style>
-								</Button.Resources>
-							</Button>
+							<Button x:Name="OPU2_UmSetLimit" Content="Изменить" Grid.Row="1" Style="{DynamicResource DefBtn}" FontSize="26" HorizontalAlignment="Center" Width="150" Click="OPU2_UmSetLim_Click"/>
 						</Grid>
 
 
@@ -1157,7 +1123,7 @@
 							<TextBlock Style="{DynamicResource TB}" Text="°" VerticalAlignment="Center" FontSize="28" HorizontalAlignment="Left" Margin="5,0,0,0" />
 						</StackPanel>
 						<StackPanel Orientation="Horizontal" Grid.Column="3">
-							<TextBox x:Name="OPU2_PolTarSpd" Width="140" Text="3.0" Grid.Column="3" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" ToolTip="Скорость" TouchDown="OPU1_TextBox_TouchDown"/>
+							<TextBox x:Name="OPU2_PolTarSpd" Width="140" Text="3.0" Grid.Column="3" FontSize="30" VerticalAlignment="Center" HorizontalContentAlignment="Center" ToolTip="Скорость" TouchDown="OPU1_TextBox_TouchDown" TextChanged="OPU2_PolTarSpd_TextChanged"/>
 							<TextBlock Style="{DynamicResource TB}" Text="°/c" VerticalAlignment="Center" FontSize="28" HorizontalAlignment="Left" Margin="5,0,0,0" />
 						</StackPanel>
 						<Grid x:Name="OPU2_PolPosControl" Grid.Row="2"  Grid.Column="4">
@@ -1199,13 +1165,7 @@
 								<RowDefinition Height="1*"/>
 							</Grid.RowDefinitions>
 							<Label x:Name="OPU2_PolLimitsLabel" Content="[ 0.0 ; 1.0 ]" FontSize="26" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-							<Button x:Name="OPU2_PolSetLim" Content="Изменить" FontSize="26" Margin="20,0,20,0" Click="OPU2_PolSetLim_Click" Style="{DynamicResource DefBtn}"  Grid.Row="80">
-								<Button.Resources>
-									<Style TargetType="Border">
-										<Setter Property="CornerRadius" Value="10"/>
-									</Style>
-								</Button.Resources>
-							</Button>
+							<Button x:Name="OPU2_PolSetLimit" Content="Изменить" Grid.Row="1" Style="{DynamicResource DefBtn}" FontSize="26" HorizontalAlignment="Center" Width="150" Click="OPU2_PolSetLim_Click"/>
 						</Grid>
 
 
@@ -1270,13 +1230,7 @@
 								<RowDefinition Height="1*"/>
 							</Grid.RowDefinitions>
 							<Label x:Name="OPU2_XLimitsLabel" Content="[ 0.0 ; 1.0 ]" FontSize="26" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-							<Button x:Name="OPU2_XSetLim" Content="Изменить" Grid.Row="1" FontSize="26" Margin="20,0,20,0" Click="OPU2_XSetLim_Click" Style="{DynamicResource DefBtn}" >
-								<Button.Resources>
-									<Style TargetType="Border">
-										<Setter Property="CornerRadius" Value="10"/>
-									</Style>
-								</Button.Resources>
-							</Button>
+							<Button x:Name="OPU2_XSetLimit" Content="Изменить" Grid.Row="1" Style="{DynamicResource DefBtn}" FontSize="26" HorizontalAlignment="Center" Width="150" Click="OPU2_XSetLim_Click"/>
 						</Grid>
 
 					</Grid>
@@ -1340,13 +1294,7 @@
 								<RowDefinition Height="1*"/>
 							</Grid.RowDefinitions>
 							<Label x:Name="OPU2_YLimitsLabel" Content="[ 0.0 ; 1.0 ]" FontSize="26" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-							<Button x:Name="OPU2_YSetLim" Content="Изменить" Grid.Row="1" FontSize="26" Margin="20,0,20,0" Click="OPU2_YSetLim_Click" Style="{DynamicResource DefBtn}" >
-								<Button.Resources>
-									<Style TargetType="Border">
-										<Setter Property="CornerRadius" Value="10"/>
-									</Style>
-								</Button.Resources>
-							</Button>
+							<Button x:Name="OPU2_YSetLimit" Content="Изменить" Grid.Row="1" Style="{DynamicResource DefBtn}" FontSize="26" HorizontalAlignment="Center" Width="150" Click="OPU2_YSetLim_Click"/>
 						</Grid>
 
 					</Grid>
