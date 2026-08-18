@@ -310,6 +310,10 @@ namespace TCPDevice
 					AC1.OPU_Connected = true;
 					//OPU1_ConnectStatus.Fill = GreenBrush;
 					Stream_OPU1 = Client_OPU1.GetStream();
+					if (!OPU1_StatusTimer.IsEnabled)
+					{
+						OPU1_StatusTimer.Start();
+					}
 					OPU1_PosTimer.Start();
 					await StartReadingOPU1DataAsync();
 				}
@@ -337,6 +341,10 @@ namespace TCPDevice
 				{
 					AC2.OPU_Connected = true;
 					Stream_OPU2 = Client_OPU2.GetStream();
+					if (!OPU2_StatusTimer.IsEnabled)
+					{
+						OPU2_StatusTimer.Start();
+					}
 					OPU2_PosTimer.Start();
 					await StartReadingOPU2DataAsync();
 				}
