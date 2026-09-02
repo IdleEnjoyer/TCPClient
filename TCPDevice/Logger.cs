@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Path = System.IO.Path;
 
@@ -20,12 +21,20 @@ namespace TCPDevice
 
 		private StreamWriter FileStream;
 
-		string DefaultLogPath = AppDomain.CurrentDomain.BaseDirectory + $"\\Logs\\{DateTime.Now.ToString().Replace(':','_')} Log.txt";
+		string DefaultLogPath = AppDomain.CurrentDomain.BaseDirectory + $"\\Logs";
 
 		public Logger()
 		{
-			FileStream = File.CreateText(DefaultLogPath);
-			FileStream.WriteLine($"{DateTime.Now}: ИНФО     : НАЧАЛО ЛОГИРОВАНИЯ");
+			if (Directory.Exists(DefaultLogPath))
+			{
+				FileStream = File.CreateText(DefaultLogPath + $"\\{DateTime.Now.ToString().Replace(':', '_')} Log.txt");
+			}
+			else
+			{
+				Directory.CreateDirectory(DefaultLogPath);
+				FileStream = File.CreateText(DefaultLogPath + $"\\{DateTime.Now.ToString().Replace(':', '_')} Log.txt");
+			}
+				FileStream.WriteLine($"{DateTime.Now}: ИНФО     : НАЧАЛО ЛОГИРОВАНИЯ");
 		}
 
 		public Logger(string FilePath)
@@ -47,7 +56,8 @@ namespace TCPDevice
 				case LogType.SEND_LOG:
 					try
 					{
-						FileStream.WriteLine($"{DateTime.Now}: ОТПРАВКА : {Message}");
+						
+						FileStream.WriteLine($"{DateTime.Now}: ОТПРАВКА : {Message.Replace("\n",string.Empty).Replace("\r",string.Empty)}");
 						return true;
 					}
 					catch

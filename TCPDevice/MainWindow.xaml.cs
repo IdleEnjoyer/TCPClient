@@ -75,8 +75,6 @@ namespace TCPDevice
 		private object PreviousDemo;
 
 		private List<double> APFC_VelList = new List<double>();//new List<double>()
-		private Dictionary<int, double> APFC_Peaks;
-		private double APFC_MeasureCount = 1000;
 		private double APFC_TimeMeas = 4.0;
 		private List<double> APFC_XAxis = new List<double>();
 
@@ -92,15 +90,22 @@ namespace TCPDevice
 
 		private NumberFormatInfo DoubleFormat = new NumberFormatInfo();
 
-		private Logger DataLog = new Logger();
+		private Logger DataLog;
 		public MainWindow()
         {
             InitializeComponent();
 			DoubleFormat.NumberDecimalSeparator = ".";
 
-			
+			if (AppSettings.LogPath != null)
+			{
+				DataLog = new Logger(AppSettings.LogPath);
+			}
+			else
+			{
+				DataLog = new Logger();
+			}
 
-			OPU1_StatusTimer.Interval = TimeSpan.FromMilliseconds(100);
+				OPU1_StatusTimer.Interval = TimeSpan.FromMilliseconds(100);
 			OPU1_StatusTimer.Tick += OPU1_StatusTimer_Tick;
 
 			OPU_PosTimer.Interval = TimeSpan.FromMilliseconds(75);
