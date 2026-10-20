@@ -398,8 +398,8 @@
 	<DockPanel LastChildFill="True">
 		<Menu DockPanel.Dock="Top" FontSize="14" Background="#0F171F">
 			<MenuItem Header="Файл" Foreground="White">
-				<MenuItem x:Name="MenuLogging" Header="Логирование" Click="MenuLogging_Click">
-					<MenuItem x:Name="LoggingFolderChange" Header="Папка" Click="LoggingFolderChange_Click"/>
+				<MenuItem x:Name="MenuLogging" Header="Логирование" Click="MenuLogging_Click" Foreground="Black">
+					<MenuItem x:Name="LoggingFolderChange" Header="Папка" Click="LoggingFolderChange_Click" Foreground="Black"/>
 				</MenuItem>
 			</MenuItem>
 		</Menu>
@@ -670,7 +670,7 @@
 			</Button>
 			<Image VerticalAlignment="Center" HorizontalAlignment="Right" Width="230" Margin="0,0,20,0" Source="TESARTLOGO.png"/>
 		</DockPanel>
-		<StatusBar x:Name="AppStatus" DockPanel.Dock="Bottom" HorizontalContentAlignment="Right" FlowDirection="RightToLeft" Height="21.96" Background="#0F171F">
+		<StatusBar x:Name="AppStatus" DockPanel.Dock="Bottom" HorizontalContentAlignment="Right" Height="21.96" Background="#0F171F">
 			<ProgressBar x:Name="StatusProgress" Width="75" Height="15" IsIndeterminate="True" Visibility="Hidden" HorizontalAlignment="Right"/>
 			<Separator/>
 			<StatusBarItem Content="Готов" Foreground="White" Width="50"/>
@@ -701,7 +701,8 @@
 			</Rectangle>
 			<StatusBarItem Content="Движение" Foreground="White"/>
 			<Separator/>
-			<StatusBarItem x:Name="CanvasSize" Content="%100" Foreground="White"/>
+			<StatusBarItem x:Name="CanvasSize" Content="100%" Foreground="White"/>
+			<StatusBarItem x:Name="TOAmount" Content="100" Foreground="White"/>
 		</StatusBar>
 		<TreeView x:Name="LeftPanel" Width="150" DockPanel.Dock="Left" Background="#0f171f" ScrollViewer.HorizontalScrollBarVisibility="Auto" BorderBrush="{x:Null}" FontSize="16" HorizontalAlignment="Left" ClipToBounds="True" Height="{Binding Height, ElementName=LeftPanel}" Padding="0,0,0,0" BorderThickness="0,0,0,0">
 			<TreeViewItem Style="{DynamicResource TreeViewItem_UserStyle}" Header="Ручное управление" FontWeight="Bold" Focusable="False" Margin="0,10,0,0" >
@@ -710,7 +711,7 @@
 				<TreeViewItem Style="{DynamicResource TreeViewItem_UserStyle}" Header="Шаговое" Selected="Tool_Click" Tag="2"  FontWeight="Normal" FontStyle="Italic" RequestBringIntoView="TreeViewItem_RequestBringIntoView"/>
 				<TreeViewItem Style="{DynamicResource TreeViewItem_UserStyle}" Header="Скоростное" Selected="Tool_Click" Tag="3" FontWeight="Normal" FontStyle="Italic" RequestBringIntoView="TreeViewItem_RequestBringIntoView"/>
 			</TreeViewItem>
-			<TreeViewItem Style="{DynamicResource TreeViewItem_UserStyle}" Header="Снятие АФЧХ" Selected="Tool_Click" Tag="4" FontWeight="Bold"/>
+			<TreeViewItem Style="{DynamicResource TreeViewItem_UserStyle}" Header="АФЧХ" Selected="Tool_Click" Tag="4" FontWeight="Bold"/>
 			<TreeViewItem Style="{DynamicResource TreeViewItem_UserStyle}" Header="Демонстрация" FontWeight="Bold" Selected="Tool_Click" Tag="5"/>
 			<TreeViewItem Style="{DynamicResource TreeViewItem_UserStyle}" Header="Аттестация" FontWeight="Bold" Selected="Tool_Click" Tag="6"/>
 			<CheckBox x:Name="InFaultCheck" IsChecked="False" Visibility="Hidden"/>
@@ -906,21 +907,33 @@
 			</TabItem>
 			<TabItem x:Name="APFC">
 				<StackPanel>
-					<TextBlock Text="Снятие АФЧХ" Style="{DynamicResource LightText}" FontSize="30" Margin="10,10,0,10" />
-					<ScrollViewer x:Name="APFC_ScrollView" Width="717" Height="317" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Visible">
-						<Canvas x:Name="APFC_Canvas" Background="White" Width="3500" Height="1500" MouseWheel="APFC_Canvas_MouseWheel" RenderTransformOrigin="0,0" HorizontalAlignment="Left" VerticalAlignment="Top" PreviewMouseWheel="APFC_Canvas_PreviewMouseWheel">
-							<Canvas.LayoutTransform>
-								<TransformGroup>
-									<ScaleTransform ScaleX="0.2" ScaleY="0.2"/>
-									<SkewTransform/>
-									<RotateTransform/>
-									<TranslateTransform/>
-								</TransformGroup>
-							</Canvas.LayoutTransform>
-							<Line X1="50" Y1="50" X2="50" Y2="1450"/>
-							<Line X1="50" Y1="1450" X2="3450" Y2="1450"/>
-						</Canvas>
-					</ScrollViewer>
+					<TextBlock Text="АФЧХ" Style="{DynamicResource LightText}" FontSize="30" Margin="10,10,0,10" />
+					<Grid Width="865" HorizontalAlignment="Left">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="28*"/>
+							<ColumnDefinition Width="5*"/>
+						</Grid.ColumnDefinitions>
+						<ScrollViewer x:Name="APFC_ScrollView" Grid.Column="0" Width="717" Height="317" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Visible">
+							<Canvas x:Name="APFC_Canvas" Background="White" Width="3500" Height="1500" MouseWheel="APFC_Canvas_MouseWheel" RenderTransformOrigin="0,0" HorizontalAlignment="Left" VerticalAlignment="Top" PreviewMouseWheel="APFC_Canvas_PreviewMouseWheel">
+								<Canvas.LayoutTransform>
+									<TransformGroup>
+										<ScaleTransform ScaleX="0.2" ScaleY="0.2"/>
+										<SkewTransform/>
+										<RotateTransform/>
+										<TranslateTransform/>
+									</TransformGroup>
+								</Canvas.LayoutTransform>
+								<Line X1="50" Y1="50" X2="50" Y2="1450"/>
+								<Line X1="50" Y1="1450" X2="3450" Y2="1450"/>
+							</Canvas>
+						</ScrollViewer>
+						<GroupBox x:Name="APFC_Legend" Header="Легенда" Grid.Column="1" Foreground="White" FontFamily="Cascadia Code Light">
+							<StackPanel x:Name="APFC_LegendContent">
+								
+							</StackPanel>
+						</GroupBox>
+					</Grid>
+					
 
 
 					<Separator Margin="0,5,0,5" Background="#FFD6D6D6"/>

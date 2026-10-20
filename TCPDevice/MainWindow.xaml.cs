@@ -69,14 +69,15 @@ namespace TCPDevice
 		private double _APFC_VerScrollPos = 0.0;
 		private bool _AttestIsRunning = false;
 		private bool _APFC_Running = false;
+		private APFC APFC_Controller = new();
 
 		private bool _Demo_Running = false;
 		private int DemoType = -1;
 		private object PreviousDemo;
 
-		private List<double> APFC_VelList = new List<double>();//new List<double>()
-		private double APFC_TimeMeas = 4.0;
-		private List<double> APFC_XAxis = new List<double>();
+		private List<double> APFC_VelList = new List<double>();
+		private double APFC_TimeMeas = 0.004;
+		private List<Point> APFC_Graph = new();
 
 		private DispatcherTimer OPU1_StatusTimer = new DispatcherTimer();
 		private DispatcherTimer OPU_PosTimer = new DispatcherTimer();
@@ -96,16 +97,26 @@ namespace TCPDevice
             InitializeComponent();
 			DoubleFormat.NumberDecimalSeparator = ".";
 
-			if (AppSettings.LogPath != null)
+			if (AppSettings.LogPath != string.Empty && AppSettings.LogPath != null)
 			{
-				DataLog = new Logger(AppSettings.LogPath);
+				try
+				{
+					DataLog = new Logger(AppSettings.LogPath);
+				}
+				catch (Exception ex)
+				{
+					MessageBox.Show("Не найдена директория хранения логов!\nСброс настроек по-умолчанию.", "Внимание!", MessageBoxButton.OK, MessageBoxImage.Error);
+					DataLog = new Logger();
+					AppSettings.LogPath = string.Empty;
+					AppSettings.Save();
+				}
 			}
 			else
 			{
 				DataLog = new Logger();
 			}
 
-				OPU1_StatusTimer.Interval = TimeSpan.FromMilliseconds(100);
+			OPU1_StatusTimer.Interval = TimeSpan.FromMilliseconds(100);
 			OPU1_StatusTimer.Tick += OPU1_StatusTimer_Tick;
 
 			OPU_PosTimer.Interval = TimeSpan.FromMilliseconds(75);
@@ -129,8 +140,11 @@ namespace TCPDevice
 		{
 			if (Client_OPU1 != null)
 			{
-				SendCommand($"MOVER {Step_TgtStep.Text.Replace(',', '.')} {Step_TgtVel.Text.Replace(',', '.')} {Step_TgtAcc.Text.Replace(',', '.')}");
-				StepTimer.Stop();
+				if (IsStepping)
+				{
+					SendCommand($"MOVER {Step_TgtStep.Text.Replace(',', '.')} {Step_TgtVel.Text.Replace(',', '.')} {Step_TgtAcc.Text.Replace(',', '.')}");
+					StepTimer.Stop();
+				}
 			}
 		}
 
@@ -190,10 +204,10 @@ namespace TCPDevice
 			{
 				IPAddress Address = IPAddress.Parse("192.168.0.100");
 				int Port = 2000;
-				Client_OPU1 = new TcpClient(Address.ToString(), Port);
+				Client_OPU1 = new TcpClient();
 				DataLog.WriteLog(Logger.LogType.INFO_LOG, "Подключение");
 
-				if (Client_OPU1.Connected)
+				if (Client_OPU1.ConnectAsync(Address,Port).Wait(5000))
 				{
 					//ConnectStatus.Fill = GreenBrush;
 					Stream_OPU1 = Client_OPU1.GetStream();
@@ -319,7 +333,7 @@ namespace TCPDevice
 											DataLog.WriteLog(Logger.LogType.INFO_LOG, $"Количество принятых ответов не совпало с отправленными: отправлено {int.Parse(Replies[2])}, принято {APFC_VelList.Count}.");
 										}
 										APFC_TimeMeas = 0.004; /*double.Parse(Replies[3].Replace("~",string.Empty), DoubleFormat);*/
-										APFC_DrawCanvas(APFC_VelList);
+										APFC_DrawCanvas();
 										OPU_PosTimer.Start();
 										OPU_VelTimer.Start();
 									}
@@ -391,6 +405,7 @@ namespace TCPDevice
 			if (Client_OPU1 != null)
 			{
 				IsStepping = false;
+				StepTimer.Stop();
 				if (PowerCheck.IsChecked == false)
 				{
 					if (MessageBox.Show("ВНИМАНИЕ!\n\nПосле подачи питания начнётся плавное движение в позицию нуля!\n\nПродолжить?", "Внимание!", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
@@ -416,6 +431,7 @@ namespace TCPDevice
 			else
 			{
 				IsStepping = false;
+				StepTimer.Stop();
 				Client_OPU1.Close();
 				DataLog.WriteLog(Logger.LogType.INFO_LOG, "Отключение пользователем от сервера");
 			}
@@ -434,6 +450,7 @@ namespace TCPDevice
 			if (Client_OPU1 != null)
 			{
 				IsStepping = false;
+				StepTimer.Stop();
 				_APFC_Running = false;
 				_AttestIsRunning = false;
 				if (PowerCheck.IsChecked == true)
@@ -452,6 +469,7 @@ namespace TCPDevice
 			if (Client_OPU1 != null)
 			{
 				IsStepping = false;
+				StepTimer.Stop();
 				_APFC_Running = false;
 				_AttestIsRunning = false;
 				if (PowerCheck.IsChecked == true)
@@ -470,6 +488,7 @@ namespace TCPDevice
 			if (Client_OPU1 != null)
 			{
 				IsStepping = false;
+				StepTimer.Stop();
 				_APFC_Running = false;
 				_AttestIsRunning = false;
 				if (PowerCheck.IsChecked == true)
@@ -491,6 +510,7 @@ namespace TCPDevice
 			if (Client_OPU1 != null)
 			{
 				IsStepping = false;
+				StepTimer.Stop();
 				_APFC_Running = false;
 				_AttestIsRunning = false;
 				if (PowerCheck.IsChecked == true)
@@ -510,6 +530,7 @@ namespace TCPDevice
 			{
 				SendCommand("STOP");
 				IsStepping = false;
+				StepTimer.Stop();
 				_APFC_Running = false;
 				_AttestIsRunning = false;
 			}
@@ -562,6 +583,7 @@ namespace TCPDevice
 						_AttestIsRunning = true;
 						_APFC_Running = false;
 						IsStepping = false;
+						StepTimer.Stop();
 						MessageBox.Show("Запущен режим аттестации!\nПодайте питание и совершите инициализацию для продолжения!","Внимание!",MessageBoxButton.OK, MessageBoxImage.Exclamation);
 					}
 				}
@@ -689,7 +711,7 @@ namespace TCPDevice
 
 		private void EmStop_Click(object sender, RoutedEventArgs e)
 		{
-
+			SendCommand("");
 		}
 
 		private void TotalProgressBar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -746,104 +768,88 @@ namespace TCPDevice
 			switch (e.Key)
 			{
 				case Key.OemPlus:
-					Attest_Variant_DigMeasSystErr_TotalProgress.Value += 1;
+					CheckBox CB = new();
+					CB.Content = "TEST";
+					CB.Foreground = Brushes.White;
+					APFC_LegendContent.Children.Add(CB);
 					break;
 				case Key.OemMinus:
-					Attest_Variant_DigMeasSystErr_TotalProgress.Value -= 1;
+					APFC_LegendContent.Children.Clear();
 					break;
-				case Key.Return:
-					APFC_DrawCanvas(APFC_XAxis);
+				case Key.RightCtrl:
+					APFC_DrawCanvas();
 					break;
 			}
 		}
 
-		public static double Map(double value, double inputMin, double inputMax, double outputMin, double outputMax)
-		{
-			return ((value - inputMin) / (inputMax - inputMin)) * (outputMax - outputMin) + outputMin;
-		}
+		
 
-		private void APFC_DrawCanvas(List<double> Points)
+		private void APFC_DrawCanvas()
 		{
 			try
 			{
 				APFC_Canvas.Children.Clear();
-				Line YAxis = new Line();
-				YAxis.X1 = 50;
-				YAxis.Y1 = 50;
-				YAxis.X2 = 50;
-				YAxis.Y2 = 1450;
+				double Frequency = double.Parse(APFC_TgtFreq.Text, DoubleFormat);
+				double Amplitude = double.Parse(APFC_TgtAmp.Text, DoubleFormat);
+				int numPeriods = int.Parse(APFC_Periods.Text);
+				double Period = 1.0 / Frequency;
+				APFC_Controller.MaxY = Amplitude * 3;
+				APFC_Graph.Clear();
 
-				Line XAxis = new Line();
-				XAxis.X1 = 50;
-				XAxis.Y1 = 1450;
-				XAxis.X2 = 3450;
-				XAxis.Y2 = 1450;
-
-				Line Zero = new Line();
-				Zero.X1 = 50;
-				Zero.Y1 = 750;
-				Zero.X2 = 3450;
-				Zero.Y2 = 750;
-				Zero.Opacity = 0.2;
-				Zero.StrokeDashArray = new DoubleCollection { 6, 12 };
-
-				APFC_Canvas.Children.Add(YAxis);
-				APFC_Canvas.Children.Add(XAxis);
-				APFC_Canvas.Children.Add(Zero);
 				if (APFC_VelList.Count > 0)
 				{
-					APFC_XAxis.Clear();
-					double Frequency = double.Parse(APFC_TgtFreq.Text, DoubleFormat);
-					double Amplitude = double.Parse(APFC_TgtAmp.Text, DoubleFormat);
-					int numPeriods = int.Parse(APFC_Periods.Text);
-					double Period = 1.0 / Frequency;
 					//Measured graph
 					for (int Index = 0; /*Convert.ToDouble(Index) * APFC_TimeMeas <= Period &&*/ Index < APFC_VelList.Count; Index++)
 					{
-						double X = Map(Index * APFC_TimeMeas, 0, Period * numPeriods, 100, 3400);
-						double Y = Map(APFC_VelList[Index], 0, Amplitude * 3, 1400, 100);
-						Point P = new Point(X, Y);
-						Ellipse E = new Ellipse();
-						ToolTip TT = new ToolTip();
-						TT.Content = (Index * APFC_TimeMeas).ToString() + " ; " + (APFC_VelList[Index]).ToString();
-						E.ToolTip = TT;
-						E.Width = 20;
-						E.Height = 20;
-						E.Fill = Brushes.Black;
-						Canvas.SetLeft(E, P.X - 10);
-						Canvas.SetTop(E, P.Y - 10);
+						double X = Index * APFC_TimeMeas;//, 0, Period * numPeriods, 100, 3400);
+						double Y = APFC_VelList[Index];//, 0, Amplitude * 3, 1400, 100);
+						APFC_Graph.Add(new(X, Y));
+						//Point P = new Point(X, Y);
+						//Ellipse E = new Ellipse();
+						//ToolTip TT = new ToolTip();
+						//TT.Content = (Index * APFC_TimeMeas).ToString() + " ; " + (APFC_VelList[Index]).ToString();
+						//E.ToolTip = TT;
+						//E.Width = 20;
+						//E.Height = 20;
+						//E.Fill = Brushes.Black;
+						//Canvas.SetLeft(E, P.X - E.Width);
+						//Canvas.SetTop(E, P.Y - E.Width);
 
-						APFC_Canvas.Children.Add(E);
+						//APFC_Canvas.Children.Add(E);
 					}
-					//Perfect graph
-					for (int Index = 0; Convert.ToDouble(Index) * APFC_TimeMeas <= Period * numPeriods; Index++)
-					{
-						double X = Map(Index * APFC_TimeMeas, 0, Period * numPeriods, 100, 3400);
-						double Y = Map(Amplitude - Amplitude * Math.Cos(2 * Math.PI * Frequency * Index * APFC_TimeMeas), 0, Amplitude * 3, 1400, 100);
-						Point P = new Point(X, Y);
-						Ellipse E = new Ellipse();
-						ToolTip TT = new ToolTip();
-						TT.Content = (Index * APFC_TimeMeas).ToString() + " ; " + (Amplitude - Amplitude * Math.Cos(2 * Math.PI * Frequency * Index * APFC_TimeMeas)).ToString();
-						E.ToolTip = TT;
-						E.Width = 20;
-						E.Height = 20;
-						E.Fill = Brushes.Blue;
-						Canvas.SetLeft(E, P.X - 10);
-						Canvas.SetTop(E, P.Y - 10);
-
-						APFC_Canvas.Children.Add(E);
-					}
-
+					
 					//Mark Peaks
 				}
+				//Perfect graph
+				for (int Index = 0; Convert.ToDouble(Index) * APFC_TimeMeas <= Period * numPeriods; Index++)
+				{
+					double X = Index * APFC_TimeMeas;//, 0, Period * numPeriods, 100, 3400);
+					double Y = (Amplitude - Amplitude * Math.Cos(2 * Math.PI * Frequency * Index * APFC_TimeMeas)) % 360.0;//, 0, Amplitude * 3, 1400, 100);
+					APFC_Graph.Add(new(X, Y));
+					//Ellipse E = new Ellipse();
+					//ToolTip TT = new ToolTip();
+					//TT.Content = (Index * APFC_TimeMeas).ToString() + " ; " + (Amplitude - Amplitude * Math.Cos(2 * Math.PI * Frequency * Index * APFC_TimeMeas)).ToString();
+					//E.ToolTip = TT;
+					//E.Width = 20;
+					//E.Height = 20;
+					//E.Fill = Brushes.Blue;
+					//Canvas.SetLeft(E, P.X - E.Width);
+					//Canvas.SetTop(E, P.Y - E.Width);
 
+					//APFC_Canvas.Children.Add(E);
+				}
+				APFC_Controller.AddGraph("Ideal", APFC_Graph);
+				if (APFC_Graph != null)
+				{
+					APFC_Controller.Draw(APFC_Canvas);
+				}
 				return;
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show(ex.Message);
+				MessageBox.Show($"{ex.Message}\n{ex.StackTrace}");
 			}
-		}
+}
 
 		private void APFC_Canvas_MouseWheel(object sender, MouseWheelEventArgs e)
 		{
@@ -851,7 +857,7 @@ namespace TCPDevice
 			
 			_APFC_CanvasScale = Math.Min(_APFC_CanvasMaxScale, _APFC_CanvasScale);
 			_APFC_CanvasScale = Math.Max(_APFC_CanvasMinScale, _APFC_CanvasScale);
-			CanvasSize.Content = "%" + Math.Round(_APFC_CanvasScale * 500).ToString();
+			CanvasSize.Content = Math.Round(_APFC_CanvasScale * 500).ToString() + "%";
 			Point MousePoint = e.GetPosition(APFC_Canvas);
 			APFC_Canvas.RenderTransformOrigin = new Point(MousePoint.X / APFC_Canvas.ActualWidth, MousePoint.Y / APFC_Canvas.ActualHeight);
 			ScaleTransform ST = new ScaleTransform(_APFC_CanvasScale, _APFC_CanvasScale);
@@ -959,6 +965,6 @@ namespace TCPDevice
 	}
 }
 //TODO:
-//EN - предупреждение о движении в ноль
-//INIT - предупредение о резком старте движения
-//SH - предупреждение о снятии и подаче питания на позиционер
+//TO? OH?
+//APFC, Нормализацию графика, 1.5 амплитуды вывести, поиск пиков, компенсация сдвига фазы, расчет амплитуды, отколнение амплитуды, сдвиг фазы
+//Аттестация, 
