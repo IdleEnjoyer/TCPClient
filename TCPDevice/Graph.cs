@@ -25,6 +25,11 @@ namespace TCPDevice
 			return MeasurePoints;
 		}
 
+		public void SetMeasure(List<Point> List)
+		{
+			MeasurePoints = List;
+		}
+
 		public List<Point> GetGraph()
 		{
 			return CanvasPoints;
@@ -61,6 +66,23 @@ namespace TCPDevice
 			{
 				MinPoint = point;
 			}
+		}
+
+		public void SetMaxPoint(Point point)
+		{
+			MaxPoint = point;
+		}
+		public Point GetMaxPoint()
+		{
+			return MaxPoint;
+		}
+		public void SetMinPoint(Point point)
+		{
+			MinPoint = point;
+		}
+		public Point GetMinPoint()
+		{
+			return MinPoint;
 		}
 
 		public Graph(string Name, List<Point> Points, Brush GColor)

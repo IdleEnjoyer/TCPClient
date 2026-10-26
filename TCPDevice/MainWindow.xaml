@@ -914,7 +914,7 @@
 							<ColumnDefinition Width="5*"/>
 						</Grid.ColumnDefinitions>
 						<ScrollViewer x:Name="APFC_ScrollView" Grid.Column="0" Width="717" Height="317" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Visible">
-							<Canvas x:Name="APFC_Canvas" Background="White" Width="3500" Height="1500" MouseWheel="APFC_Canvas_MouseWheel" RenderTransformOrigin="0,0" HorizontalAlignment="Left" VerticalAlignment="Top" PreviewMouseWheel="APFC_Canvas_PreviewMouseWheel">
+							<Canvas x:Name="APFC_Canvas" Background="White" Width="10000" Height="5000" MouseWheel="APFC_Canvas_MouseWheel" RenderTransformOrigin="0,0" HorizontalAlignment="Left" VerticalAlignment="Top" PreviewMouseWheel="APFC_Canvas_PreviewMouseWheel">
 								<Canvas.LayoutTransform>
 									<TransformGroup>
 										<ScaleTransform ScaleX="0.2" ScaleY="0.2"/>
@@ -923,8 +923,8 @@
 										<TranslateTransform/>
 									</TransformGroup>
 								</Canvas.LayoutTransform>
-								<Line X1="50" Y1="50" X2="50" Y2="1450"/>
-								<Line X1="50" Y1="1450" X2="3450" Y2="1450"/>
+								<Line X1="50" Y1="50" X2="50" Y2="4950"/>
+								<Line X1="50" Y1="1450" X2="9950" Y2="1450"/>
 							</Canvas>
 						</ScrollViewer>
 						<GroupBox x:Name="APFC_Legend" Header="Легенда" Grid.Column="1" Foreground="White" FontFamily="Cascadia Code Light">
@@ -962,7 +962,8 @@
 						<TextBox Style="{DynamicResource TextInput_UserStyle}" x:Name="APFC_Periods" Grid.Column="1" Grid.Row="2" Width="180" Height="30" HorizontalAlignment="Left" Margin="10,5,10,5" FontSize="18"/>
 
 						<TextBlock Style="{DynamicResource LightText}" Text="Результат:" Grid.Column="3" Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="18"/>
-						<TextBox Background="Transparent" Foreground="White" FontFamily="Bahnschrift" FontSize="18" Grid.Column="3" Grid.Row="1" BorderThickness="0" Text="" IsReadOnly="True" TextWrapping="Wrap" VerticalAlignment="Center" />
+						<TextBox x:Name="APFC_ResultAmpTB" Background="Transparent" Foreground="White" FontFamily="Bahnschrift" FontSize="18" Grid.Column="3" Grid.Row="1" BorderThickness="0" Text="" IsReadOnly="True" TextWrapping="Wrap" VerticalAlignment="Center" />
+						<TextBox x:Name="APFC_ResultPhsTB" Background="Transparent" Foreground="White" FontFamily="Bahnschrift" FontSize="18" Grid.Column="3" Grid.Row="2" BorderThickness="0" Text="" IsReadOnly="True" TextWrapping="Wrap" VerticalAlignment="Center" />
 					</Grid>
 
 					<Grid Width="200" Height="50" HorizontalAlignment="Left" Margin="10,20,0,0" >

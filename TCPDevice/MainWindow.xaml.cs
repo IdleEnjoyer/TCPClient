@@ -84,6 +84,7 @@ namespace TCPDevice
 		private DispatcherTimer OPU_VelTimer = new DispatcherTimer();
 		private DispatcherTimer StepTimer = new DispatcherTimer();
 		private DispatcherTimer MoveTaskTimer = new DispatcherTimer();
+		private int MoveTaskStep = 0;
 		private int OPU1_Status = 0;
 		private byte[] WriteByteData;
 		private int ValidationFlags = 0b_111111111111;
@@ -333,7 +334,7 @@ namespace TCPDevice
 											DataLog.WriteLog(Logger.LogType.INFO_LOG, $"Количество принятых ответов не совпало с отправленными: отправлено {int.Parse(Replies[2])}, принято {APFC_VelList.Count}.");
 										}
 										APFC_TimeMeas = 0.004; /*double.Parse(Replies[3].Replace("~",string.Empty), DoubleFormat);*/
-										APFC_DrawCanvas();
+										APFC_Calculate();
 										OPU_PosTimer.Start();
 										OPU_VelTimer.Start();
 									}
@@ -611,19 +612,23 @@ namespace TCPDevice
 							{
 								MoveTaskTimer.Tick -= MoveTask_Handler;
 							}
+							MoveTaskStep = 0;
 							MoveTask_Handler = (sender, e) =>
 							{
-								if (MoveTask_CurPos + MoveTask_Step <= MoveTask_EndPos)
+								if (MoveTaskStep < 72)
 								{
 									MoveTask_CurPos += MoveTask_Step;
 									SendCommand($"MOVER {MoveTask_Step} 6 6");
 									Attest_Variant_DigMeasSystErr_StepProgress.Value++;
+									MoveTaskStep++;
 									MoveTaskTimer.Stop();
 								}
 								else
 								{
 									Attest_Variant_DigMeasSystErr_TotalProgress.Value++;
 									MoveTaskTimer.Stop();
+									
+									MoveTaskTimer.Tick -= MoveTask_Handler;
 									MessageBox.Show("Этап закончен, наимте \"Далее\" для продолжения");
 									if (Attest_Variant_DigMeasSystErr_TotalProgress.Value == 4)
 									{
@@ -631,7 +636,8 @@ namespace TCPDevice
 									}
 								}
 							};
-							
+							MoveTaskTimer.Interval = TimeSpan.FromMilliseconds(2000);
+							MoveTaskTimer.Tick += MoveTask_Handler;
 							switch (Attest_Variant_DigMeasSystErr_TotalProgress.Value){
 								case 0:
 								{
@@ -777,14 +783,20 @@ namespace TCPDevice
 					APFC_LegendContent.Children.Clear();
 					break;
 				case Key.RightCtrl:
-					APFC_DrawCanvas();
+					foreach (UIElement E in APFC_Canvas.Children)
+					{
+						if (E.GetType() == typeof(Ellipse))
+						{
+							((Ellipse)E).Fill = Brushes.Black;
+						}
+					}
 					break;
 			}
 		}
 
 		
 
-		private void APFC_DrawCanvas()
+		private void APFC_Calculate()
 		{
 			try
 			{
@@ -794,8 +806,11 @@ namespace TCPDevice
 				int numPeriods = int.Parse(APFC_Periods.Text);
 				double Period = 1.0 / Frequency;
 				APFC_Controller.MaxY = Amplitude * 3;
-				APFC_Graph.Clear();
+				APFC_Controller.MaxX = Period * 1.5;
+				APFC_Controller.Frequency = Frequency;
+				APFC_Controller.PeriodPoints = (int)(Period / APFC_TimeMeas);
 
+				APFC_Graph.Clear();
 				if (APFC_VelList.Count > 0)
 				{
 					//Measured graph
@@ -804,44 +819,24 @@ namespace TCPDevice
 						double X = Index * APFC_TimeMeas;//, 0, Period * numPeriods, 100, 3400);
 						double Y = APFC_VelList[Index];//, 0, Amplitude * 3, 1400, 100);
 						APFC_Graph.Add(new(X, Y));
-						//Point P = new Point(X, Y);
-						//Ellipse E = new Ellipse();
-						//ToolTip TT = new ToolTip();
-						//TT.Content = (Index * APFC_TimeMeas).ToString() + " ; " + (APFC_VelList[Index]).ToString();
-						//E.ToolTip = TT;
-						//E.Width = 20;
-						//E.Height = 20;
-						//E.Fill = Brushes.Black;
-						//Canvas.SetLeft(E, P.X - E.Width);
-						//Canvas.SetTop(E, P.Y - E.Width);
-
-						//APFC_Canvas.Children.Add(E);
 					}
-					
-					//Mark Peaks
 				}
+				APFC_Controller.AddGraph("Измеренное", APFC_Graph);
+				APFC_Graph.Clear();
 				//Perfect graph
 				for (int Index = 0; Convert.ToDouble(Index) * APFC_TimeMeas <= Period * numPeriods; Index++)
 				{
 					double X = Index * APFC_TimeMeas;//, 0, Period * numPeriods, 100, 3400);
-					double Y = (Amplitude - Amplitude * Math.Cos(2 * Math.PI * Frequency * Index * APFC_TimeMeas)) % 360.0;//, 0, Amplitude * 3, 1400, 100);
+					double Y = (Amplitude - Amplitude * Math.Cos(2 * Math.PI * Frequency * (Index * APFC_TimeMeas - 0.015))) % 360.0;//, 0, Amplitude * 3, 1400, 100);
 					APFC_Graph.Add(new(X, Y));
-					//Ellipse E = new Ellipse();
-					//ToolTip TT = new ToolTip();
-					//TT.Content = (Index * APFC_TimeMeas).ToString() + " ; " + (Amplitude - Amplitude * Math.Cos(2 * Math.PI * Frequency * Index * APFC_TimeMeas)).ToString();
-					//E.ToolTip = TT;
-					//E.Width = 20;
-					//E.Height = 20;
-					//E.Fill = Brushes.Blue;
-					//Canvas.SetLeft(E, P.X - E.Width);
-					//Canvas.SetTop(E, P.Y - E.Width);
-
-					//APFC_Canvas.Children.Add(E);
 				}
-				APFC_Controller.AddGraph("Ideal", APFC_Graph);
-				if (APFC_Graph != null)
+				APFC_Controller.AddGraph("Теоретическое", APFC_Graph);
+				APFC_Graph.Clear();
+				APFC_Controller.Draw(APFC_Canvas);
+				if (APFC_Controller.GetGraphCount() > 1)
 				{
-					APFC_Controller.Draw(APFC_Canvas);
+					APFC_ResultAmpTB.Text = APFC_Controller.ShowResults()[0].ToString() + "%";
+					APFC_ResultPhsTB.Text = APFC_Controller.ShowResults()[1].ToString() + "°";
 				}
 				return;
 			}
@@ -902,6 +897,8 @@ namespace TCPDevice
 					{
 						try
 						{
+							APFC_Controller.ClearGraph();
+							APFC_VelList.Clear();
 							if (PowerCheck.IsChecked == false)
 							{
 								throw new Exception("Не подано питание при снятии АФЧХ!");
